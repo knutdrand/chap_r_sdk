@@ -40,8 +40,9 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# pkgdown site
-docs/
+# pkgdown site (but keep docs/decisions for ADRs)
+docs/*
+!docs/decisions/
 
 # translation temp files
 po/*~
