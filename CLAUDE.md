@@ -44,3 +44,51 @@ devtools::check()           # Run R CMD check
 testthat::test_file("tests/testthat/test-file.R")  # Run single test file
 devtools::test_active_file()                        # Test currently open file
 ```
+
+## Best Practices and Pre-Push Checklist
+
+**IMPORTANT**: Before committing or pushing code, ALWAYS verify the following:
+
+### Code Organization
+- New functions are placed in the appropriate R source file:
+  - CLI functions → `R/cli.R`
+  - Validation functions → `R/validation.R`
+  - Configuration functions → `R/config.R`
+  - Spatio-temporal functions → `R/spatial_temporal.R`
+- Each function has complete roxygen2 documentation with `@param`, `@return`, `@export`, and `@examples`
+- Related test files exist in `tests/testthat/test-*.R` matching the source file name
+
+### Documentation
+- All exported functions have roxygen2 documentation blocks
+- Documentation includes meaningful examples (even if wrapped in `\dontrun{}`)
+- After adding/modifying functions, run `devtools::document()` to update NAMESPACE and man files
+
+### Testing
+- Every new function has corresponding tests in `tests/testthat/`
+- Tests follow the naming pattern: `test_that("function_name does expected behavior", { ... })`
+- Run `devtools::test()` to ensure all tests pass
+- Tests should be meaningful, not just placeholder `skip()` calls
+
+### Package Validation
+- Run `devtools::check()` before pushing to catch:
+  - Missing documentation
+  - NAMESPACE issues
+  - Undefined global variables
+  - Code quality issues
+- Address all ERRORS and WARNINGS (NOTEs are acceptable but should be reviewed)
+
+### Code Quality
+- Follow tidyverse style guide conventions
+- Use meaningful variable and function names
+- Avoid code duplication - extract common logic into helper functions
+- Functions should have clear, single responsibilities
+
+### Dependencies
+- Only add new dependencies to DESCRIPTION if truly necessary
+- Use `Imports:` for packages required for the package to work
+- Use `Suggests:` for packages only needed for tests, vignettes, or optional features
+
+### Version Control
+- Commit messages should be clear and descriptive
+- Group related changes together in single commits
+- Don't commit generated files (man/*.Rd files are auto-generated but should be committed)
