@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.github$
+^\.idea$
+^\.claude$
+^\.mcp\.json$
+^LICENSE\.md$
+^README\.Rmd$
+^CLAUDE\.md$
+^data-raw$
+^vignettes/articles$
