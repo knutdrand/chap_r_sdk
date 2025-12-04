@@ -8,7 +8,6 @@
   - Automatic CSV loading and tsibble conversion
   - Auto-detection of time and key columns
   - Subcommand dispatch (train/predict/info)
-  - 41% code reduction compared to legacy pattern
 
 * **Configuration Management**:
   - `read_model_config()` for YAML configuration parsing
@@ -20,10 +19,6 @@
   - Mean model baseline example demonstrating unified CLI pattern
   - EWARS spatio-temporal model example
 
-### Deprecated
-
-* `create_train_cli()` - Use `create_chap_cli()` instead
-* `create_predict_cli()` - Use `create_chap_cli()` instead
 
 ### Infrastructure
 

@@ -6,13 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an R package (chap_r_sdk) that provides convenience functionality for developing chap-compatible models and integrating existing models with the chap system. The package is tidyverse-oriented and follows R best practices.
 
+### Jira Epic
+
+**Epic:** [CLIM-201 - CHAP R SDK Development](https://dhis2.atlassian.net/browse/CLIM-201)
 ## Core Functionality
 
 The SDK provides three main areas of functionality:
 
 1. **CLI Interface Creation**: Unified CLI infrastructure with automatic file I/O handling:
-   - **NEW**: `create_chap_cli(train_fn, predict_fn, schema)` - Single unified CLI with subcommand dispatch
-   - **Deprecated**: `create_train_cli()` and `create_predict_cli()` - Legacy separate CLI wrappers
+   - `create_chap_cli(train_fn, predict_fn, schema)` - Single unified CLI with subcommand dispatch
    - Automatically handles CSV loading, tsibble conversion, YAML config parsing, and output saving
    - Model functions receive loaded data objects, not file paths
 
@@ -33,9 +35,9 @@ This is an early-stage project with skeleton code structure. When implementing:
 
 ## Examples
 
-### Mean Model Example (Recommended Pattern)
+### Mean Model Example
 
-The **recommended pattern** for new models is shown in `examples/mean_model/model.R`. This uses the unified CLI interface:
+The standard pattern for models is shown in `examples/mean_model/model.R`. This uses the unified CLI interface:
 
 ```r
 library(chap.r.sdk)
@@ -81,7 +83,6 @@ Rscript model.R info
 ```
 
 **Key Benefits:**
-- **41% less code** compared to legacy pattern
 - **Zero file I/O boilerplate** - handled automatically
 - **Single file** - train and predict together
 - **Automatic detection** of time and key columns
@@ -89,19 +90,16 @@ Rscript model.R info
 
 See `examples/mean_model/README.md` for detailed documentation.
 
-### EWARS Model Example (Legacy Pattern)
+### EWARS Model Example
 
-A complex working example using the **legacy pattern** is available in `examples/ewars_model/`. This demonstrates:
+A complex working example is available in `examples/ewars_model/`. This demonstrates:
 
-- Using deprecated `create_train_cli()` and `create_predict_cli()` wrappers
 - YAML configuration parsing with `read_model_config()`
 - Safe parameter extraction with `get_config_param()`
 - Models that combine training and prediction in a single step
 - Handling spatio-temporal data with covariates
 
 See `examples/ewars_model/README.md` for detailed documentation and `examples/ewars_model/MIGRATION_TO_CHAP_SDK.md` for migration guide from legacy code.
-
-**Note:** For new models, use the unified `create_chap_cli()` pattern shown in the Mean Model Example instead.
 
 ## Standard R Package Commands
 
