@@ -15,9 +15,26 @@ The package is tidyverse-oriented and follows best practices in R development.
 
 ## Installation
 
+### Development Version (from GitHub)
+
+You can install the development version of chap.r.sdk from GitHub:
+
 ```r
-# Install from GitHub
+# Using remotes (recommended)
+install.packages("remotes")
+remotes::install_github("knutdrand/chap_r_sdk")
+
+# Or using devtools
+install.packages("devtools")
 devtools::install_github("knutdrand/chap_r_sdk")
+```
+
+### CRAN Version (Coming Soon)
+
+Once published on CRAN, you'll be able to install with:
+
+```r
+install.packages("chap.r.sdk")
 ```
 
 ## Quick Start
