@@ -1,3 +1,111 @@
+#' Read Model Configuration
+#'
+#' Reads a YAML configuration file and optionally validates it against a schema
+#'
+#' @param config_path Path to YAML configuration file
+#' @param schema_path Path to JSON schema file (optional)
+#' @param validate Logical, whether to validate against schema (default: TRUE)
+#'
+#' @return List containing parsed configuration
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' config <- read_model_config("model_config.yaml")
+#' config <- read_model_config("model_config.yaml", "schema.json", validate = TRUE)
+#' }
+read_model_config <- function(config_path, schema_path = NULL, validate = TRUE) {
+  if (!file.exists(config_path)) {
+    stop("Configuration file not found: ", config_path)
+  }
+
+  # Parse YAML with error handling
+  config <- tryCatch(
+    yaml::yaml.load_file(config_path),
+    error = function(e) {
+      stop("Failed to parse YAML configuration: ", e$message, call. = FALSE)
+    }
+  )
+
+  # Validate if schema provided (requires ajv package)
+  if (validate && !is.null(schema_path)) {
+    if (!requireNamespace("ajv", quietly = TRUE)) {
+      warning("ajv package not available, skipping validation")
+    } else {
+      if (!file.exists(schema_path)) {
+        stop("Schema file not found: ", schema_path)
+      }
+
+      is_valid <- ajv::ajv.validate(schema_path, config)
+
+      if (!is_valid) {
+        errors <- attr(is_valid, "errors")
+        stop("Configuration validation failed. See errors for details.", call. = FALSE)
+      }
+    }
+  }
+
+  return(config)
+}
+
+
+#' Write Model Configuration
+#'
+#' Writes a configuration object to YAML file
+#'
+#' @param config Configuration list
+#' @param config_path Output path for YAML file
+#' @param indent Number of spaces for indentation (default: 2)
+#'
+#' @return Invisible NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' config <- list(model_type = "rf", parameters = list(n_trees = 100))
+#' write_model_config(config, "model_config.yaml")
+#' }
+write_model_config <- function(config, config_path, indent = 2) {
+  tryCatch(
+    {
+      yaml_output <- yaml::as.yaml(
+        config,
+        indent = indent,
+        indent.mapping.sequence = TRUE
+      )
+      write(yaml_output, file = config_path)
+    },
+    error = function(e) {
+      stop("Failed to write configuration: ", e$message, call. = FALSE)
+    }
+  )
+
+  message("Configuration written to: ", config_path)
+  invisible(NULL)
+}
+
+
+#' Get Configuration Parameter
+#'
+#' Safely extracts a parameter from configuration with default fallback
+#'
+#' @param config Configuration list
+#' @param ... Path to parameter (passed to purrr::pluck)
+#' @param .default Default value if parameter not found
+#'
+#' @return Parameter value or default
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' config <- list(model = list(params = list(lr = 0.01)))
+#' lr <- get_config_param(config, "model", "params", "lr", .default = 0.001)
+#' }
+get_config_param <- function(config, ..., .default = NULL) {
+  purrr::pluck(config, ..., .default = .default)
+}
+
+
 #' Expose Model Configuration Schema
 #'
 #' Generates and exposes a model configuration schema in a format

@@ -14,11 +14,14 @@ RoxygenNote: 7.2.3
 Imports:
     cli,
     jsonlite,
-    rlang
+    rlang,
+    yaml,
+    purrr
 Suggests:
     testthat (>= 3.0.0),
     covr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    ajv
 Config/testthat/edition: 3
 VignetteBuilder: knitr
