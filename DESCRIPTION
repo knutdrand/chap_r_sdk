@@ -13,8 +13,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports:
     cli,
+    dplyr,
     jsonlite,
+    readr,
     rlang,
+    tsibble,
     yaml,
     purrr
 Suggests:

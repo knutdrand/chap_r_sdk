@@ -6,15 +6,21 @@ This directory contains a simple example of using the chap.r.sdk CLI infrastruct
 
 The mean model is a simple baseline model that predicts disease cases for each location based on the historical mean for that location. This example demonstrates:
 
-1. Creating CLI wrappers for model functions
-2. Handling data I/O (CSV files)
-3. Converting between data frames and tsibbles
-4. Using the SDK's `create_train_cli()` and `create_predict_cli()` functions
+1. Creating a unified CLI with `create_chap_cli()` (**NEW - Recommended Pattern**)
+2. Automatic file I/O handling (no manual CSV loading needed)
+3. Clean separation of business logic from infrastructure
+4. Legacy pattern with `create_train_cli()` and `create_predict_cli()` (deprecated)
 
 ## Files
 
-- `train.R` - CLI wrapper for training the mean model
-- `predict.R` - CLI wrapper for generating predictions
+### New Unified Pattern (Recommended)
+- `model.R` - **NEW**: Single file with unified CLI using `create_chap_cli()`
+
+### Legacy Pattern (Deprecated)
+- `train.R` - Legacy CLI wrapper for training (uses deprecated `create_train_cli()`)
+- `predict.R` - Legacy CLI wrapper for prediction (uses deprecated `create_predict_cli()`)
+
+### Data Files
 - `example_data.csv` - Sample training data
 - `future_data.csv` - Sample future data for predictions
 
@@ -27,7 +33,64 @@ The mean model calculates the mean disease cases for each location from the trai
 
 ## Usage
 
-### Interactive
+### New Unified CLI Pattern (Recommended)
+
+#### Command Line
+
+```bash
+# Train the model
+Rscript examples/mean_model/model.R train examples/mean_model/example_data.csv
+
+# Generate predictions
+Rscript examples/mean_model/model.R predict \
+  examples/mean_model/example_data.csv \
+  examples/mean_model/future_data.csv \
+  model.rds
+
+# Display model info and configuration schema
+Rscript examples/mean_model/model.R info
+```
+
+#### Interactive
+
+```r
+# Source the model functions
+source("examples/mean_model/model.R")
+
+# Train
+model <- train_mean_model(
+  training_data = training_tsibble,  # Already loaded tsibble
+  model_configuration = list()
+)
+
+# Predict
+predictions <- predict_mean_model(
+  historic_data = historic_tsibble,  # Already loaded tsibble
+  future_data = future_tsibble,      # Already loaded tsibble
+  saved_model = model,
+  model_configuration = list()
+)
+
+print(predictions)
+```
+
+### Legacy CLI Pattern (Deprecated)
+
+#### Command Line
+
+```bash
+# Train the model
+Rscript examples/mean_model/train.R \
+  examples/mean_model/example_data.csv
+
+# Generate predictions
+Rscript examples/mean_model/predict.R \
+  examples/mean_model/example_data.csv \
+  examples/mean_model/future_data.csv \
+  mean_model.rds
+```
+
+#### Interactive
 
 ```r
 # Source the functions
@@ -51,20 +114,6 @@ predictions_path <- predict_mean_model_cli(
 # Load and view predictions
 predictions <- readr::read_csv(predictions_path)
 print(predictions)
-```
-
-### Command Line
-
-```bash
-# Train the model
-Rscript examples/mean_model/train.R \
-  examples/mean_model/example_data.csv
-
-# Generate predictions
-Rscript examples/mean_model/predict.R \
-  examples/mean_model/example_data.csv \
-  examples/mean_model/future_data.csv \
-  mean_model.rds
 ```
 
 ## Data Format
@@ -92,9 +141,73 @@ Columns:
 - `disease_cases` - Predicted disease cases (mean from training data)
 - Any other columns from future_data
 
+## Implementation Comparison
+
+### New Unified Pattern vs. Legacy Pattern
+
+**Code Reduction**: The new pattern reduces boilerplate by **41%** (from 119 lines across 2 files to 70 lines in 1 file)
+
+**Key Advantages of New Pattern:**
+1. **Single File**: `model.R` combines training and prediction in one place
+2. **Zero File I/O Boilerplate**: No manual CSV loading, tsibble conversion, or file saving
+3. **Clean Functions**: Model functions only contain business logic
+4. **Subcommand Dispatch**: `train`, `predict`, and `info` subcommands from one script
+5. **Auto-Detection**: Automatic identification of time and key columns
+
+**Migration Guide:**
+- Old pattern: CLI wrapper functions receive file paths and handle all I/O
+- New pattern: Model functions receive loaded tsibbles; CLI handles I/O automatically
+- Legacy `create_train_cli()` and `create_predict_cli()` are deprecated but still functional
+
 ## Implementation Details
 
-### CLI Wrapper Pattern
+### New Unified CLI Pattern
+
+With `create_chap_cli()`, you only write business logic:
+
+```r
+library(chap.r.sdk)
+library(dplyr)
+
+# Pure business logic - no file I/O!
+train_mean_model <- function(training_data, model_configuration = list()) {
+  means <- training_data |>
+    group_by(location) |>
+    summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+
+  return(list(means = means))
+}
+
+predict_mean_model <- function(historic_data, future_data, saved_model,
+                                model_configuration = list()) {
+  predictions <- future_data |>
+    left_join(saved_model$means, by = "location") |>
+    mutate(disease_cases = mean_cases)
+
+  return(predictions)
+}
+
+config_schema <- list(
+  title = "Mean Model Configuration",
+  type = "object",
+  properties = list()
+)
+
+# One line enables full CLI!
+if (!interactive()) {
+  create_chap_cli(train_mean_model, predict_mean_model, config_schema)
+}
+```
+
+The `create_chap_cli()` function automatically:
+- Parses subcommands (train/predict/info)
+- Loads CSV files and converts to tsibbles
+- Detects time and key columns
+- Parses YAML configuration files
+- Loads saved models
+- Saves outputs (RDS for models, CSV for predictions)
+
+### Legacy CLI Wrapper Pattern
 
 The CLI wrappers follow this pattern:
 

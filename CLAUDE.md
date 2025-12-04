@@ -10,9 +10,11 @@ This is an R package (chap_r_sdk) that provides convenience functionality for de
 
 The SDK provides three main areas of functionality:
 
-1. **CLI Interface Creation**: Convenience functions to create chap-compatible command line interfaces from functions that implement:
-   - `train(training_data, model_configuration) -> saved_model`
-   - `predict(historic_data, future_data, saved_model, model_configuration)`
+1. **CLI Interface Creation**: Unified CLI infrastructure with automatic file I/O handling:
+   - **NEW**: `create_chap_cli(train_fn, predict_fn, schema)` - Single unified CLI with subcommand dispatch
+   - **Deprecated**: `create_train_cli()` and `create_predict_cli()` - Legacy separate CLI wrappers
+   - Automatically handles CSV loading, tsibble conversion, YAML config parsing, and output saving
+   - Model functions receive loaded data objects, not file paths
 
 2. **Model Validation**: Test suite to sanity check models and ensure prediction output is consistent with chap expectations
 
@@ -31,17 +33,75 @@ This is an early-stage project with skeleton code structure. When implementing:
 
 ## Examples
 
-### EWARS Model Example
+### Mean Model Example (Recommended Pattern)
 
-A complete working example of a CHAP-compatible model is available in `examples/ewars_model/`. This demonstrates:
+The **recommended pattern** for new models is shown in `examples/mean_model/model.R`. This uses the unified CLI interface:
 
-- Using `create_train_cli()` and `create_predict_cli()` wrappers
+```r
+library(chap.r.sdk)
+library(dplyr)
+
+# Pure business logic - no file I/O!
+train_my_model <- function(training_data, model_configuration = list()) {
+  # training_data is already a tsibble
+  means <- training_data |>
+    group_by(location) |>
+    summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+
+  return(list(means = means))
+}
+
+predict_my_model <- function(historic_data, future_data, saved_model,
+                              model_configuration = list()) {
+  # All inputs are already loaded
+  predictions <- future_data |>
+    left_join(saved_model$means, by = "location") |>
+    mutate(disease_cases = mean_cases)
+
+  return(predictions)
+}
+
+config_schema <- list(
+  title = "My Model Configuration",
+  type = "object",
+  properties = list()
+)
+
+# One line enables full CLI with train/predict/info subcommands!
+if (!interactive()) {
+  create_chap_cli(train_my_model, predict_my_model, config_schema)
+}
+```
+
+**Usage:**
+```bash
+Rscript model.R train data.csv [config.yaml]
+Rscript model.R predict historic.csv future.csv model.rds [config.yaml]
+Rscript model.R info
+```
+
+**Key Benefits:**
+- **41% less code** compared to legacy pattern
+- **Zero file I/O boilerplate** - handled automatically
+- **Single file** - train and predict together
+- **Automatic detection** of time and key columns
+- **Subcommand dispatch** built-in
+
+See `examples/mean_model/README.md` for detailed documentation.
+
+### EWARS Model Example (Legacy Pattern)
+
+A complex working example using the **legacy pattern** is available in `examples/ewars_model/`. This demonstrates:
+
+- Using deprecated `create_train_cli()` and `create_predict_cli()` wrappers
 - YAML configuration parsing with `read_model_config()`
 - Safe parameter extraction with `get_config_param()`
 - Models that combine training and prediction in a single step
 - Handling spatio-temporal data with covariates
 
 See `examples/ewars_model/README.md` for detailed documentation and `examples/ewars_model/MIGRATION_TO_CHAP_SDK.md` for migration guide from legacy code.
+
+**Note:** For new models, use the unified `create_chap_cli()` pattern shown in the Mean Model Example instead.
 
 ## Standard R Package Commands
 
