@@ -32,7 +32,7 @@ load_tsibble <- function(file_path) {
     tsibble::as_tsibble(df, index = !!rlang::sym(time_col))
   } else {
     # Multivariate time series with spatial keys
-    tsibble::as_tsibble(df, index = !!rlang::sym(time_col), key = !!rlang::syms(key_cols))
+    tsibble::as_tsibble(df, index = !!rlang::sym(time_col), key = dplyr::all_of(key_cols))
   }
 }
 
