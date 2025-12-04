@@ -22,12 +22,26 @@ The SDK provides three main areas of functionality:
 
 ## Development Status
 
-This is an early-stage project with no code implemented yet. When implementing:
+This is an early-stage project with skeleton code structure. When implementing:
 
 - Follow tidyverse conventions and R best practices
 - The package should integrate with standard R package development tools (devtools, roxygen2, testthat)
 - All functions should be well-documented with roxygen2 comments
 - Focus on spatio-temporal data compatibility
+
+## Examples
+
+### EWARS Model Example
+
+A complete working example of a CHAP-compatible model is available in `examples/ewars_model/`. This demonstrates:
+
+- Using `create_train_cli()` and `create_predict_cli()` wrappers
+- YAML configuration parsing with `read_model_config()`
+- Safe parameter extraction with `get_config_param()`
+- Models that combine training and prediction in a single step
+- Handling spatio-temporal data with covariates
+
+See `examples/ewars_model/README.md` for detailed documentation and `examples/ewars_model/MIGRATION_TO_CHAP_SDK.md` for migration guide from legacy code.
 
 ## Standard R Package Commands
 
