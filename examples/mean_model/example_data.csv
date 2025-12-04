@@ -1,0 +1,13 @@
+time_period,location,disease_cases,population
+2023-01,LocationA,45,10000
+2023-02,LocationA,52,10000
+2023-03,LocationA,48,10000
+2023-04,LocationA,51,10000
+2023-01,LocationB,78,15000
+2023-02,LocationB,82,15000
+2023-03,LocationB,75,15000
+2023-04,LocationB,80,15000
+2023-01,LocationC,23,8000
+2023-02,LocationC,28,8000
+2023-03,LocationC,25,8000
+2023-04,LocationC,27,8000
