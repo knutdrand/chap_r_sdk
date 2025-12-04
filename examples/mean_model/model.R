@@ -30,7 +30,9 @@ train_mean_model <- function(training_data, model_configuration = list()) {
   # training_data is already a tsibble - no file I/O needed!
 
   # Calculate mean disease cases for each location
+  # Convert to tibble first to avoid tsibble grouping issues
   means <- training_data |>
+    as_tibble() |>
     group_by(location) |>
     summarise(
       mean_cases = mean(disease_cases, na.rm = TRUE),
@@ -65,10 +67,13 @@ predict_mean_model <- function(historic_data, future_data, saved_model, model_co
   # All inputs are already loaded - no file I/O needed!
 
   # Join future data with location means and create predictions
+  # Note: Using as_tibble() first to avoid tsibble key conflicts, then convert back
   predictions <- future_data |>
+    as_tibble() |>
     left_join(saved_model$means, by = "location") |>
     mutate(disease_cases = coalesce(mean_cases, 0)) |>
-    select(-mean_cases, -n_obs)
+    select(-mean_cases, -n_obs) |>
+    tsibble::as_tsibble(index = time_period, key = location)
 
   return(predictions)
 }

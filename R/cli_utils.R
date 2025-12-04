@@ -26,6 +26,9 @@ load_tsibble <- function(file_path) {
   # Auto-detect key columns (location, region, etc.)
   key_cols <- detect_key_columns(df)
 
+  # Convert time column to appropriate temporal type if it's character
+  df <- convert_time_column(df, time_col)
+
   # Convert to tsibble
   if (is.null(key_cols) || length(key_cols) == 0) {
     # Univariate time series (no key columns)
@@ -77,6 +80,60 @@ detect_key_columns <- function(df) {
 
   # No key columns found - return NULL (univariate time series)
   return(NULL)
+}
+
+#' Convert time column to appropriate temporal type
+#'
+#' Converts a time column from character to the appropriate tsibble temporal type.
+#' Supports yearmonth (YYYY-MM), yearweek (YYYY-Www), yearquarter (YYYY-Qq), and Date formats.
+#'
+#' @param df Data frame containing the time column
+#' @param time_col Name of the time column to convert
+#' @return Data frame with converted time column
+#' @keywords internal
+convert_time_column <- function(df, time_col) {
+  # Skip if already a proper temporal type
+  col_class <- class(df[[time_col]])[1]
+  if (col_class %in% c("Date", "POSIXct", "POSIXlt", "yearmonth", "yearweek", "yearquarter")) {
+    return(df)
+  }
+
+  # Only convert if it's character
+  if (!is.character(df[[time_col]])) {
+    return(df)
+  }
+
+  # Get first value to detect format
+  sample_val <- df[[time_col]][1]
+
+  # Try to detect format and convert
+  converted <- tryCatch({
+    if (grepl("^\\d{4}-\\d{2}$", sample_val)) {
+      # Format: YYYY-MM (yearmonth)
+      df[[time_col]] <- tsibble::yearmonth(df[[time_col]])
+    } else if (grepl("^\\d{4}-W\\d{2}$", sample_val, ignore.case = TRUE)) {
+      # Format: YYYY-Www (yearweek)
+      df[[time_col]] <- tsibble::yearweek(df[[time_col]])
+    } else if (grepl("^\\d{4}-Q[1-4]$", sample_val, ignore.case = TRUE)) {
+      # Format: YYYY-Qq (yearquarter)
+      df[[time_col]] <- tsibble::yearquarter(df[[time_col]])
+    } else if (grepl("^\\d{4}-\\d{2}-\\d{2}", sample_val)) {
+      # Format: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS (Date or datetime)
+      df[[time_col]] <- as.Date(df[[time_col]])
+    } else {
+      # Try generic date parsing as fallback
+      df[[time_col]] <- as.Date(df[[time_col]])
+    }
+    df
+  }, error = function(e) {
+    warning(sprintf(
+      "Could not auto-convert time column '%s' from character. Please ensure it's a valid temporal type. Error: %s",
+      time_col, e$message
+    ))
+    df
+  })
+
+  return(converted)
 }
 
 #' Load and parse configuration file

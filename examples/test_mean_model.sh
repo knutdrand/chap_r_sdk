@@ -12,8 +12,8 @@ echo ""
 SCRIPT="examples/mean_model/model.R"
 TRAIN_DATA="examples/mean_model/example_data.csv"
 FUTURE_DATA="examples/mean_model/future_data.csv"
-MODEL_OUTPUT="mean_model.rds"
-PREDICTIONS_OUTPUT="mean_model_predictions.csv"
+MODEL_OUTPUT="model.rds"
+PREDICTIONS_OUTPUT="model_predictions.csv"
 
 # Step 1: Display model info
 echo "Step 1: Display model information..."
