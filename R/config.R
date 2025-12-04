@@ -97,10 +97,26 @@ write_model_config <- function(config, config_path, indent = 2) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' # Simple nested parameter extraction
 #' config <- list(model = list(params = list(lr = 0.01)))
 #' lr <- get_config_param(config, "model", "params", "lr", .default = 0.001)
-#' }
+#' print(lr)  # 0.01
+#'
+#' # With default fallback
+#' missing <- get_config_param(config, "model", "missing", .default = "default")
+#' print(missing)  # "default"
+#'
+#' # Deep nesting
+#' complex_config <- list(
+#'   training = list(
+#'     optimizer = list(
+#'       type = "adam",
+#'       params = list(lr = 0.001, beta1 = 0.9)
+#'     )
+#'   )
+#' )
+#' beta1 <- get_config_param(complex_config, "training", "optimizer", "params", "beta1")
+#' print(beta1)  # 0.9
 get_config_param <- function(config, ..., .default = NULL) {
   purrr::pluck(config, ..., .default = .default)
 }

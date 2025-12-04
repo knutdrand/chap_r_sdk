@@ -1,8 +1,8 @@
 Package: chap.r.sdk
 Title: Chap SDK for R
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R:
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+    person("Knut", "Rand", , "knutdrand@gmail.com", role = c("aut", "cre"))
 Description: Provides convenience functionality for developing chap-compatible
     models and integrating existing models with chap. Includes utilities for
     creating command line interfaces, model validation, spatio-temporal data
@@ -11,6 +11,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+URL: https://github.com/knutdrand/chap_r_sdk
+BugReports: https://github.com/knutdrand/chap_r_sdk/issues
 Imports:
     cli,
     dplyr,

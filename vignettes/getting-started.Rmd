@@ -1,0 +1,230 @@
+---
+title: "Getting Started with chap.r.sdk"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with chap.r.sdk}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The `chap.r.sdk` package provides infrastructure for developing CHAP-compatible disease forecasting models. It simplifies model development by handling common tasks like file I/O, configuration management, and CLI creation.
+
+### Key Features
+
+- **Unified CLI**: Single function call to create command-line interfaces
+- **Automatic file handling**: CSV loading, tsibble conversion, model saving
+- **Configuration management**: YAML config parsing with schema validation
+- **Auto-detection**: Automatically finds time and key columns in your data
+
+## Quick Start
+
+The recommended pattern for creating a CHAP-compatible model uses the `create_chap_cli()` function:
+
+```{r eval=FALSE}
+library(chap.r.sdk)
+library(dplyr)
+
+# Define training function - receives loaded tsibble, not file paths
+train_my_model <- function(training_data, model_configuration = list()) {
+  # Calculate mean disease cases per location
+  means <- training_data |>
+    group_by(location) |>
+    summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+
+  return(list(means = means))
+}
+
+# Define prediction function - all inputs already loaded
+predict_my_model <- function(historic_data, future_data, saved_model,
+                              model_configuration = list()) {
+  # Join future data with model predictions
+  predictions <- future_data |>
+    left_join(saved_model$means, by = "location") |>
+    mutate(disease_cases = mean_cases)
+
+  return(predictions)
+}
+
+# Enable CLI with one function call
+if (!interactive()) {
+  create_chap_cli(train_my_model, predict_my_model)
+}
+```
+
+### Command Line Usage
+
+Once you have a model script (e.g., `model.R`), you can use it from the command line:
+
+```bash
+# Train the model
+Rscript model.R train training_data.csv
+
+# Generate predictions
+Rscript model.R predict historic_data.csv future_data.csv model.rds
+
+# Display model information
+Rscript model.R info
+```
+
+## Model Development Workflow
+
+### 1. Define Model Functions
+
+Your model needs two functions:
+
+**Training function:**
+- Input: `training_data` (tsibble), `model_configuration` (list)
+- Output: Model object (will be saved as RDS)
+
+**Prediction function:**
+- Input: `historic_data` (tsibble), `future_data` (tsibble), `saved_model` (object), `model_configuration` (list)
+- Output: Predictions (tsibble or data frame, saved as CSV)
+
+### 2. What the SDK Handles Automatically
+
+You don't need to write code for:
+
+- Loading CSV files → `readr::read_csv()`
+- Converting to tsibbles → `tsibble::as_tsibble()`
+- Detecting time columns → automatically finds `time_period`, `date`, `week`, etc.
+- Detecting key columns → automatically finds `location`, `region`, etc.
+- Loading models → `readRDS()`
+- Saving outputs → `saveRDS()` for models, CSV for predictions
+- Parsing YAML configs → `yaml::yaml.load_file()`
+
+### 3. Focus on Business Logic
+
+Your functions only contain the model logic:
+
+```{r eval=FALSE}
+train_fn <- function(training_data, model_configuration = list()) {
+  # training_data is already a tsibble - ready to use!
+  # Your model training code here
+  return(model)
+}
+```
+
+No file I/O boilerplate needed.
+
+## Configuration Management
+
+### Reading Configuration Files
+
+```{r eval=FALSE}
+# Automatic via create_chap_cli() - config loaded and passed to functions
+# Or manual:
+config <- read_model_config("config.yaml")
+```
+
+### Safe Parameter Extraction
+
+```{r}
+# Example configuration
+config <- list(
+  model = list(
+    params = list(
+      learning_rate = 0.01,
+      epochs = 100
+    )
+  )
+)
+
+# Extract nested parameters safely
+lr <- get_config_param(config, "model", "params", "learning_rate", .default = 0.001)
+print(lr)
+
+# Returns default if not found
+missing <- get_config_param(config, "model", "missing_param", .default = "default_value")
+print(missing)
+```
+
+### Configuration Schema
+
+Define a schema for the `info` subcommand:
+
+```{r eval=FALSE}
+config_schema <- list(
+  title = "My Model Configuration",
+  type = "object",
+  properties = list(
+    learning_rate = list(
+      type = "number",
+      default = 0.01,
+      minimum = 0,
+      maximum = 1
+    ),
+    epochs = list(
+      type = "integer",
+      default = 100,
+      minimum = 1
+    )
+  )
+)
+
+create_chap_cli(train_fn, predict_fn, config_schema)
+```
+
+## Data Format
+
+### Training Data
+
+CSV file with:
+- **Time column**: `time_period`, `date`, `week`, `month`, etc.
+- **Key columns**: `location`, `region`, `district`, etc. (optional for univariate)
+- **Target variable**: `disease_cases` or your outcome variable
+- **Covariates**: Any additional columns
+
+Example:
+```
+time_period,location,disease_cases,population
+2023-01,LocationA,45,10000
+2023-02,LocationA,52,10000
+2023-01,LocationB,78,15000
+2023-02,LocationB,82,15000
+```
+
+### Future Data
+
+Same structure as training data, but without the target variable:
+
+```
+time_period,location,population
+2023-05,LocationA,10000
+2023-06,LocationA,10000
+2023-05,LocationB,15000
+2023-06,LocationB,15000
+```
+
+## Complete Example
+
+See `examples/mean_model/model.R` in the package for a complete working example implementing a baseline mean model.
+
+## Migrating from Legacy Pattern
+
+If you have existing code using `create_train_cli()` and `create_predict_cli()`, these functions still work but are deprecated. See the package documentation for migration guidance.
+
+**Benefits of migrating to unified CLI:**
+- 41% less code
+- Single file instead of separate train.R and predict.R
+- No file I/O boilerplate
+- Automatic format detection
+
+## Next Steps
+
+- Explore the included examples: `system.file("examples", package = "chap.r.sdk")`
+- Read the function documentation: `?create_chap_cli`
+- Check the GitHub repository: https://github.com/knutdrand/chap_r_sdk
+
+## Getting Help
+
+- **Issues**: https://github.com/knutdrand/chap_r_sdk/issues
+- **Documentation**: `help(package = "chap.r.sdk")`
