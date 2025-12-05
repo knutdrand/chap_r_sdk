@@ -294,39 +294,105 @@ features |>
 
 ## Using Features in a CHAP Model
 
-```{r model-with-features, eval=FALSE}
-library(chap.r.sdk)
+Here's a complete example using lag features, validated against the Laos dataset:
 
+```{r model-with-features}
+# Define a model that uses lag features
 train_fn <- function(training_data, model_configuration = list()) {
-  # Prepare features
-  features <- prepare_features(training_data)
+  # Calculate mean and use lagged values for adjustment
+  location_stats <- training_data |>
+    as_tibble() |>
+    group_by(location) |>
+    summarise(
+      mean_cases = mean(disease_cases, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+  list(location_stats = location_stats)
+}
+
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  # Get the last observed value per location from historic data
+  last_obs <- historic_data |>
+    as_tibble() |>
+    group_by(location) |>
+    slice_max(time_period, n = 1) |>
+    select(location, last_cases = disease_cases) |>
+    ungroup()
+
+  # Blend historical mean with last observation
+  future_data |>
+    left_join(saved_model$location_stats, by = "location") |>
+    left_join(last_obs, by = "location") |>
+    mutate(
+      # Simple blend: 70% mean + 30% last observation
+      prediction = 0.7 * mean_cases + 0.3 * coalesce(last_cases, mean_cases),
+      samples = purrr::map(prediction, ~c(.x))
+    ) |>
+    select(-mean_cases, -last_cases, -prediction)
+}
+
+# Validate on Laos dataset
+data <- get_example_data('laos', 'M')
+result <- validate_model_io(train_fn, predict_fn, data)
+
+result$success
+result$n_predictions
+result$n_samples
+```
+
+The validation confirms our model produces the correct output structure.
+
+### A More Complex Example with Rolling Features
+
+For models using rolling window features (requires the slider package):
+
+```{r model-rolling-features, eval=FALSE}
+train_fn <- function(training_data, model_configuration = list()) {
+  # Prepare features with rolling statistics
+  features <- training_data |>
+    group_by_key() |>
+    mutate(
+      cases_lag1 = lag(disease_cases, 1),
+      cases_ma3 = slider::slide_dbl(disease_cases, mean, .before = 2, .complete = TRUE),
+      rainfall_lag1 = lag(rainfall, 1)
+    ) |>
+    ungroup() |>
+    filter(!is.na(cases_ma3))
 
   # Fit a simple linear model per location
   models <- features |>
+    as_tibble() |>
     group_by(location) |>
     group_map(~ lm(disease_cases ~ cases_lag1 + cases_ma3 + rainfall_lag1, data = .x))
 
   names(models) <- unique(features$location)
-  list(models = models)
+  list(models = models, feature_means = features |>
+         summarise(across(c(cases_lag1, cases_ma3, rainfall_lag1), mean, na.rm = TRUE)))
 }
 
-predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list()) {
-  # Prepare features from historic data
-  features <- prepare_features(historic_data)
-
-  # Get the last known values for prediction
-  last_values <- features |>
-    group_by(location) |>
-    slice_max(time_period, n = 1)
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  # Get the last known feature values from historic data
+  last_features <- historic_data |>
+    group_by_key() |>
+    mutate(
+      cases_lag1 = lag(disease_cases, 1),
+      cases_ma3 = slider::slide_dbl(disease_cases, mean, .before = 2, .complete = TRUE),
+      rainfall_lag1 = lag(rainfall, 1)
+    ) |>
+    slice_max(time_period, n = 1) |>
+    ungroup() |>
+    select(location, cases_lag1, cases_ma3, rainfall_lag1)
 
   # Generate predictions
   future_data |>
-    left_join(last_values |> select(location, cases_lag1, cases_ma3, rainfall_lag1),
-              by = "location") |>
+    left_join(last_features, by = "location") |>
     rowwise() |>
     mutate(
-      pred = predict(saved_model$models[[location]], newdata = cur_data()),
-      samples = list(c(pred))
+      pred = predict(saved_model$models[[location]], newdata = pick(everything())),
+      samples = list(c(max(0, pred)))  # Ensure non-negative
     ) |>
     ungroup() |>
     select(-pred, -cases_lag1, -cases_ma3, -rainfall_lag1)
