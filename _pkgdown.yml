@@ -3,6 +3,10 @@ url: https://knutdrand.github.io/chap_r_sdk/
 template:
   bootstrap: 5
 
+home:
+  title: CHAP R SDK
+  description: Tools for building CHAP-compatible disease forecasting models
+
 navbar:
   structure:
     left:  [intro, reference, articles, news]
