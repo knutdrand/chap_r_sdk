@@ -30,15 +30,10 @@ train_mean_model <- function(training_data, model_configuration = list()) {
   # training_data is already a tsibble - no file I/O needed!
 
   # Calculate mean disease cases for each location
-  # Convert to tibble first to avoid tsibble grouping issues
+  # Use as_tibble() to collapse across time dimension
   means <- training_data |>
     as_tibble() |>
-    group_by(location) |>
-    summarise(
-      mean_cases = mean(disease_cases, na.rm = TRUE),
-      n_obs = n(),
-      .groups = "drop"
-    )
+    summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
 
   # Create model object
   model <- list(
@@ -62,18 +57,15 @@ train_mean_model <- function(training_data, model_configuration = list()) {
 #' @param future_data A tsibble with columns: time_period, location, and optional covariates
 #' @param saved_model A model object from train_mean_model containing location means
 #' @param model_configuration A list with model configuration options (currently unused)
-#' @return A tsibble with predictions including the disease_cases column
+#' @return A tsibble with predictions including a samples list-column
 predict_mean_model <- function(historic_data, future_data, saved_model, model_configuration = list()) {
   # All inputs are already loaded - no file I/O needed!
 
-  # Join future data with location means and create predictions
-  # Note: Using as_tibble() first to avoid tsibble key conflicts, then convert back
+  # Join future data with location means and create predictions with samples column
   predictions <- future_data |>
-    as_tibble() |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = coalesce(mean_cases, 0)) |>
-    select(-mean_cases, -n_obs) |>
-    tsibble::as_tsibble(index = time_period, key = location)
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
+    select(-mean_cases)
 
   return(predictions)
 }

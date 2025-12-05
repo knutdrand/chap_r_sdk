@@ -82,15 +82,13 @@ test_that("validate_model_io passes with deterministic model (single sample)", {
   train_fn <- function(training_data, model_configuration = list()) {
     means <- training_data |>
       tibble::as_tibble() |>
-      dplyr::group_by(location) |>
-      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
     list(means = means)
   }
 
   predict_fn <- function(historic_data, future_data, saved_model,
                          model_configuration = list()) {
     future_data |>
-      tibble::as_tibble() |>
       dplyr::left_join(saved_model$means, by = "location") |>
       dplyr::mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
       dplyr::select(-mean_cases)
@@ -113,8 +111,7 @@ test_that("validate_model_io passes with probabilistic model (multiple samples)"
   train_fn <- function(training_data, model_configuration = list()) {
     means <- training_data |>
       tibble::as_tibble() |>
-      dplyr::group_by(location) |>
-      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
     list(means = means)
   }
 
@@ -122,7 +119,6 @@ test_that("validate_model_io passes with probabilistic model (multiple samples)"
                          model_configuration = list()) {
     n_samples <- 100
     future_data |>
-      tibble::as_tibble() |>
       dplyr::left_join(saved_model$means, by = "location") |>
       dplyr::rowwise() |>
       dplyr::mutate(
@@ -171,7 +167,6 @@ test_that("validate_model_io detects row count mismatch", {
                          model_configuration = list()) {
     # Return only first row with samples added
     future_data[1, ] |>
-      tibble::as_tibble() |>
       dplyr::mutate(samples = list(c(0)))
   }
 
@@ -205,15 +200,13 @@ test_that("validate_model_io_all validates all combinations when no params given
   train_fn <- function(training_data, model_configuration = list()) {
     means <- training_data |>
       tibble::as_tibble() |>
-      dplyr::group_by(location) |>
-      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
     list(means = means)
   }
 
   predict_fn <- function(historic_data, future_data, saved_model,
                          model_configuration = list()) {
     future_data |>
-      tibble::as_tibble() |>
       dplyr::left_join(saved_model$means, by = "location") |>
       dplyr::mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
       dplyr::select(-mean_cases)
