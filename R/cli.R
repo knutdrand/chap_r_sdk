@@ -19,6 +19,14 @@
 #'   sample per forecast unit (e.g., \code{samples = list(c(42))}). For probabilistic
 #'   models, include multiple Monte Carlo samples. The CLI automatically converts
 #'   the nested samples to wide CSV format (sample_0, sample_1, ...) for CHAP.
+#'
+#'   **Important**: \code{historic_data} may contain more recent observations than
+#'   the original training data. CHAP may call predict with updated data after the
+#'   model was trained. For time series models, you should typically refit the model
+#'   to \code{historic_data} before forecasting. Use \code{saved_model} to store model
+#'   hyperparameters or structure that should persist across predictions, rather than
+#'   the fitted model itself. See \code{examples/arima_model/} for a demonstration of
+#'   this pattern using \code{fable::refit()}.
 #' @param model_config_schema Optional model configuration schema (reserved for future use).
 #'   Can be used with the "info" subcommand to display schema information.
 #' @param args Command line arguments (defaults to \code{commandArgs(trailingOnly = TRUE)})

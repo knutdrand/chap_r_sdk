@@ -47,6 +47,11 @@ predict_fn <- function(historic_data, future_data, saved_model,
   # Returns: tibble with samples list-column containing numeric vectors
   #   - For deterministic models: single sample per row (e.g., samples = list(c(42)))
   #   - For probabilistic models: multiple samples per row (e.g., 1000 samples)
+  #
+  # IMPORTANT: historic_data may contain more recent data than training_data.
+  # For time series models, you should refit to historic_data before forecasting.
+  # Use saved_model for hyperparameters/structure, not the fitted model itself.
+  # See examples/arima_model/ for a demonstration of this pattern.
 }
 ```
 

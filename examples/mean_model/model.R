@@ -53,7 +53,10 @@ train_mean_model <- function(training_data, model_configuration = list()) {
 #' Generates predictions by using the historical mean for each location.
 #' Simply joins the future data with the location means from the trained model.
 #'
-#' @param historic_data A tsibble with historic data (unused but kept for interface compatibility)
+#' @param historic_data A tsibble with historic observations. Note: this may be more
+#'   recent than training data. For mean models, refitting is not needed since the
+#'   saved model already contains location means. Time series models (e.g., ARIMA)
+#'   should typically refit to this data before forecasting - see examples/arima_model/.
 #' @param future_data A tsibble with columns: time_period, location, and optional covariates
 #' @param saved_model A model object from train_mean_model containing location means
 #' @param model_configuration A list with model configuration options (currently unused)
