@@ -71,6 +71,23 @@ The example data contains four tsibbles. Each has `time_period` as the index and
 data$training_data
 ```
 
+**Historic data** - observations available at prediction time:
+```{r}
+data$historic_data
+```
+
+Notice that `historic_data` extends beyond `training_data`:
+
+```{r}
+# Training data ends at:
+max(data$training_data$time_period)
+
+# Historic data ends at:
+max(data$historic_data$time_period)
+```
+
+This is a key concept: when CHAP calls your prediction function, `historic_data` may contain **more recent observations** than what the model was trained on. For time series models (ARIMA, exponential smoothing, etc.), you should **refit** the model to `historic_data` before forecasting. See `examples/arima_model/` for a demonstration of this pattern.
+
 **Future data** - time periods to predict (no `disease_cases`):
 ```{r}
 data$future_data
