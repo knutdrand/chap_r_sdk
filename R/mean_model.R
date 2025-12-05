@@ -1,3 +1,6 @@
+# Global variable declarations for R CMD check
+utils::globalVariables(c("location", "disease_cases", "mean_cases"))
+
 #' Train a simple mean model
 #'
 #' Trains a model that predicts the mean disease cases for each location

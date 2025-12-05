@@ -11,3 +11,9 @@
 ^vignettes/articles$
 ^doc$
 ^Meta$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^cran-comments\.md$
+^examples$
+^VALIDATION_CHECKLIST\.md$

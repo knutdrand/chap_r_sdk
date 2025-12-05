@@ -7,7 +7,12 @@
 #'
 #' @name predictions
 #' @keywords internal
+#' @importFrom stats quantile
+#' @importFrom rlang .data :=
 NULL
+
+# Global variable declarations for R CMD check
+utils::globalVariables(c("samples", "sample_id", "quantile_values"))
 
 #' Convert Wide Format Predictions to Nested Format
 #'

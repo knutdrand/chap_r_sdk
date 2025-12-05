@@ -27,22 +27,13 @@ read_model_config <- function(config_path, schema_path = NULL, validate = TRUE) 
     }
   )
 
-  # Validate if schema provided (requires ajv package)
+  # Validate if schema provided
+
+  # NOTE: Schema validation is not yet implemented.
+  # The ajv R package API has changed and requires a different approach.
+  # For now, we skip validation and just warn the user.
   if (validate && !is.null(schema_path)) {
-    if (!requireNamespace("ajv", quietly = TRUE)) {
-      warning("ajv package not available, skipping validation")
-    } else {
-      if (!file.exists(schema_path)) {
-        stop("Schema file not found: ", schema_path)
-      }
-
-      is_valid <- ajv::ajv.validate(schema_path, config)
-
-      if (!is_valid) {
-        errors <- attr(is_valid, "errors")
-        stop("Configuration validation failed. See errors for details.", call. = FALSE)
-      }
-    }
+    warning("Schema validation is not yet implemented. Skipping validation.")
   }
 
   return(config)
