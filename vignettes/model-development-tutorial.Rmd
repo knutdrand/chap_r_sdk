@@ -1,0 +1,208 @@
+---
+title: "Building Your First CHAP Model"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Building Your First CHAP Model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This tutorial walks you through building a CHAP-compatible model step-by-step, using a validation-first approach to ensure your model works correctly before deploying it.
+
+## Setup
+
+```{r setup}
+library(chap.r.sdk)
+library(dplyr)
+```
+
+## Step 1: Understand the Function Interface
+
+Every CHAP model requires two functions:
+
+**Training function:**
+```r
+train_fn <- function(training_data, model_configuration = list()) {
+
+  # training_data: tibble with time_period, location, disease_cases, covariates
+  # model_configuration: optional list of parameters
+  # Returns: any model object (list, fitted model, etc.)
+}
+```
+
+**Prediction function:**
+```r
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  # historic_data: tibble with historical observations
+
+  # future_data: tibble with time periods to predict
+  # saved_model: the object returned by train_fn
+  # Returns: tibble with time_period, location, disease_cases columns
+}
+```
+
+## Step 2: Explore the Example Data
+
+The SDK provides example datasets for testing. Let's examine the Laos monthly data:
+
+```{r explore-data}
+data <- get_example_data('laos', 'M')
+names(data)
+```
+
+The example data contains four components:
+
+**Training data** - what your model learns from:
+```{r}
+head(data$training_data)
+```
+
+**Future data** - time periods to predict (no `disease_cases`):
+```{r}
+head(data$future_data)
+```
+
+**Expected predictions** - what your output should look like:
+```{r}
+head(data$predictions)
+```
+
+Note the key columns: `time_period`, `location`, and `disease_cases`.
+
+## Step 3: Validate Before Implementing
+
+Before writing any model logic, let's see what the validation expects. Start with stub functions:
+
+```{r validate-stubs}
+train_fn <- function(training_data, model_configuration = list()) {
+  list(dummy = 1)
+}
+
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  future_data
+}
+
+result <- validate_model_io(train_fn, predict_fn, data)
+result$success
+result$errors
+```
+
+The validation tells us exactly what's missing: the `disease_cases` column in predictions.
+
+## Step 4: Implement a Simple Mean Model
+
+Now let's implement a minimal model that predicts the historical mean for each location:
+
+```{r implement-model}
+train_fn <- function(training_data, model_configuration = list()) {
+  means <- training_data |>
+    group_by(location) |>
+    summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+  list(means = means)
+}
+
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  future_data |>
+    left_join(saved_model$means, by = "location") |>
+    mutate(disease_cases = mean_cases) |>
+    select(-mean_cases)
+}
+```
+
+That's it! Just 10 lines of actual model logic.
+
+## Step 5: Validate the Implementation
+
+```{r validate-implementation}
+result <- validate_model_io(train_fn, predict_fn, data)
+result$success
+result$n_predictions
+```
+
+The validation passes and we generated 21 predictions.
+
+## Step 6: Validate Against All Datasets
+
+The SDK can validate against all available example datasets:
+
+```{r validate-all}
+result <- validate_model_io_all(train_fn, predict_fn)
+result$success
+names(result$results)
+```
+
+## Step 7: Create the CLI
+
+Once validation passes, wrap your model in a CLI. Create a file called `model.R`:
+
+```r
+library(chap.r.sdk)
+library(dplyr)
+
+train_fn <- function(training_data, model_configuration = list()) {
+  means <- training_data |>
+    group_by(location) |>
+    summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+  list(means = means)
+}
+
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  future_data |>
+    left_join(saved_model$means, by = "location") |>
+    mutate(disease_cases = mean_cases) |>
+    select(-mean_cases)
+}
+
+if (!interactive()) {
+  create_chap_cli(train_fn, predict_fn)
+}
+```
+
+## Step 8: Use the CLI
+
+Your model is now ready for command-line use:
+```bash
+# Train the model
+Rscript model.R train training_data.csv
+
+# Generate predictions
+Rscript model.R predict historic.csv future.csv model.rds
+
+# Display model info
+Rscript model.R info
+```
+
+The CLI automatically handles:
+
+- Loading CSV files
+- Converting to tsibbles
+- Saving the model as RDS
+- Writing predictions to CSV
+
+## Summary
+
+The development workflow is:
+
+1. **Explore** example data with `get_example_data()`
+2. **Validate** with stubs using `validate_model_io()` to understand requirements
+3. **Implement** your train and predict functions
+4. **Validate** the implementation
+5. **Test** against all datasets with `validate_model_io_all()`
+6. **Deploy** with `create_chap_cli()`
+
+## Next Steps
+
+- See `examples/ewars_model/` for a more complex example with configuration
+- Read about configuration schemas in `?create_config_schema`
+- Explore spatial-temporal utilities in `?aggregate_temporal`
