@@ -38,6 +38,18 @@ reference:
       - aggregate_spatial
       - aggregate_temporal
 
+  - title: Prediction Samples
+    desc: Convert between prediction sample formats
+    contents:
+      - predictions_from_wide
+      - predictions_to_wide
+      - predictions_from_long
+      - predictions_to_long
+      - predictions_to_quantiles
+      - predictions_summary
+      - has_prediction_samples
+      - detect_prediction_format
+
   - title: Example Models
     desc: Reference model implementations
     contents:
