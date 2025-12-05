@@ -73,7 +73,14 @@ and <code>model_configuration</code> is a list. Must return a tibble with a <cod
 list-column containing numeric vectors. For deterministic models, use a single
 sample per forecast unit (e.g., <code>samples = list(c(42))</code>). For probabilistic
 models, include multiple Monte Carlo samples. The CLI automatically converts
-the nested samples to wide CSV format (sample_0, sample_1, ...) for CHAP.</p></dd>
+the nested samples to wide CSV format (sample_0, sample_1, ...) for CHAP.</p>
+<p><strong>Important</strong>: <code>historic_data</code> may contain more recent observations than
+the original training data. CHAP may call predict with updated data after the
+model was trained. For time series models, you should typically refit the model
+to <code>historic_data</code> before forecasting. Use <code>saved_model</code> to store model
+hyperparameters or structure that should persist across predictions, rather than
+the fitted model itself. See <code>examples/arima_model/</code> for a demonstration of
+this pattern using <code>fable::refit()</code>.</p></dd>
 
 
 <dt id="arg-model-config-schema">model_config_schema<a class="anchor" aria-label="anchor" href="#arg-model-config-schema"></a></dt>

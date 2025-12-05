@@ -151,7 +151,11 @@ use it from the command line:</p>
 <code>historic_data</code> (tsibble), <code>future_data</code>
 (tsibble), <code>saved_model</code> (object),
 <code>model_configuration</code> (list) - Output: Predictions (tsibble
-or data frame, saved as CSV)</p>
+or data frame, saved as CSV) - <strong>Note</strong>:
+<code>historic_data</code> may be more recent than the training data.
+Time series models should refit to <code>historic_data</code> before
+forecasting. See <code>examples/arima_model/</code> for a
+demonstration.</p>
 </div>
 <div class="section level3">
 <h3 id="what-the-sdk-handles-automatically">2. What the SDK Handles Automatically<a class="anchor" aria-label="anchor" href="#what-the-sdk-handles-automatically"></a>

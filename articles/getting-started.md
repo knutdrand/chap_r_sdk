@@ -87,7 +87,10 @@ RDS)
 
 **Prediction function:** - Input: `historic_data` (tsibble),
 `future_data` (tsibble), `saved_model` (object), `model_configuration`
-(list) - Output: Predictions (tsibble or data frame, saved as CSV)
+(list) - Output: Predictions (tsibble or data frame, saved as CSV) -
+**Note**: `historic_data` may be more recent than the training data.
+Time series models should refit to `historic_data` before forecasting.
+See `examples/arima_model/` for a demonstration.
 
 ### 2. What the SDK Handles Automatically
 

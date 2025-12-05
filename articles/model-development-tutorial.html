@@ -100,6 +100,11 @@ works correctly before deploying it.</p>
 <span>  <span class="co"># Returns: tibble with samples list-column containing numeric vectors</span></span>
 <span>  <span class="co">#   - For deterministic models: single sample per row (e.g., samples = list(c(42)))</span></span>
 <span>  <span class="co">#   - For probabilistic models: multiple samples per row (e.g., 1000 samples)</span></span>
+<span>  <span class="co">#</span></span>
+<span>  <span class="co"># IMPORTANT: historic_data may contain more recent data than training_data.</span></span>
+<span>  <span class="co"># For time series models, you should refit to historic_data before forecasting.</span></span>
+<span>  <span class="co"># Use saved_model for hyperparameters/structure, not the fitted model itself.</span></span>
+<span>  <span class="co"># See examples/arima_model/ for a demonstration of this pattern.</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -123,7 +128,7 @@ key:</p>
 <p><strong>Training data</strong> - what your model learns from:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">training_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tsibble: 1,071 x 13 [1M]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tsibble: 1,057 x 13 [1M]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Key:       location [7]</span></span></span>
 <span><span class="co">#&gt;     ...1 time_period rainfall mean_temperature disease_cases population parent</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;mth&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
@@ -137,7 +142,7 @@ key:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     7    2001 Feb     7.28             22.0             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     8    2001 Mar   123.               22.6             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     9    2001 Apr    29.6              27.5             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,061 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,047 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: location &lt;chr&gt;, Cases &lt;dbl&gt;, E &lt;dbl&gt;, month &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   ID_year &lt;dbl&gt;, ID_spat &lt;chr&gt;</span></span></span></code></pre></div>
 <p><strong>Future data</strong> - time periods to predict (no
@@ -183,48 +188,48 @@ each element is a numeric vector. Let’s look at the structure:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Each row has a vector of samples</span></span>
 <span><span class="va">data</span><span class="op">$</span><span class="va">predictions</span><span class="op">$</span><span class="va">samples</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;    [1] 15  7  3  9  7 19  2  2 11  5  5  3  9 24  0 18  4  3  6 62  3  0  4  4</span></span>
-<span><span class="co">#&gt;   [25] 13  0 44  2  4 19  1  5  3 27  5  0  1  4  7  5  3 11  7 17 16  3 10  1</span></span>
-<span><span class="co">#&gt;   [49] 12  2  0  4  4  2 20  4  7  3  8 11  5  3 16 22  9  7  3  3  0  2  4 12</span></span>
-<span><span class="co">#&gt;   [73]  9  6  3  6  4 12  2  0  6  8 16  5 14  3  0 10  5 10  5  1  0  1  0  3</span></span>
-<span><span class="co">#&gt;   [97]  3  6  4  1  0  3 18 13  6  9  9 19  7  8  1  5 13  3  8 18  1 19  0 23</span></span>
-<span><span class="co">#&gt;  [121]  4 30  2  2 11  0  0  5  7  0  7 10  4  1  8  4 13  1 21 11  1  9 13  3</span></span>
-<span><span class="co">#&gt;  [145] 14  4  2 28 17  1  7  7  9 19 12  3  2  4  6  4  3  0  0  9  0  7  6  4</span></span>
-<span><span class="co">#&gt;  [169]  6  3 17 11  8 15  3  5  3 13 18  4  0 11  2 48  7  5 26  5  5  3  5  2</span></span>
-<span><span class="co">#&gt;  [193]  4  4 16  9 15  9  6  2  2 10  7  7  3  8 11 17  6  6 10  0  8  6  4 27</span></span>
-<span><span class="co">#&gt;  [217]  1 37  0  2  0 14  1 29  8  1 16  9  2  9  6  6  7 10  5 28 15  1  7  1</span></span>
-<span><span class="co">#&gt;  [241]  1 17 12  3  6  8 10 35 22  7  2  0 13  4  1  6 20  3  1  7  1  7 11  4</span></span>
-<span><span class="co">#&gt;  [265] 37  1 13  2 31  1 47  6  1  0  3  1  0 11  8 12  1  7  4  5  3 16  7 14</span></span>
-<span><span class="co">#&gt;  [289]  2 15  1  7  1  2 13  2 10  3  2 10  0  1 17  5  1  2  1 17 23  2  8  2</span></span>
-<span><span class="co">#&gt;  [313]  7  2  2  4  1  3  5  6  0  1 11  4  4  7 22  7 10  7 10 12 31 10  1  2</span></span>
-<span><span class="co">#&gt;  [337] 16  0 11  2  0  0  6 18  1  2  6  0  3  1  3 23 15  9  0  1 21 14  0  4</span></span>
-<span><span class="co">#&gt;  [361]  1  2 17  5 25  0 14  3 13  0  0  8  3 14  3  3  2  7  7  2  3  3  2 12</span></span>
-<span><span class="co">#&gt;  [385]  2  5  8  8 14 12 11  9  1  3 26  5  9 12  3  8 15  0  5  2 10  8  6  3</span></span>
-<span><span class="co">#&gt;  [409] 15  3  3  3 13 27  0  5 11  4  5  6  3  4  6 28  5 11  4  0  0  0  1  1</span></span>
-<span><span class="co">#&gt;  [433] 11 29  0  6  1 10  8  5  1  2  0  4  1 13  9  5  6  0 11  1  9 18  7  8</span></span>
-<span><span class="co">#&gt;  [457]  3  0  2 10  3  5 10  1 16 74  3  2  1 14  1  2  0  0  6  3 12  7  6 10</span></span>
-<span><span class="co">#&gt;  [481] 10  9  3  6  4 16  0  2  2  1 16  9  6  2  7  3 10 10  1  3  2  6  8  6</span></span>
-<span><span class="co">#&gt;  [505] 13  2 18  3  2  0 40  1  7  4  5  2 10  2  2 16  4  0 10  7  5 12 15  3</span></span>
-<span><span class="co">#&gt;  [529] 11 10  2  0  4  1  2 18  0  0 12  4  2  3 10 13  6 17 17  7 19  4  5  2</span></span>
-<span><span class="co">#&gt;  [553]  7 31  0 14  1  5  8 11 14 40 19  5  0  5  5  9  0 20  0  4  2  1  3 18</span></span>
-<span><span class="co">#&gt;  [577]  0  1  1 22  0 24  7  0  3 10 21 12 15  7  0  0  2 14  0  4 29 25  5  7</span></span>
-<span><span class="co">#&gt;  [601]  2  0  5  2  2  3  1  2 10  1 10  4  3  7  1 15  5  6  6 25  2  2  5 52</span></span>
-<span><span class="co">#&gt;  [625]  1  7  1 23  8  4  3 17  9 10  6  6 10  9  6  0  1  4  0 17  2  7 49  7</span></span>
-<span><span class="co">#&gt;  [649]  8  8  1 12 45  1  9  1  2  4  0  2 10 10  0  3 22  2  4 16  8  0  3  8</span></span>
-<span><span class="co">#&gt;  [673]  4 11  8  7  2  7 19  7  5 13  3 11  2  2 23  7  2  8  2 17  4  1  2  4</span></span>
-<span><span class="co">#&gt;  [697]  0 11  8  0  8  8  3  5  6  7  7  1  1  9  7 13  5 12 10 17  8  2  2  5</span></span>
-<span><span class="co">#&gt;  [721]  8  0  0  2 15 14  6  4  5 29 13  9  3  3 16  2  2  7  2  1  7  1  0 26</span></span>
-<span><span class="co">#&gt;  [745]  7  2  4  0  5 11  4 12  8  0 11  1  1  3  2 12  3  3  1 10 12  7  2 15</span></span>
-<span><span class="co">#&gt;  [769]  4  2  3  1  5  2  1  5  1 11 17  2  2  3  7  5 23  9 14  0 27 35  0  2</span></span>
-<span><span class="co">#&gt;  [793]  1  0  2  3  1 10  6  5  0 13 16  4 11  1  5  0  1  1  3  3 14  4  5 16</span></span>
-<span><span class="co">#&gt;  [817]  7  4 10  0  6  1 22 14 12  0  1  5  0  1 40 11  4  8  0  4  9  3  8  1</span></span>
-<span><span class="co">#&gt;  [841]  5  9  6 13  0  5 22  1  7  2  7  6  3  2  5  3  5  6  6  2  2  5  0  1</span></span>
-<span><span class="co">#&gt;  [865]  4  4  4 15 60  5  5 14  6 14 12  3 22  7  3  5  7 10  4 35 11 17 17  4</span></span>
-<span><span class="co">#&gt;  [889] 11  4 12  7 21 30  8  2 21  6 17  9  4 24 11  0  3 28 14  3  3  4  1  9</span></span>
-<span><span class="co">#&gt;  [913] 30 10 10  7  5  4  2  1 10 13 12  9  3 13  1  1 13  4  8 11  1  8  8  2</span></span>
-<span><span class="co">#&gt;  [937] 11  5 17  2 12  0  3 13  8  7  2  3  4 17  2  3  4  4  4 16  4  3  8 10</span></span>
-<span><span class="co">#&gt;  [961]  0  4  2  5  3  1  4  2  3  4  5  3  4 12 14  3  4 15  2  3 23  7 13  5</span></span>
-<span><span class="co">#&gt;  [985]  4 13 17  0 11 13 15  6 11  1 20 23  2 12 11  2</span></span></code></pre></div>
+<span><span class="co">#&gt;    [1]  9  5 46  5  3  8  1  9  9 14  3  7  6  7  3 10 11  2 17 13 12  0  3  1</span></span>
+<span><span class="co">#&gt;   [25] 10 38 19  7 15  0  1 11  1  8  7 43 11  3  4  8  1  4  3  7 24  4  1  6</span></span>
+<span><span class="co">#&gt;   [49] 11  3  9  0  0 16  0 11 17  1  3  8 13  5  5 22  2  1  5 26 11 31  4  3</span></span>
+<span><span class="co">#&gt;   [73] 10  7  4  6  9 13  1  5 14 13 14  8  4  1  0  7 31  6  6  2 16 12  2  9</span></span>
+<span><span class="co">#&gt;   [97]  1  5  7  3  6  4 22  1  3 10  1  0  3  7 10  3  0  8 30  8  7  1 17 14</span></span>
+<span><span class="co">#&gt;  [121] 10  8  4  8  2  5 20  3 11  7  6 11  2  0  4  3  4  5  3  8  4 21  5  7</span></span>
+<span><span class="co">#&gt;  [145] 15  8 17  8  9 12  6  1 11  3 21  4 10  2  3  4 17  2  1 11 33  6 10  2</span></span>
+<span><span class="co">#&gt;  [169] 25 12  3  0  3  1  5 16 22  0  2 24 15 13  3  1  4  0  6  2  8  1  2  1</span></span>
+<span><span class="co">#&gt;  [193] 21 17  0  6  8  9  8  2  0  3 21  3 14  5  4  6  5 18 14 17  4  2 10  9</span></span>
+<span><span class="co">#&gt;  [217]  7  2  3  2  3  3  1  4  3  5  3  8  1 15  4  5 11 16  8 26  0  6  3 10</span></span>
+<span><span class="co">#&gt;  [241]  4 10  2  3  0  8  3 18  2  8  2  1  4  2  6  5 10 13 10  8  9  3  1  1</span></span>
+<span><span class="co">#&gt;  [265]  6  7  7  9 13  8  1  7 28 23  6  7 12  8  1  4  1  6  1  2  0  6  2 16</span></span>
+<span><span class="co">#&gt;  [289] 44  2 20 24 14  9  2  4 12  7  6 23 39 16 17  5 27 17  2  4  7  3  1  0</span></span>
+<span><span class="co">#&gt;  [313]  6  1 10  3  6 19  2  3  6 13 14  5  8  1 14  6 15  5  4  3 30  7  9  4</span></span>
+<span><span class="co">#&gt;  [337] 17  3  4  4  1  6 11 15  4 11 15  1  3  8  4 15 15  0  7 13 14 26  6  1</span></span>
+<span><span class="co">#&gt;  [361]  5 15  1 21 13  6 22  6  1 19  7  0 11 13 10  1  0  2  1  7 13  1  1  9</span></span>
+<span><span class="co">#&gt;  [385] 12 24  7  2  8  9  2  0  5  0  2  2  2  7 15 10 15 10  7  1 26  2 20 11</span></span>
+<span><span class="co">#&gt;  [409] 41 15 13  4  7  1  8  3  4 16 27  0  1  2  3 22 20  8  3  9  7  9  3 44</span></span>
+<span><span class="co">#&gt;  [433]  0 17  5  1  8 17 18  8 27 16  4  7  1  4  1 13 22  0  7  2 12 18 49  9</span></span>
+<span><span class="co">#&gt;  [457]  1  1  2 16  2  5  2 12  3  8  3  5  1  1  0 28 22  1  4  6 11  5 13 24</span></span>
+<span><span class="co">#&gt;  [481]  4  2 13  1  5  1  5 12  6  5  6  5 14  9  2 15  2 27 25  9  5  5  3  6</span></span>
+<span><span class="co">#&gt;  [505]  3 25  9 16  2 14  6  5 25 11  4 10  2 11  5  6 16  3  2  6  3  4  5 18</span></span>
+<span><span class="co">#&gt;  [529]  9  2  8  6  3 11  7 16 22  4  0  3  3 19 10  3  2  5  3 10  4 18  1  6</span></span>
+<span><span class="co">#&gt;  [553]  5 19  3  1  8  2  6  5 12 15 11  1  0  0 22  6  7  2 40 21 20  2  9  9</span></span>
+<span><span class="co">#&gt;  [577] 11  0  0  2  6 12  6  5 19  8 17  7  3 39  0  6 11  8  9  8 10  6  5  2</span></span>
+<span><span class="co">#&gt;  [601]  3 11  3 18  0  3  5  5  1  5  2  1 37 15  7  1  0  3  1 17  1 19  3 20</span></span>
+<span><span class="co">#&gt;  [625] 12 11  8  2  3  2  2  0  9  1 17 14  4 10 10 13  5 12  8  0  5  9 41  9</span></span>
+<span><span class="co">#&gt;  [649] 38  8 13  6 15  7  8  4 17  1  3  9  1 33  9  5 21 27  3 22 10 16  6 21</span></span>
+<span><span class="co">#&gt;  [673]  0 12 22  1  8 22  1  1 62 13 17 13 15  6 37  2 19  5  3  6  3  1  1 15</span></span>
+<span><span class="co">#&gt;  [697] 31  7  3  7 15  6  1  4  5  3  6  9 17  0  5  5  1  9  5  2  0 26  1  4</span></span>
+<span><span class="co">#&gt;  [721]  0  1 14  8 10  4  2  7  3  4 17  3  2 93  6  7 11  1  5 16  7 11  5 15</span></span>
+<span><span class="co">#&gt;  [745]  7 15  6  4  3 38  0  3 17  4  1  0 13  5  2 10  7  2  1  8  8  6  3  0</span></span>
+<span><span class="co">#&gt;  [769]  2  1  9  0  7 13  5  4  2 11  5  4  6  3  9 18  2  7  2 16  3  2  5 26</span></span>
+<span><span class="co">#&gt;  [793]  3  5 18  4 25  5 12  8  2 14 15  1  5 19 14 21  0  3 26  3  2 17 39 14</span></span>
+<span><span class="co">#&gt;  [817] 21 21  3 10 19 12  3  1  6  0  3 24 59  2 15 12  3  9  7 16  3 16  6  6</span></span>
+<span><span class="co">#&gt;  [841]  0 15  8 12 17  6  3 12  2  2 15 10 11  1  1  1 16  2  7  0 11 39  6  2</span></span>
+<span><span class="co">#&gt;  [865]  5  6 13  4 11  2  4  4  9 38  1  8 16 15 21 15  7 16  2  3 10 33  9  7</span></span>
+<span><span class="co">#&gt;  [889]  4  2  6 12  9  1 16  4  5  7  3  3  4  1  3  5  9  5  9 14 23  3 21  2</span></span>
+<span><span class="co">#&gt;  [913]  4  6  6 26  5 11  0  7  5  4  9  2 26  5  5 10 16 17 30  2  8 10  5 25</span></span>
+<span><span class="co">#&gt;  [937]  1  1 47  7  2  4  2  0  7  0 20  1 19  2  6  5 15  5 14  5  7  7  4  2</span></span>
+<span><span class="co">#&gt;  [961]  0  9  3  3 15  0  2  0  5 14  1 44 16  0 14  2  1 15  4 29 10 21  6  6</span></span>
+<span><span class="co">#&gt;  [985]  0  6 24  7 16  0 12  5  2  6  5 31  9 14  0  3</span></span></code></pre></div>
 <p>For probabilistic models, each vector contains multiple Monte Carlo
 samples (e.g., 1000). For deterministic models, use a single sample per
 row: <code>samples = list(c(42))</code>.</p>

@@ -37,6 +37,15 @@ create_chap_cli(
   Monte Carlo samples. The CLI automatically converts the nested samples
   to wide CSV format (sample_0, sample_1, ...) for CHAP.
 
+  **Important**: `historic_data` may contain more recent observations
+  than the original training data. CHAP may call predict with updated
+  data after the model was trained. For time series models, you should
+  typically refit the model to `historic_data` before forecasting. Use
+  `saved_model` to store model hyperparameters or structure that should
+  persist across predictions, rather than the fitted model itself. See
+  `examples/arima_model/` for a demonstration of this pattern using
+  `fable::refit()`.
+
 - model_config_schema:
 
   Optional model configuration schema (reserved for future use). Can be
