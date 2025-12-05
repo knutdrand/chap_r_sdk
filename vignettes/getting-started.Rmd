@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r setup}
+library(chap.r.sdk)
+```
+
 ## Introduction
 
 The `chap.r.sdk` package provides infrastructure for developing CHAP-compatible disease forecasting models. It simplifies model development by handling common tasks like file I/O, configuration management, and CLI creation.
