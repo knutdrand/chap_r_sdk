@@ -7,12 +7,14 @@
 #' @param frequency Character string specifying the temporal frequency.
 #'   Currently only 'M' (monthly) is supported.
 #'
-#' @return A named list containing four tibbles:
+#' @return A named list containing four elements:
 #'   \itemize{
-#'     \item \code{training_data}: Historical data for training the model
-#'     \item \code{historic_data}: Historical data for making predictions
-#'     \item \code{future_data}: Future time periods for prediction
-#'     \item \code{predictions}: Example prediction output
+#'     \item \code{training_data}: tsibble with historical data for training the model
+#'     \item \code{historic_data}: tsibble with historical data for making predictions
+#'     \item \code{future_data}: tsibble with future time periods for prediction
+#'     \item \code{predictions}: tibble with example prediction output. If the predictions
+#'       contain sample columns (sample_0, sample_1, ...), they are converted to nested
+#'       list-column format with a \code{samples} column containing numeric vectors.
 #'   }
 #'
 #' @export
@@ -22,6 +24,9 @@
 #' data <- get_example_data('laos', 'M')
 #' model <- train_fn(data$training_data)
 #' preds <- predict_fn(data$historic_data, data$future_data, model)
+#'
+#' # If predictions have samples, access them like this:
+#' data$predictions$samples[[1]]  # Samples for first forecast unit
 #' }
 get_example_data <- function(country, frequency) {
   # Validate inputs
@@ -44,7 +49,17 @@ get_example_data <- function(country, frequency) {
   training_data <- load_tsibble(file.path(data_dir, "training_data.csv"))
   historic_data <- load_tsibble(file.path(data_dir, "historic_data.csv"))
   future_data <- load_tsibble(file.path(data_dir, "future_data.csv"))
-  predictions <- load_tsibble(file.path(data_dir, "predictions.csv"))
+
+  # Load predictions and convert to nested sample format if samples are present
+  predictions_path <- file.path(data_dir, "predictions.csv")
+  predictions_raw <- readr::read_csv(predictions_path, show_col_types = FALSE)
+
+  # Check if predictions have sample columns and convert to nested format
+  if (detect_prediction_format(predictions_raw) == "wide") {
+    predictions <- predictions_from_wide(predictions_raw)
+  } else {
+    predictions <- tibble::as_tibble(predictions_raw)
+  }
 
   # Return as named list
   list(
@@ -62,10 +77,18 @@ get_example_data <- function(country, frequency) {
 #' with a specific example dataset and produce output with the expected structure
 #' (matching time periods and locations).
 #'
+#' Models can return either:
+#' \itemize{
+#'   \item Point predictions with a \code{disease_cases} column
+#'   \item Sample-based predictions with a \code{samples} list-column containing
+#'     numeric vectors of Monte Carlo samples
+#' }
+#'
 #' @param train_fn Training function that takes (training_data, model_configuration = list())
 #'   and returns a trained model object
 #' @param predict_fn Prediction function that takes (historic_data, future_data, saved_model,
-#'   model_configuration = list()) and returns predictions
+#'   model_configuration = list()) and returns predictions. Can return either point predictions
+#'   (with disease_cases column) or sample-based predictions (with samples list-column).
 #' @param example_data Named list containing training_data, historic_data, future_data,
 #'   and predictions (as returned by get_example_data())
 #' @param model_configuration Optional list of model configuration parameters to pass to
@@ -76,6 +99,8 @@ get_example_data <- function(country, frequency) {
 #'     \item \code{success}: Logical indicating if validation passed
 #'     \item \code{errors}: Character vector of error messages (if any)
 #'     \item \code{n_predictions}: Number of prediction rows returned
+#'     \item \code{prediction_format}: Format of predictions ("point", "samples", or "unknown")
+#'     \item \code{n_samples}: Number of samples per forecast unit (if sample-based)
 #'   }
 #'
 #' @export
@@ -107,6 +132,8 @@ validate_model_io <- function(train_fn, predict_fn, example_data,
                                model_configuration = list()) {
   validation_errors <- character(0)
   n_predictions <- NA
+  prediction_format <- "unknown"
+  n_samples <- NA
 
   tryCatch({
     # Train model
@@ -123,14 +150,38 @@ validate_model_io <- function(train_fn, predict_fn, example_data,
     # Check that predictions is a data frame
     if (!is.data.frame(predictions)) {
       validation_errors <- c(validation_errors,
-                             "Predictions must be a data frame or tsibble")
+                             "Predictions must be a data frame or tibble")
     } else {
       n_predictions <- nrow(predictions)
 
-      # Check disease_cases column exists (the actual prediction output)
-      if (!"disease_cases" %in% names(predictions)) {
+      # Detect prediction format
+      has_disease_cases <- "disease_cases" %in% names(predictions)
+      has_samples <- "samples" %in% names(predictions) && is.list(predictions$samples)
+
+      if (has_samples) {
+        prediction_format <- "samples"
+        # Validate samples structure
+        if (length(predictions$samples) > 0) {
+          n_samples <- length(predictions$samples[[1]])
+
+          # Check all rows have same number of samples
+          sample_lengths <- vapply(predictions$samples, length, integer(1))
+          if (!all(sample_lengths == n_samples)) {
+            validation_errors <- c(validation_errors,
+                                   "All rows must have the same number of samples")
+          }
+
+          # Check samples are numeric
+          if (!all(vapply(predictions$samples, is.numeric, logical(1)))) {
+            validation_errors <- c(validation_errors,
+                                   "All samples must be numeric vectors")
+          }
+        }
+      } else if (has_disease_cases) {
+        prediction_format <- "point"
+      } else {
         validation_errors <- c(validation_errors,
-                               "Predictions missing required column: disease_cases")
+                               "Predictions must have either 'disease_cases' column (point predictions) or 'samples' list-column (sample-based predictions)")
       }
 
       # Check dimensions match expected
@@ -150,7 +201,9 @@ validate_model_io <- function(train_fn, predict_fn, example_data,
   list(
     success = length(validation_errors) == 0,
     errors = validation_errors,
-    n_predictions = n_predictions
+    n_predictions = n_predictions,
+    prediction_format = prediction_format,
+    n_samples = n_samples
   )
 }
 

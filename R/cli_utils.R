@@ -171,13 +171,49 @@ save_model <- function(model, output_path = "model.rds") {
 #' Save predictions to CSV
 #'
 #' Saves prediction results to a CSV file with a status message.
+#' If predictions contain nested sample list-columns, they are automatically
+#' converted to wide format (sample_0, sample_1, ...) for CHAP compatibility.
 #'
 #' @param predictions Predictions data frame or tsibble
 #' @param output_path Path for output CSV file
 #' @return Path to the saved predictions file
 #' @keywords internal
 save_predictions <- function(predictions, output_path) {
+  # Detect if predictions have nested samples and convert to wide format
+  format <- detect_prediction_format(predictions)
+
+  if (format == "nested") {
+    # Convert nested samples to wide format for CHAP CSV output
+    predictions <- predictions_to_wide(predictions)
+    message("Converted nested samples to wide format for CSV output")
+  }
+
   readr::write_csv(predictions, output_path)
   message("Predictions saved to: ", output_path)
   return(output_path)
+}
+
+#' Load predictions from CSV
+#'
+#' Loads a predictions CSV file and optionally converts from wide sample format
+#' to nested list-column format for easier manipulation.
+#'
+#' @param file_path Path to predictions CSV file
+#' @param convert_samples Whether to convert wide sample columns to nested format (default: TRUE)
+#' @return A tibble with predictions. If convert_samples is TRUE and sample columns
+#'   are detected, returns nested format with a 'samples' list-column.
+#' @keywords internal
+load_predictions <- function(file_path, convert_samples = TRUE) {
+  # Load CSV
+  df <- readr::read_csv(file_path, show_col_types = FALSE)
+
+  # Check for sample columns and convert if requested
+  if (convert_samples) {
+    format <- detect_prediction_format(df)
+    if (format == "wide") {
+      df <- predictions_from_wide(df)
+    }
+  }
+
+  tibble::as_tibble(df)
 }

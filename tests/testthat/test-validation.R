@@ -5,11 +5,13 @@ test_that("get_example_data returns valid structure for laos monthly", {
   expect_type(data, "list")
   expect_named(data, c("training_data", "historic_data", "future_data", "predictions"))
 
-  # Check that all elements are tsibbles
+  # Check that training/historic/future are tsibbles
   expect_true(tsibble::is_tsibble(data$training_data))
   expect_true(tsibble::is_tsibble(data$historic_data))
   expect_true(tsibble::is_tsibble(data$future_data))
-  expect_true(tsibble::is_tsibble(data$predictions))
+
+  # Predictions is a tibble (may have nested samples)
+  expect_true(tibble::is_tibble(data$predictions))
 
   # Check that data has rows
   expect_gt(nrow(data$training_data), 0)
@@ -25,8 +27,25 @@ test_that("get_example_data returns valid structure for laos monthly", {
   expect_equal(tsibble::index_var(data$future_data), "time_period")
   expect_true("location" %in% tsibble::key_vars(data$future_data))
 
-  expect_equal(tsibble::index_var(data$predictions), "time_period")
-  expect_true("location" %in% tsibble::key_vars(data$predictions))
+  # Predictions should have time_period and location columns
+  expect_true("time_period" %in% names(data$predictions))
+  expect_true("location" %in% names(data$predictions))
+})
+
+test_that("get_example_data converts sample predictions to nested format", {
+  data <- get_example_data('laos', 'M')
+
+  # Check if predictions have samples column (nested format)
+  format <- chap.r.sdk::detect_prediction_format(data$predictions)
+
+  # The example data may or may not have samples depending on the dataset
+
+  # If it has samples, they should be in nested format
+  if (format == "nested") {
+    expect_true("samples" %in% names(data$predictions))
+    expect_type(data$predictions$samples, "list")
+    expect_true(is.numeric(data$predictions$samples[[1]]))
+  }
 })
 
 test_that("get_example_data rejects unsupported country", {
@@ -58,7 +77,7 @@ test_that("run_model_tests executes full test suite", {
   skip("Not yet implemented")
 })
 
-test_that("validate_model_io passes with correct model functions", {
+test_that("validate_model_io passes with correct point prediction model", {
   # Define simple model functions that work correctly with tsibbles
   train_fn <- function(training_data, model_configuration = list()) {
     means <- training_data |>
@@ -82,21 +101,59 @@ test_that("validate_model_io passes with correct model functions", {
   result <- validate_model_io(train_fn, predict_fn, example_data)
 
   expect_type(result, "list")
-  expect_named(result, c("success", "errors", "n_predictions"))
+  expect_named(result, c("success", "errors", "n_predictions", "prediction_format", "n_samples"))
   expect_true(result$success)
   expect_length(result$errors, 0)
   expect_equal(result$n_predictions, 21)
+  expect_equal(result$prediction_format, "point")
+  expect_true(is.na(result$n_samples))
 })
 
-test_that("validate_model_io detects missing disease_cases column", {
+test_that("validate_model_io passes with correct sample-based prediction model", {
+  # Define model functions that return sample-based predictions
+  train_fn <- function(training_data, model_configuration = list()) {
+    means <- training_data |>
+      tibble::as_tibble() |>
+      dplyr::group_by(location) |>
+      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+    list(means = means)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    n_samples <- 100
+    future_data |>
+      tibble::as_tibble() |>
+      dplyr::left_join(saved_model$means, by = "location") |>
+      dplyr::rowwise() |>
+      dplyr::mutate(
+        samples = list(rpois(n_samples, lambda = mean_cases))
+      ) |>
+      dplyr::ungroup() |>
+      dplyr::select(-mean_cases)
+  }
+
+  # Test with single example_data
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_type(result, "list")
+  expect_true(result$success)
+  expect_length(result$errors, 0)
+  expect_equal(result$n_predictions, 21)
+  expect_equal(result$prediction_format, "samples")
+  expect_equal(result$n_samples, 100)
+})
+
+test_that("validate_model_io detects missing prediction output", {
   train_fn <- function(training_data, model_configuration = list()) {
     list(dummy = 1)
   }
 
   predict_fn <- function(historic_data, future_data, saved_model,
                          model_configuration = list()) {
-    # Return future_data as-is (no disease_cases column)
-    future_data
+    # Return future_data as-is (no disease_cases or samples column)
+    tibble::as_tibble(future_data)
   }
 
   example_data <- get_example_data('laos', 'M')
@@ -104,7 +161,8 @@ test_that("validate_model_io detects missing disease_cases column", {
 
   expect_false(result$success)
   expect_gt(length(result$errors), 0)
-  expect_match(result$errors[1], "disease_cases", ignore.case = TRUE)
+  # Should mention either disease_cases or samples
+  expect_match(result$errors[1], "disease_cases|samples", ignore.case = TRUE)
 })
 
 test_that("validate_model_io detects row count mismatch", {

@@ -16,5 +16,7 @@ Path to the saved predictions file
 }
 \description{
 Saves prediction results to a CSV file with a status message.
+If predictions contain nested sample list-columns, they are automatically
+converted to wide format (sample_0, sample_1, ...) for CHAP compatibility.
 }
 \keyword{internal}

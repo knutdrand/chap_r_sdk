@@ -16,7 +16,8 @@ validate_model_io(
 and returns a trained model object}
 
 \item{predict_fn}{Prediction function that takes (historic_data, future_data, saved_model,
-model_configuration = list()) and returns predictions}
+model_configuration = list()) and returns predictions. Can return either point predictions
+(with disease_cases column) or sample-based predictions (with samples list-column).}
 
 \item{example_data}{Named list containing training_data, historic_data, future_data,
 and predictions (as returned by get_example_data())}
@@ -30,12 +31,22 @@ A list with validation results:
 \item \code{success}: Logical indicating if validation passed
 \item \code{errors}: Character vector of error messages (if any)
 \item \code{n_predictions}: Number of prediction rows returned
+\item \code{prediction_format}: Format of predictions ("point", "samples", or "unknown")
+\item \code{n_samples}: Number of samples per forecast unit (if sample-based)
 }
 }
 \description{
 Validates that a model's training and prediction functions work correctly
 with a specific example dataset and produce output with the expected structure
 (matching time periods and locations).
+}
+\details{
+Models can return either:
+\itemize{
+\item Point predictions with a \code{disease_cases} column
+\item Sample-based predictions with a \code{samples} list-column containing
+numeric vectors of Monte Carlo samples
+}
 }
 \examples{
 \dontrun{

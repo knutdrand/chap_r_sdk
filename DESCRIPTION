@@ -17,11 +17,13 @@ Imports:
     cli,
     dplyr,
     jsonlite,
+    purrr,
     readr,
     rlang,
+    tibble,
+    tidyr,
     tsibble,
-    yaml,
-    purrr
+    yaml
 Suggests:
     testthat (>= 3.0.0),
     covr,

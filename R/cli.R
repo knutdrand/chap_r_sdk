@@ -14,7 +14,11 @@
 #' @param predict_fn Prediction function with signature:
 #'   \code{function(historic_data, future_data, saved_model, model_configuration = list())}
 #'   where all data inputs are tsibbles, \code{saved_model} is a loaded object,
-#'   and \code{model_configuration} is a list. Should return a predictions tsibble.
+#'   and \code{model_configuration} is a list. Should return a predictions data frame
+#'   or tibble. For probabilistic forecasts, return a tibble with a \code{samples}
+#'   list-column containing numeric vectors of Monte Carlo samples per forecast unit.
+#'   The CLI will automatically convert nested samples to wide CSV format (sample_0,
+#'   sample_1, ...) for CHAP compatibility.
 #' @param model_config_schema Optional model configuration schema (reserved for future use).
 #'   Can be used with the "info" subcommand to display schema information.
 #' @param args Command line arguments (defaults to \code{commandArgs(trailingOnly = TRUE)})

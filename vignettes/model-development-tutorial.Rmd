@@ -44,7 +44,9 @@ predict_fn <- function(historic_data, future_data, saved_model,
   # historic_data: tsibble with historical observations
   # future_data: tsibble with time periods to predict
   # saved_model: the object returned by train_fn
-  # Returns: data frame/tsibble with disease_cases column
+  # Returns: tibble with either:
+  #   - disease_cases column (point predictions), or
+  #   - samples list-column (probabilistic predictions with Monte Carlo samples)
 }
 ```
 
@@ -69,7 +71,7 @@ data$training_data
 data$future_data
 ```
 
-Your predictions must include a `disease_cases` column with the forecasted values.
+Your predictions must include either a `disease_cases` column (point predictions) or a `samples` list-column (probabilistic predictions).
 
 ## Step 3: Validate Before Implementing
 
@@ -186,7 +188,48 @@ The CLI automatically handles:
 - Loading CSV files
 - Converting to tsibbles
 - Saving the model as RDS
-- Writing predictions to CSV
+- Writing predictions to CSV (converting nested samples to wide format)
+
+## Probabilistic Predictions (Optional)
+
+For probabilistic forecasting, return Monte Carlo samples instead of point predictions:
+
+```r
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  n_samples <- 1000
+
+  future_data |>
+    as_tibble() |>
+    left_join(saved_model$means, by = "location") |>
+    rowwise() |>
+    mutate(
+      # Generate samples from Poisson distribution
+      samples = list(rpois(n_samples, lambda = mean_cases))
+    ) |>
+    ungroup() |>
+    select(-mean_cases)
+}
+```
+
+The `samples` column is a list-column where each element is a numeric vector of samples.
+The CLI automatically converts this to wide CSV format (`sample_0`, `sample_1`, ...) for CHAP.
+
+You can also use the conversion functions directly:
+
+```r
+# Convert nested samples to wide format
+wide_preds <- predictions_to_wide(nested_preds)
+
+# Convert to long format for scoringutils
+long_preds <- predictions_to_long(nested_preds)
+
+# Compute quantiles for hub submissions
+quantile_preds <- predictions_to_quantiles(nested_preds)
+
+# Add summary statistics (mean, median, CIs)
+preds_with_summary <- predictions_summary(nested_preds)
+```
 
 ## Summary
 
