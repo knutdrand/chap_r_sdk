@@ -9,6 +9,7 @@ Description: Provides convenience functionality for developing chap-compatible
     transformations, and configuration schema management.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 URL: https://github.com/knutdrand/chap_r_sdk

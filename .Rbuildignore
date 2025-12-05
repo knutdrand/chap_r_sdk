@@ -17,3 +17,5 @@
 ^cran-comments\.md$
 ^examples$
 ^VALIDATION_CHECKLIST\.md$
+^CODE_OF_CONDUCT\.md$
+^CONTRIBUTING\.md$
