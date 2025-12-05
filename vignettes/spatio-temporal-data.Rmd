@@ -1,0 +1,354 @@
+---
+title: "Working with Spatio-Temporal Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with Spatio-Temporal Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+This tutorial shows how to work with spatio-temporal data in CHAP models using established R packages. Rather than reinventing the wheel, we leverage the excellent tidyverse ecosystem.
+
+## Recommended Packages
+
+| Package | Purpose | Install |
+|---------|---------|---------|
+| **tsibble** | Temporal data structures | `install.packages("tsibble")` |
+| **fabletools** | Temporal aggregation, reconciliation | `install.packages("fabletools")` |
+| **sf** | Spatial data and operations | `install.packages("sf")` |
+| **cubble** | Spatio-temporal data wrangling | `install.packages("cubble")` |
+
+```{r setup}
+library(chap.r.sdk)
+library(dplyr)
+library(tidyr)
+library(tsibble)
+```
+
+## Working with CHAP Example Data
+
+Let's start with the example data from the SDK:
+
+```{r load-data}
+data <- get_example_data('laos', 'M')
+training_data <- data$training_data
+
+# Examine the structure
+training_data
+```
+
+The data is already a tsibble with:
+- `time_period` as the temporal index (monthly)
+- `location` as the spatial key
+- `disease_cases` as the target variable
+- Various covariates (rainfall, temperature, population)
+
+## Temporal Operations with tsibble
+
+### Lag Features
+
+Create lagged versions of variables for time series modeling:
+
+```{r lag-features}
+# Add lagged disease cases (1 and 2 months ago)
+training_with_lags <- training_data |>
+  group_by_key() |>
+  mutate(
+    cases_lag1 = lag(disease_cases, 1),
+    cases_lag2 = lag(disease_cases, 2),
+    rainfall_lag1 = lag(rainfall, 1)
+  ) |>
+  ungroup()
+
+training_with_lags |>
+  select(time_period, location, disease_cases, cases_lag1, cases_lag2) |>
+  head(10)
+```
+
+### Rolling Window Statistics
+
+Calculate moving averages and other rolling statistics using the slider package:
+
+```{r rolling-stats, eval=requireNamespace("slider", quietly = TRUE)}
+# Rolling mean of disease cases (3-month window)
+training_with_rolling <- training_data |>
+  group_by_key() |>
+  mutate(
+    cases_ma3 = slider::slide_dbl(disease_cases, mean, .before = 2, .complete = TRUE),
+    cases_max3 = slider::slide_dbl(disease_cases, max, .before = 2, .complete = TRUE)
+  ) |>
+  ungroup()
+
+training_with_rolling |>
+  select(time_period, location, disease_cases, cases_ma3, cases_max3) |>
+  filter(location == "Bokeo") |>
+  head(10)
+```
+
+### Differencing
+
+Remove trends with differencing:
+
+```{r differencing}
+training_diff <- training_data |>
+  group_by_key() |>
+  mutate(
+    cases_diff = difference(disease_cases, 1),
+    cases_diff12 = difference(disease_cases, 12)  # Seasonal difference
+  ) |>
+  ungroup()
+
+training_diff |>
+  select(time_period, location, disease_cases, cases_diff, cases_diff12) |>
+  filter(location == "Bokeo") |>
+  head(15)
+```
+
+### Handling Missing Values
+
+tsibble provides tools for gap detection and filling:
+
+```{r gaps}
+# Check for gaps in the time series
+has_gaps(training_data)
+
+# Count gaps per location
+count_gaps(training_data)
+```
+
+```{r fill-gaps, eval=FALSE}
+# If there were gaps, fill them:
+filled_data <- training_data |>
+  fill_gaps() |>
+  group_by_key() |>
+  tidyr::fill(disease_cases, .direction = "down") |>
+  ungroup()
+```
+
+## Temporal Aggregation with fabletools
+
+### Aggregate to Quarterly Data
+
+```{r temporal-agg, message=FALSE, eval=requireNamespace("fabletools", quietly = TRUE)}
+library(fabletools)
+
+# Convert monthly to quarterly
+quarterly_data <- training_data |>
+  index_by(quarter = yearquarter(time_period)) |>
+  group_by(location) |>
+  summarise(
+    disease_cases = sum(disease_cases, na.rm = TRUE),
+    rainfall = mean(rainfall, na.rm = TRUE),
+    mean_temperature = mean(mean_temperature, na.rm = TRUE),
+    population = mean(population, na.rm = TRUE)
+  )
+
+quarterly_data
+```
+### Aggregate to Yearly Data
+
+```{r yearly-agg}
+yearly_data <- training_data |>
+  as_tibble() |>
+  mutate(year = lubridate::year(time_period)) |>
+  group_by(location, year) |>
+  summarise(
+    total_cases = sum(disease_cases, na.rm = TRUE),
+    mean_rainfall = mean(rainfall, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+yearly_data
+```
+
+## Spatial Aggregation
+
+### Aggregate Across Locations
+
+Sometimes you need national-level totals from regional data:
+
+```{r spatial-agg}
+# Aggregate all locations to national level
+national_data <- training_data |>
+  as_tibble() |>
+  group_by(time_period) |>
+  summarise(
+    total_cases = sum(disease_cases, na.rm = TRUE),
+    total_population = sum(population, na.rm = TRUE),
+    mean_rainfall = weighted.mean(rainfall, population, na.rm = TRUE),
+    mean_temperature = weighted.mean(mean_temperature, population, na.rm = TRUE)
+  )
+
+national_data |> head(10)
+```
+
+### Hierarchical Aggregation
+
+Create data at multiple levels for hierarchical forecasting:
+
+```{r hierarchical}
+# Assume we have a parent column for regional grouping
+# Create hierarchical structure
+hierarchical_data <- training_data |>
+  as_tibble() |>
+  group_by(time_period, parent) |>
+  summarise(
+    regional_cases = sum(disease_cases, na.rm = TRUE),
+    regional_pop = sum(population, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+hierarchical_data |> head(10)
+```
+
+## Working with Spatial Data (sf)
+
+If your data includes geographic coordinates or boundaries:
+
+```{r sf-example, eval=FALSE}
+library(sf)
+
+# Example: Create spatial features from coordinates
+locations_sf <- tibble(
+  location = c("Bokeo", "Luangprabang", "Oudomxay"),
+  lon = c(100.5, 102.1, 101.5),
+  lat = c(20.2, 19.9, 20.7)
+) |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+# Spatial join with administrative boundaries
+# admin_boundaries <- st_read("boundaries.geojson")
+# joined <- st_join(locations_sf, admin_boundaries)
+
+# Calculate distances between locations
+# distances <- st_distance(locations_sf)
+```
+
+## Spatio-Temporal Data with cubble
+
+For more complex spatio-temporal analyses, the cubble package provides a unified structure:
+
+```{r cubble-example, eval=FALSE}
+library(cubble)
+
+# Create a cubble from separate spatial and temporal data
+cb <- as_cubble(
+  data = training_data,
+  key = location,
+  index = time_period,
+  coords = c(lon, lat)  # if coordinates available
+)
+
+# Switch between spatial and temporal views
+cb_temporal <- cb |> face_temporal()
+cb_spatial <- cb |> face_spatial()
+
+# Useful for linking maps with time series plots
+```
+
+## Feature Engineering for CHAP Models
+
+Here's a complete example of preparing features for a CHAP model:
+
+```{r feature-engineering, eval=requireNamespace("slider", quietly = TRUE) && requireNamespace("lubridate", quietly = TRUE)}
+prepare_features <- function(data) {
+  data |>
+    group_by_key() |>
+    mutate(
+      # Lag features
+      cases_lag1 = lag(disease_cases, 1),
+      cases_lag2 = lag(disease_cases, 2),
+      cases_lag3 = lag(disease_cases, 3),
+      rainfall_lag1 = lag(rainfall, 1),
+
+      # Rolling statistics
+      cases_ma3 = slider::slide_dbl(disease_cases, mean, .before = 2, .complete = TRUE),
+      rainfall_ma3 = slider::slide_dbl(rainfall, mean, .before = 2, .complete = TRUE),
+
+      # Seasonal features
+      month = lubridate::month(time_period),
+
+      # Year-over-year change
+      cases_yoy = disease_cases - lag(disease_cases, 12)
+    ) |>
+    ungroup() |>
+    # Remove rows with NA from lagging
+    filter(!is.na(cases_lag3))
+}
+
+# Apply to training data
+features <- prepare_features(training_data)
+features |>
+  select(time_period, location, disease_cases, cases_lag1, cases_ma3, month) |>
+  head(10)
+```
+
+## Using Features in a CHAP Model
+
+```{r model-with-features, eval=FALSE}
+library(chap.r.sdk)
+
+train_fn <- function(training_data, model_configuration = list()) {
+  # Prepare features
+  features <- prepare_features(training_data)
+
+  # Fit a simple linear model per location
+  models <- features |>
+    group_by(location) |>
+    group_map(~ lm(disease_cases ~ cases_lag1 + cases_ma3 + rainfall_lag1, data = .x))
+
+  names(models) <- unique(features$location)
+  list(models = models)
+}
+
+predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list()) {
+  # Prepare features from historic data
+  features <- prepare_features(historic_data)
+
+  # Get the last known values for prediction
+  last_values <- features |>
+    group_by(location) |>
+    slice_max(time_period, n = 1)
+
+  # Generate predictions
+  future_data |>
+    left_join(last_values |> select(location, cases_lag1, cases_ma3, rainfall_lag1),
+              by = "location") |>
+    rowwise() |>
+    mutate(
+      pred = predict(saved_model$models[[location]], newdata = cur_data()),
+      samples = list(c(pred))
+    ) |>
+    ungroup() |>
+    select(-pred, -cases_lag1, -cases_ma3, -rainfall_lag1)
+}
+```
+
+## Summary
+
+For spatio-temporal data in CHAP:
+
+1. **tsibble** - Use for all temporal data structures and operations
+2. **fabletools** - Use for temporal aggregation and hierarchical forecasting
+3. **sf** - Use for spatial operations (joins, distances, boundaries)
+4. **cubble** - Use for complex spatio-temporal analysis with linked views
+5. **slider** - Use for rolling window calculations
+
+These packages integrate seamlessly with the tidyverse and work well with the CHAP SDK's tsibble-based data format.
+
+## Further Reading
+
+- [tsibble documentation](https://tsibble.tidyverts.org/)
+- [fabletools reference](https://fabletools.tidyverts.org/)
+- [sf package](https://r-spatial.github.io/sf/)
+- [cubble paper (Journal of Statistical Software)](https://www.jstatsoft.org/article/view/v110i07)
+- [CRAN Task View: Spatio-Temporal Data](https://cran.r-project.org/view=SpatioTemporal)

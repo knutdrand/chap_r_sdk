@@ -28,7 +28,11 @@ Suggests:
     knitr,
     rmarkdown,
     fable,
+    fabletools,
     distributional,
-    lubridate
+    lubridate,
+    slider,
+    sf,
+    cubble
 Config/testthat/edition: 3
 VignetteBuilder: knitr
