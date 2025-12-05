@@ -222,24 +222,27 @@ we wrap the single prediction value in a list:
 train_fn <- function(training_data, model_configuration = list()) {
   means <- training_data |>
     as_tibble() |>
-    group_by(location) |>
-    summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+    summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
   list(means = means)
 }
 
 predict_fn <- function(historic_data, future_data, saved_model,
                        model_configuration = list()) {
   future_data |>
-    as_tibble() |>
     left_join(saved_model$means, by = "location") |>
     mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
     select(-mean_cases)
 }
 ```
 
-That’s it! We convert to tibble before grouping to avoid tsibble key
-conflicts, and wrap each prediction in `list(c(value))` to create the
-samples column.
+Note: We use
+[`as_tibble()`](https://tibble.tidyverse.org/reference/as_tibble.html)
+in the training function because `summarise(.by = ...)` needs a tibble
+to collapse across the time dimension. The prediction function works
+directly on tsibbles since
+[`left_join()`](https://dplyr.tidyverse.org/reference/mutate-joins.html)
+and [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
+preserve tsibble structure.
 
 ## Step 5: Validate the Implementation
 
@@ -281,15 +284,13 @@ library(dplyr)
 train_fn <- function(training_data, model_configuration = list()) {
   means <- training_data |>
     as_tibble() |>
-    group_by(location) |>
-    summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+    summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
   list(means = means)
 }
 
 predict_fn <- function(historic_data, future_data, saved_model,
                        model_configuration = list()) {
   future_data |>
-    as_tibble() |>
     left_join(saved_model$means, by = "location") |>
     mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
     select(-mean_cases)
@@ -333,7 +334,6 @@ predict_fn <- function(historic_data, future_data, saved_model,
   n_samples <- 1000
 
   future_data |>
-    as_tibble() |>
     left_join(saved_model$means, by = "location") |>
     rowwise() |>
     mutate(
