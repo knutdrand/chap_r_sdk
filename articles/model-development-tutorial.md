@@ -42,7 +42,9 @@ predict_fn <- function(historic_data, future_data, saved_model,
   # historic_data: tsibble with historical observations
   # future_data: tsibble with time periods to predict
   # saved_model: the object returned by train_fn
-  # Returns: data frame/tsibble with disease_cases column
+  # Returns: tibble with samples list-column containing numeric vectors
+  #   - For deterministic models: single sample per row (e.g., samples = list(c(42)))
+  #   - For probabilistic models: multiple samples per row (e.g., 1000 samples)
 }
 ```
 
@@ -111,8 +113,8 @@ data$future_data
 #> # ℹ 3 more variables: month <dbl>, ID_year <dbl>, ID_spat <chr>
 ```
 
-Your predictions must include a `disease_cases` column with the
-forecasted values.
+Your predictions must include a `samples` list-column. For deterministic
+models, use a single sample per row.
 
 ## Step 3: Validate Before Implementing
 
@@ -133,16 +135,17 @@ result <- validate_model_io(train_fn, predict_fn, data)
 result$success
 #> [1] FALSE
 result$errors
-#> [1] "Predictions missing required column: disease_cases"
+#> [1] "Predictions must have a 'samples' list-column containing numeric vectors"
 ```
 
-The validation tells us exactly what’s missing: the `disease_cases`
-column in predictions.
+The validation tells us exactly what’s missing: the `samples`
+list-column in predictions.
 
 ## Step 4: Implement a Simple Mean Model
 
 Now let’s implement a minimal model that predicts the historical mean
-for each location:
+for each location. Since all models must return a `samples` list-column,
+we wrap the single prediction value in a list:
 
 ``` r
 train_fn <- function(training_data, model_configuration = list()) {
@@ -158,13 +161,14 @@ predict_fn <- function(historic_data, future_data, saved_model,
   future_data |>
     as_tibble() |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = mean_cases) |>
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
     select(-mean_cases)
 }
 ```
 
-That’s it! Just 12 lines of actual model logic. We convert to tibble
-before grouping to avoid tsibble key conflicts.
+That’s it! We convert to tibble before grouping to avoid tsibble key
+conflicts, and wrap each prediction in `list(c(value))` to create the
+samples column.
 
 ## Step 5: Validate the Implementation
 
@@ -216,7 +220,7 @@ predict_fn <- function(historic_data, future_data, saved_model,
   future_data |>
     as_tibble() |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = mean_cases) |>
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
     select(-mean_cases)
 }
 
@@ -245,7 +249,53 @@ The CLI automatically handles:
 - Loading CSV files
 - Converting to tsibbles
 - Saving the model as RDS
-- Writing predictions to CSV
+- Writing predictions to CSV (converting nested samples to wide format)
+
+## Probabilistic Models
+
+For probabilistic forecasting, include multiple Monte Carlo samples
+instead of a single value:
+
+``` r
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  n_samples <- 1000
+
+  future_data |>
+    as_tibble() |>
+    left_join(saved_model$means, by = "location") |>
+    rowwise() |>
+    mutate(
+      # Generate 1000 samples from Poisson distribution
+      samples = list(rpois(n_samples, lambda = mean_cases))
+    ) |>
+    ungroup() |>
+    select(-mean_cases)
+}
+```
+
+The `samples` column is a list-column where each element is a numeric
+vector. The CLI automatically converts this to wide CSV format
+(`sample_0`, `sample_1`, …) for CHAP.
+
+## Working with Samples
+
+The SDK provides utility functions for working with sample-based
+predictions:
+
+``` r
+# Convert nested samples to wide format
+wide_preds <- predictions_to_wide(nested_preds)
+
+# Convert to long format for scoringutils
+long_preds <- predictions_to_long(nested_preds)
+
+# Compute quantiles for hub submissions
+quantile_preds <- predictions_to_quantiles(nested_preds)
+
+# Add summary statistics (mean, median, CIs)
+preds_with_summary <- predictions_summary(nested_preds)
+```
 
 ## Summary
 

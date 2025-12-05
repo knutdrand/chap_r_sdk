@@ -30,8 +30,12 @@ create_chap_cli(
   Prediction function with signature:
   `function(historic_data, future_data, saved_model, model_configuration = list())`
   where all data inputs are tsibbles, `saved_model` is a loaded object,
-  and `model_configuration` is a list. Should return a predictions
-  tsibble.
+  and `model_configuration` is a list. Must return a tibble with a
+  `samples` list-column containing numeric vectors. For deterministic
+  models, use a single sample per forecast unit (e.g.,
+  `samples = list(c(42))`). For probabilistic models, include multiple
+  Monte Carlo samples. The CLI automatically converts the nested samples
+  to wide CSV format (sample_0, sample_1, ...) for CHAP.
 
 - model_config_schema:
 
@@ -71,10 +75,12 @@ train_my_model <- function(training_data, model_configuration = list()) {
 predict_my_model <- function(historic_data, future_data, saved_model,
                               model_configuration = list()) {
   # All inputs are already loaded - no file I/O needed!
-  predictions <- future_data |>
+  # Return samples list-column (single sample for deterministic model)
+  future_data |>
+    as_tibble() |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = mean_cases)
-  return(predictions)
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
+    select(-mean_cases)
 }
 
 config_schema <- list(

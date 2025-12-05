@@ -290,6 +290,27 @@ Utilities for working with spatio-temporal data
 - [`aggregate_temporal()`](https://knutdrand.github.io/chap_r_sdk/reference/aggregate_temporal.md)
   : Aggregate Temporal Data
 
+## Prediction Samples
+
+Convert between prediction sample formats
+
+- [`predictions_from_wide()`](https://knutdrand.github.io/chap_r_sdk/reference/predictions_from_wide.md)
+  : Convert Wide Format Predictions to Nested Format
+- [`predictions_to_wide()`](https://knutdrand.github.io/chap_r_sdk/reference/predictions_to_wide.md)
+  : Convert Nested Format Predictions to Wide Format
+- [`predictions_from_long()`](https://knutdrand.github.io/chap_r_sdk/reference/predictions_from_long.md)
+  : Convert Long Format to Nested Format
+- [`predictions_to_long()`](https://knutdrand.github.io/chap_r_sdk/reference/predictions_to_long.md)
+  : Convert Nested Format to Long Format
+- [`predictions_to_quantiles()`](https://knutdrand.github.io/chap_r_sdk/reference/predictions_to_quantiles.md)
+  : Compute Quantiles from Prediction Samples
+- [`predictions_summary()`](https://knutdrand.github.io/chap_r_sdk/reference/predictions_summary.md)
+  : Add Summary Statistics to Predictions
+- [`has_prediction_samples()`](https://knutdrand.github.io/chap_r_sdk/reference/has_prediction_samples.md)
+  : Check if Predictions Have Samples
+- [`detect_prediction_format()`](https://knutdrand.github.io/chap_r_sdk/reference/detect_prediction_format.md)
+  : Detect Prediction Sample Format
+
 ## Example Models
 
 Reference model implementations
