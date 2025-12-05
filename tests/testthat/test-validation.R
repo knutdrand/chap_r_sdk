@@ -57,3 +57,132 @@ test_that("run_model_tests executes full test suite", {
   # TODO: Implement test
   skip("Not yet implemented")
 })
+
+test_that("validate_model_io passes with correct model functions", {
+  # Define simple model functions that work correctly
+  train_fn <- function(training_data, model_configuration = list()) {
+    means <- training_data |>
+      dplyr::group_by(location) |>
+      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+    list(means = means)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    future_data |>
+      dplyr::left_join(saved_model$means, by = "location") |>
+      dplyr::mutate(disease_cases = mean_cases) |>
+      dplyr::select(-mean_cases)
+  }
+
+  # Test with single example_data
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_type(result, "list")
+  expect_named(result, c("success", "errors", "n_predictions"))
+  expect_true(result$success)
+  expect_length(result$errors, 0)
+  expect_equal(result$n_predictions, 21)
+})
+
+test_that("validate_model_io detects missing time_period column", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    list(dummy = 1)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    # Return data without time_period
+    future_data |> dplyr::select(-time_period)
+  }
+
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_false(result$success)
+  expect_gt(length(result$errors), 0)
+  expect_match(result$errors[1], "time_period", ignore.case = TRUE)
+})
+
+test_that("validate_model_io detects missing location column", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    list(dummy = 1)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    # Return data without location
+    future_data |> dplyr::select(-location)
+  }
+
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_false(result$success)
+  expect_gt(length(result$errors), 0)
+  expect_match(result$errors[1], "location", ignore.case = TRUE)
+})
+
+test_that("validate_model_io detects row count mismatch", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    list(dummy = 1)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    # Return only first row
+    future_data[1, ]
+  }
+
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_false(result$success)
+  expect_gt(length(result$errors), 0)
+  expect_match(result$errors[1], "Row count mismatch", ignore.case = TRUE)
+})
+
+test_that("validate_model_io handles train_fn errors gracefully", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    stop("Intentional training error")
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    future_data
+  }
+
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_false(result$success)
+  expect_gt(length(result$errors), 0)
+  expect_match(result$errors[1], "Error", ignore.case = TRUE)
+})
+
+test_that("validate_model_io_all validates all combinations when no params given", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    means <- training_data |>
+      dplyr::group_by(location) |>
+      dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+    list(means = means)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    future_data |>
+      dplyr::left_join(saved_model$means, by = "location") |>
+      dplyr::mutate(disease_cases = mean_cases) |>
+      dplyr::select(-mean_cases)
+  }
+
+  result <- validate_model_io_all(train_fn, predict_fn)
+
+  expect_type(result, "list")
+  expect_named(result, c("success", "results", "errors"))
+  expect_gt(length(result$results), 0)
+  # Should have validated laos_M
+  expect_true("laos_M" %in% names(result$results))
+  expect_true(result$success)
+})
