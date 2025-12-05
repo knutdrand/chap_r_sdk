@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Chap SDK for R • chap.r.sdk</title>
+<title>CHAP R SDK • chap.r.sdk</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Chap SDK for R">
-<meta name="description" content="Provides convenience functionality for developing chap-compatible models and integrating existing models with chap. Includes utilities for creating command line interfaces, model validation, spatio-temporal data transformations, and configuration schema management.">
-<meta property="og:description" content="Provides convenience functionality for developing chap-compatible models and integrating existing models with chap. Includes utilities for creating command line interfaces, model validation, spatio-temporal data transformations, and configuration schema management.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="CHAP R SDK">
+<meta name="description" content="Tools for building CHAP-compatible disease forecasting models">
+<meta property="og:description" content="Tools for building CHAP-compatible disease forecasting models">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -48,249 +48,315 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="chap-r-sdk">Chap R SDK<a class="anchor" aria-label="anchor" href="#chap-r-sdk"></a>
+<div class="page-header"><h1 id="chaprsdk">chap.r.sdk<a class="anchor" aria-label="anchor" href="#chaprsdk"></a>
 </h1></div>
-<p>This package provides convenience functionality for developing CHAP models and integrating existing models with CHAP.</p>
-<div class="section level2">
-<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
-</h2>
-<ul>
-<li>
-<strong>CLI Interface Generator</strong>: Create CHAP-compatible command line interfaces from functions fulfilling the CHAP interface
-<ul>
-<li><code>train(training_data, model_configuration) -&gt; saved_model</code></li>
-<li><code>predict(historic_data, future_data, saved_model, model_configuration)</code></li>
-</ul>
-</li>
-<li>
-<strong>Test Suite</strong>: Sanity check models to ensure prediction output is consistent with CHAP expectations</li>
-<li>
-<strong>Configuration Management</strong>: Expose model configuration schemas to CHAP</li>
-<li>
-<strong>Data Transformations</strong>: Common functionality for extracting and transforming spatio-temporal data</li>
-</ul>
-<p>The package is tidyverse-oriented and follows best practices in R development.</p>
-</div>
+<!-- badges: start -->
+
+<p>The CHAP R SDK provides tools for building disease forecasting models compatible with the <a href="https://github.com/dhis2/chap-core" class="external-link">CHAP platform</a>. It handles CLI creation, data loading, validation, and prediction format conversion.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<div class="section level3">
-<h3 id="development-version-from-github">Development Version (from GitHub)<a class="anchor" aria-label="anchor" href="#development-version-from-github"></a>
-</h3>
 <p>You can install the development version of chap.r.sdk from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Using remotes (recommended)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"knutdrand/chap_r_sdk"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Or using devtools</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"knutdrand/chap_r_sdk"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"knutdrand/chap_r_sdk"</span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="building-your-first-chap-model">Building Your First CHAP Model<a class="anchor" aria-label="anchor" href="#building-your-first-chap-model"></a>
+</h2>
+<p>This tutorial walks you through building a CHAP-compatible model step-by-step, using a validation-first approach.</p>
 <div class="section level3">
-<h3 id="cran-version-coming-soon">CRAN Version (Coming Soon)<a class="anchor" aria-label="anchor" href="#cran-version-coming-soon"></a>
+<h3 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h3>
-<p>Once published on CRAN, you’ll be able to install with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"chap.r.sdk"</span><span class="op">)</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
-</h2>
-<div class="section level3">
-<h3 id="example-mean-model">Example: Mean Model<a class="anchor" aria-label="anchor" href="#example-mean-model"></a>
-</h3>
-<p>The SDK includes a simple mean model as a reference implementation. This model predicts the mean disease cases for each location based on historical data.</p>
-<div class="section level4">
-<h4 id="using-the-r-functions">Using the R Functions<a class="anchor" aria-label="anchor" href="#using-the-r-functions"></a>
-</h4>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">chapr</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tsibble.tidyverts.org" class="external-link">tsibble</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/knutdrand/chap_r_sdk" class="external-link">chap.r.sdk</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load and prepare training data</span></span>
-<span><span class="va">training_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"inst/testdata/ewars_example/monthly/training_data.csv"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>time_period <span class="op">=</span> <span class="fu"><a href="https://tsibble.tidyverts.org/reference/year-month.html" class="external-link">yearmonth</a></span><span class="op">(</span><span class="va">time_period</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">time_period</span>, key <span class="op">=</span> <span class="va">location</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Train the model</span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/train_mean_model.html">train_mean_model</a></span><span class="op">(</span><span class="va">training_data</span>, model_config <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load future data for prediction</span></span>
-<span><span class="va">future_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"inst/testdata/ewars_example/monthly/future_data.csv"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>time_period <span class="op">=</span> <span class="fu"><a href="https://tsibble.tidyverts.org/reference/year-month.html" class="external-link">yearmonth</a></span><span class="op">(</span><span class="va">time_period</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">time_period</span>, key <span class="op">=</span> <span class="va">location</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Generate predictions</span></span>
-<span><span class="va">predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predict_mean_model.html">predict_mean_model</a></span><span class="op">(</span></span>
-<span>  historic_data <span class="op">=</span> <span class="cn">NULL</span>,  <span class="co"># Not used by mean model</span></span>
-<span>  future_data <span class="op">=</span> <span class="va">future_data</span>,</span>
-<span>  model <span class="op">=</span> <span class="va">model</span>,</span>
-<span>  model_config <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="using-the-cli">Using the CLI<a class="anchor" aria-label="anchor" href="#using-the-cli"></a>
-</h4>
-<p>The SDK provides command-line scripts for training and prediction:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Train a model</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">Rscript</span> inst/scripts/train_cli.R <span class="dt">\</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">--data</span> inst/testdata/ewars_example/monthly/training_data.csv <span class="dt">\</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">--config</span> inst/testdata/ewars_example/monthly/config.yaml <span class="dt">\</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">--output</span> model.rds</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Generate predictions</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="ex">Rscript</span> inst/scripts/predict_cli.R <span class="dt">\</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="at">--model</span> model.rds <span class="dt">\</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="at">--historic</span> inst/testdata/ewars_example/monthly/historic_data.csv <span class="dt">\</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="at">--future</span> inst/testdata/ewars_example/monthly/future_data.csv <span class="dt">\</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="at">--output</span> predictions.csv</span></code></pre></div>
-<p>See <code>examples/test_mean_model.sh</code> for a complete working example.</p>
-</div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="data-format">Data Format<a class="anchor" aria-label="anchor" href="#data-format"></a>
-</h2>
-<div class="section level3">
-<h3 id="training-data">Training Data<a class="anchor" aria-label="anchor" href="#training-data"></a>
-</h3>
-<p>Training data should be provided as a tsibble with the following columns:</p>
-<ul>
-<li>
-<code>time_period</code>: Temporal index (yearmonth for monthly data, yearweek for weekly)</li>
-<li>
-<code>location</code>: Spatial key (location name)</li>
-<li>
-<code>disease_cases</code>: Target variable (number of disease cases)</li>
-<li>Additional covariates (e.g., <code>rainfall</code>, <code>mean_temperature</code>, <code>population</code>)</li>
-</ul>
-<p>Example:</p>
-<pre class="csv"><code>time_period,location,disease_cases,rainfall,mean_temperature,population
-2000-07,Bokeo,0.0,430.119,23.44,58502.77
-2000-08,Bokeo,0.0,321.913,23.82,58502.77</code></pre>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="future-data">Future Data<a class="anchor" aria-label="anchor" href="#future-data"></a>
+<h3 id="step-1-understand-the-function-interface">Step 1: Understand the Function Interface<a class="anchor" aria-label="anchor" href="#step-1-understand-the-function-interface"></a>
 </h3>
-<p>Future data should have the same structure but without the <code>disease_cases</code> column:</p>
-<pre class="csv"><code>time_period,location,rainfall,mean_temperature,population
-2013-04,Bokeo,39.474,26.8,80013.60
-2013-05,Bokeo,170.046,25.85,80013.60</code></pre>
+<p>Every CHAP model requires two functions:</p>
+<p><strong>Training function:</strong></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># training_data: tsibble with time_period index, location key,</span></span>
+<span>  <span class="co">#                disease_cases, and covariates</span></span>
+<span>  <span class="co"># model_configuration: optional list of parameters</span></span>
+<span>  <span class="co"># Returns: any model object (list, fitted model, etc.)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p><strong>Prediction function:</strong></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">predict_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
+<span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># historic_data: tsibble with historical observations</span></span>
+<span>  <span class="co"># future_data: tsibble with time periods to predict</span></span>
+<span>  <span class="co"># saved_model: the object returned by train_fn</span></span>
+<span>  <span class="co"># Returns: tibble with samples list-column containing numeric vectors</span></span>
+<span>  <span class="co">#   - For deterministic models: single sample per row (e.g., samples = list(c(42)))</span></span>
+<span>  <span class="co">#   - For probabilistic models: multiple samples per row (e.g., 1000 samples)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="prediction-output">Prediction Output<a class="anchor" aria-label="anchor" href="#prediction-output"></a>
+<h3 id="step-2-explore-the-example-data">Step 2: Explore the Example Data<a class="anchor" aria-label="anchor" href="#step-2-explore-the-example-data"></a>
 </h3>
-<p>Predictions are returned as a tsibble with the same structure as training data, including the predicted <code>disease_cases</code> column.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="model-interface">Model Interface<a class="anchor" aria-label="anchor" href="#model-interface"></a>
-</h2>
-<p>All CHAP models should implement two functions:</p>
-<div class="section level3">
-<h3 id="train-function">Train Function<a class="anchor" aria-label="anchor" href="#train-function"></a>
-</h3>
+<p>The SDK provides example datasets for testing. Let’s examine the Laos monthly data:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">'laos'</span>, <span class="st">'M'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; Registered S3 method overwritten by 'tsibble': method from as_tibble.grouped_df</span></span>
+<span><span class="co">#&gt; dplyr</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; • `` -&gt; `...1`</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "training_data" "historic_data" "future_data"   "predictions"</span></span></code></pre></div>
+<p>The example data contains four tsibbles. Each has <code>time_period</code> as the index and <code>location</code> as the key:</p>
+<p><strong>Training data</strong> - what your model learns from:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">training_data</span></span>
+<span><span class="co">#&gt; # A tsibble: 1,071 x 13 [1M]</span></span>
+<span><span class="co">#&gt; # Key:       location [7]</span></span>
+<span><span class="co">#&gt;     ...1 time_period rainfall mean_temperature disease_cases population parent</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt;       &lt;mth&gt;    &lt;dbl&gt;            &lt;dbl&gt;         &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt; </span></span>
+<span><span class="co">#&gt;  1     0    2000 Jul   430.               23.4             0     58503. -     </span></span>
+<span><span class="co">#&gt;  2     1    2000 Aug   322.               23.8             0     58503. -     </span></span>
+<span><span class="co">#&gt;  3     2    2000 Sep   265.               22.7             0     58503. -     </span></span>
+<span><span class="co">#&gt;  4     3    2000 Oct   103.               22.6             0     58503. -     </span></span>
+<span><span class="co">#&gt;  5     4    2000 Nov    19.7              20.3             0     58503. -     </span></span>
+<span><span class="co">#&gt;  6     5    2000 Dec    26.0              19.1             0     58503. -     </span></span>
+<span><span class="co">#&gt;  7     6    2001 Jan    17.6              19.8             0     60157. -     </span></span>
+<span><span class="co">#&gt;  8     7    2001 Feb     7.28             22.0             0     60157. -     </span></span>
+<span><span class="co">#&gt;  9     8    2001 Mar   123.               22.6             0     60157. -     </span></span>
+<span><span class="co">#&gt; 10     9    2001 Apr    29.6              27.5             0     60157. -     </span></span>
+<span><span class="co">#&gt; # ℹ 1,061 more rows</span></span>
+<span><span class="co">#&gt; # ℹ 6 more variables: location &lt;chr&gt;, Cases &lt;dbl&gt;, E &lt;dbl&gt;, month &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   ID_year &lt;dbl&gt;, ID_spat &lt;chr&gt;</span></span></code></pre></div>
+<p><strong>Future data</strong> - time periods to predict (no <code>disease_cases</code>):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">train_model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_config</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># training_data: tsibble with historical disease cases and covariates</span></span>
-<span>  <span class="co"># model_config: list with model configuration options</span></span>
-<span></span>
-<span>  <span class="co"># Train your model here</span></span>
-<span></span>
-<span>  <span class="co"># Return model object</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="predict-function">Predict Function<a class="anchor" aria-label="anchor" href="#predict-function"></a>
-</h3>
+<code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">future_data</span></span>
+<span><span class="co">#&gt; # A tsibble: 21 x 11 [1M]</span></span>
+<span><span class="co">#&gt; # Key:       location [7]</span></span>
+<span><span class="co">#&gt;     ...1 time_period rainfall mean_temperature population parent location      E</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt;       &lt;mth&gt;    &lt;dbl&gt;            &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1     0    2013 Apr     39.5             26.8     80014. -      Bokeo    8.00e4</span></span>
+<span><span class="co">#&gt;  2     1    2013 May    170.              25.8     80014. -      Bokeo    8.00e4</span></span>
+<span><span class="co">#&gt;  3     2    2013 Jun    231.              24.7     80014. -      Bokeo    8.00e4</span></span>
+<span><span class="co">#&gt;  4     0    2013 Apr    152.              27.2    731598. -      Champas… 7.32e5</span></span>
+<span><span class="co">#&gt;  5     1    2013 May    236.              26.3    731598. -      Champas… 7.32e5</span></span>
+<span><span class="co">#&gt;  6     2    2013 Jun    327.              25.1    731598. -      Champas… 7.32e5</span></span>
+<span><span class="co">#&gt;  7     0    2013 Apr     58.8             25.1    124396. -      LouangN… 1.24e5</span></span>
+<span><span class="co">#&gt;  8     1    2013 May    162.              24.7    124396. -      LouangN… 1.24e5</span></span>
+<span><span class="co">#&gt;  9     2    2013 Jun    184.              24.0    124396. -      LouangN… 1.24e5</span></span>
+<span><span class="co">#&gt; 10     0    2013 Apr     72.5             25.0    282683. -      Oudomxai 2.83e5</span></span>
+<span><span class="co">#&gt; # ℹ 11 more rows</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: month &lt;dbl&gt;, ID_year &lt;dbl&gt;, ID_spat &lt;chr&gt;</span></span></code></pre></div>
+<p><strong>Example predictions</strong> - what your model should output:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">predict_model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">model</span>, <span class="va">model_config</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># historic_data: tsibble with recent historical data</span></span>
-<span>  <span class="co"># future_data: tsibble with future time periods and covariates</span></span>
-<span>  <span class="co"># model: trained model object</span></span>
-<span>  <span class="co"># model_config: list with model configuration options</span></span>
-<span></span>
-<span>  <span class="co"># Generate predictions</span></span>
-<span></span>
-<span>  <span class="co"># Return tsibble with predictions</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">predictions</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">predictions</span></span>
+<span><span class="co">#&gt; # A tibble: 21 × 3</span></span>
+<span><span class="co">#&gt;    time_period location     samples      </span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;       &lt;chr&gt;        &lt;list&gt;       </span></span>
+<span><span class="co">#&gt;  1 2013-04     Bokeo        &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt;  2 2013-05     Bokeo        &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt;  3 2013-06     Bokeo        &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt;  4 2013-04     Champasak    &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt;  5 2013-05     Champasak    &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt;  6 2013-06     Champasak    &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt;  7 2013-04     LouangNamtha &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt;  8 2013-05     LouangNamtha &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt;  9 2013-06     LouangNamtha &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt; 10 2013-04     Oudomxai     &lt;dbl [1,000]&gt;</span></span>
+<span><span class="co">#&gt; # ℹ 11 more rows</span></span></code></pre></div>
+<p>The predictions tibble has a <code>samples</code> list-column where each element is a numeric vector. Let’s look at the structure:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Each row has a vector of samples</span></span>
+<span><span class="va">data</span><span class="op">$</span><span class="va">predictions</span><span class="op">$</span><span class="va">samples</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt;    [1] 15  7  3  9  7 19  2  2 11  5  5  3  9 24  0 18  4  3  6 62  3  0  4  4</span></span>
+<span><span class="co">#&gt;   [25] 13  0 44  2  4 19  1  5  3 27  5  0  1  4  7  5  3 11  7 17 16  3 10  1</span></span>
+<span><span class="co">#&gt;   [49] 12  2  0  4  4  2 20  4  7  3  8 11  5  3 16 22  9  7  3  3  0  2  4 12</span></span>
+<span><span class="co">#&gt;   [73]  9  6  3  6  4 12  2  0  6  8 16  5 14  3  0 10  5 10  5  1  0  1  0  3</span></span>
+<span><span class="co">#&gt;   [97]  3  6  4  1  0  3 18 13  6  9  9 19  7  8  1  5 13  3  8 18  1 19  0 23</span></span>
+<span><span class="co">#&gt;  [121]  4 30  2  2 11  0  0  5  7  0  7 10  4  1  8  4 13  1 21 11  1  9 13  3</span></span>
+<span><span class="co">#&gt;  [145] 14  4  2 28 17  1  7  7  9 19 12  3  2  4  6  4  3  0  0  9  0  7  6  4</span></span>
+<span><span class="co">#&gt;  [169]  6  3 17 11  8 15  3  5  3 13 18  4  0 11  2 48  7  5 26  5  5  3  5  2</span></span>
+<span><span class="co">#&gt;  [193]  4  4 16  9 15  9  6  2  2 10  7  7  3  8 11 17  6  6 10  0  8  6  4 27</span></span>
+<span><span class="co">#&gt;  [217]  1 37  0  2  0 14  1 29  8  1 16  9  2  9  6  6  7 10  5 28 15  1  7  1</span></span>
+<span><span class="co">#&gt;  [241]  1 17 12  3  6  8 10 35 22  7  2  0 13  4  1  6 20  3  1  7  1  7 11  4</span></span>
+<span><span class="co">#&gt;  [265] 37  1 13  2 31  1 47  6  1  0  3  1  0 11  8 12  1  7  4  5  3 16  7 14</span></span>
+<span><span class="co">#&gt;  [289]  2 15  1  7  1  2 13  2 10  3  2 10  0  1 17  5  1  2  1 17 23  2  8  2</span></span>
+<span><span class="co">#&gt;  [313]  7  2  2  4  1  3  5  6  0  1 11  4  4  7 22  7 10  7 10 12 31 10  1  2</span></span>
+<span><span class="co">#&gt;  [337] 16  0 11  2  0  0  6 18  1  2  6  0  3  1  3 23 15  9  0  1 21 14  0  4</span></span>
+<span><span class="co">#&gt;  [361]  1  2 17  5 25  0 14  3 13  0  0  8  3 14  3  3  2  7  7  2  3  3  2 12</span></span>
+<span><span class="co">#&gt;  [385]  2  5  8  8 14 12 11  9  1  3 26  5  9 12  3  8 15  0  5  2 10  8  6  3</span></span>
+<span><span class="co">#&gt;  [409] 15  3  3  3 13 27  0  5 11  4  5  6  3  4  6 28  5 11  4  0  0  0  1  1</span></span>
+<span><span class="co">#&gt;  [433] 11 29  0  6  1 10  8  5  1  2  0  4  1 13  9  5  6  0 11  1  9 18  7  8</span></span>
+<span><span class="co">#&gt;  [457]  3  0  2 10  3  5 10  1 16 74  3  2  1 14  1  2  0  0  6  3 12  7  6 10</span></span>
+<span><span class="co">#&gt;  [481] 10  9  3  6  4 16  0  2  2  1 16  9  6  2  7  3 10 10  1  3  2  6  8  6</span></span>
+<span><span class="co">#&gt;  [505] 13  2 18  3  2  0 40  1  7  4  5  2 10  2  2 16  4  0 10  7  5 12 15  3</span></span>
+<span><span class="co">#&gt;  [529] 11 10  2  0  4  1  2 18  0  0 12  4  2  3 10 13  6 17 17  7 19  4  5  2</span></span>
+<span><span class="co">#&gt;  [553]  7 31  0 14  1  5  8 11 14 40 19  5  0  5  5  9  0 20  0  4  2  1  3 18</span></span>
+<span><span class="co">#&gt;  [577]  0  1  1 22  0 24  7  0  3 10 21 12 15  7  0  0  2 14  0  4 29 25  5  7</span></span>
+<span><span class="co">#&gt;  [601]  2  0  5  2  2  3  1  2 10  1 10  4  3  7  1 15  5  6  6 25  2  2  5 52</span></span>
+<span><span class="co">#&gt;  [625]  1  7  1 23  8  4  3 17  9 10  6  6 10  9  6  0  1  4  0 17  2  7 49  7</span></span>
+<span><span class="co">#&gt;  [649]  8  8  1 12 45  1  9  1  2  4  0  2 10 10  0  3 22  2  4 16  8  0  3  8</span></span>
+<span><span class="co">#&gt;  [673]  4 11  8  7  2  7 19  7  5 13  3 11  2  2 23  7  2  8  2 17  4  1  2  4</span></span>
+<span><span class="co">#&gt;  [697]  0 11  8  0  8  8  3  5  6  7  7  1  1  9  7 13  5 12 10 17  8  2  2  5</span></span>
+<span><span class="co">#&gt;  [721]  8  0  0  2 15 14  6  4  5 29 13  9  3  3 16  2  2  7  2  1  7  1  0 26</span></span>
+<span><span class="co">#&gt;  [745]  7  2  4  0  5 11  4 12  8  0 11  1  1  3  2 12  3  3  1 10 12  7  2 15</span></span>
+<span><span class="co">#&gt;  [769]  4  2  3  1  5  2  1  5  1 11 17  2  2  3  7  5 23  9 14  0 27 35  0  2</span></span>
+<span><span class="co">#&gt;  [793]  1  0  2  3  1 10  6  5  0 13 16  4 11  1  5  0  1  1  3  3 14  4  5 16</span></span>
+<span><span class="co">#&gt;  [817]  7  4 10  0  6  1 22 14 12  0  1  5  0  1 40 11  4  8  0  4  9  3  8  1</span></span>
+<span><span class="co">#&gt;  [841]  5  9  6 13  0  5 22  1  7  2  7  6  3  2  5  3  5  6  6  2  2  5  0  1</span></span>
+<span><span class="co">#&gt;  [865]  4  4  4 15 60  5  5 14  6 14 12  3 22  7  3  5  7 10  4 35 11 17 17  4</span></span>
+<span><span class="co">#&gt;  [889] 11  4 12  7 21 30  8  2 21  6 17  9  4 24 11  0  3 28 14  3  3  4  1  9</span></span>
+<span><span class="co">#&gt;  [913] 30 10 10  7  5  4  2  1 10 13 12  9  3 13  1  1 13  4  8 11  1  8  8  2</span></span>
+<span><span class="co">#&gt;  [937] 11  5 17  2 12  0  3 13  8  7  2  3  4 17  2  3  4  4  4 16  4  3  8 10</span></span>
+<span><span class="co">#&gt;  [961]  0  4  2  5  3  1  4  2  3  4  5  3  4 12 14  3  4 15  2  3 23  7 13  5</span></span>
+<span><span class="co">#&gt;  [985]  4 13 17  0 11 13 15  6 11  1 20 23  2 12 11  2</span></span></code></pre></div>
+<p>For probabilistic models, each vector contains multiple Monte Carlo samples (e.g., 1000). For deterministic models, use a single sample per row: <code>samples = list(c(42))</code>.</p>
 </div>
-</div>
-<div class="section level2">
-<h2 id="configuration-files">Configuration Files<a class="anchor" aria-label="anchor" href="#configuration-files"></a>
-</h2>
-<p>Model configurations can be provided as YAML or JSON files:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># config.yaml</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">additional_continuous_covariates</span><span class="kw">:</span><span class="at"> </span><span class="kw">[]</span></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="fu">user_option_values</span><span class="kw">:</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="at">  </span><span class="fu">chap__covid_mask</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="architecture-decisions">Architecture Decisions<a class="anchor" aria-label="anchor" href="#architecture-decisions"></a>
-</h2>
-<p>See the <code>docs/decisions/</code> directory for Architecture Decision Records (ADRs) documenting key technical decisions:</p>
-<ul>
-<li>
-<a href="docs/decisions/001-cli-interface-approach.html">ADR 001: CLI Interface Approach</a> - Why we use <code>optparse</code> for command-line interfaces</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
-</h2>
 <div class="section level3">
-<h3 id="project-structure">Project Structure<a class="anchor" aria-label="anchor" href="#project-structure"></a>
+<h3 id="step-3-validate-before-implementing">Step 3: Validate Before Implementing<a class="anchor" aria-label="anchor" href="#step-3-validate-before-implementing"></a>
 </h3>
-<pre><code>chap_r_sdk/
-├── R/                      # R package code
-│   ├── mean_model.R        # Example mean model implementation
-│   ├── cli.R              # CLI helper functions
-│   ├── config.R           # Configuration management
-│   ├── validation.R       # Model validation utilities
-│   └── spatial_temporal.R # Data transformation utilities
-├── inst/
-│   ├── scripts/           # CLI scripts
-│   │   ├── train_cli.R    # Training CLI
-│   │   └── predict_cli.R  # Prediction CLI
-│   └── testdata/          # Test datasets
-├── tests/                 # Unit tests
-├── examples/              # Example scripts
-├── docs/
-│   └── decisions/         # Architecture Decision Records
-└── README.md</code></pre>
+<p>Before writing any model logic, let’s see what the validation expects. Start with stub functions:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>dummy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">predict_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
+<span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">future_data</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/validate_model_io.html">validate_model_io</a></span><span class="op">(</span><span class="va">train_fn</span>, <span class="va">predict_fn</span>, <span class="va">data</span><span class="op">)</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">success</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">errors</span></span>
+<span><span class="co">#&gt; [1] "Predictions must have a 'samples' list-column containing numeric vectors"</span></span></code></pre></div>
+<p>The validation tells us exactly what’s missing: the <code>samples</code> list-column in predictions.</p>
 </div>
 <div class="section level3">
-<h3 id="running-tests">Running Tests<a class="anchor" aria-label="anchor" href="#running-tests"></a>
+<h3 id="step-4-implement-a-simple-mean-model">Step 4: Implement a Simple Mean Model<a class="anchor" aria-label="anchor" href="#step-4-implement-a-simple-mean-model"></a>
 </h3>
+<p>Now let’s implement a minimal model that predicts the historical mean for each location. Since all models must return a <code>samples</code> list-column, we wrap the single prediction value in a list:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">means</span> <span class="op">&lt;-</span> <span class="va">training_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>mean_cases <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">disease_cases</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">location</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>means <span class="op">=</span> <span class="va">means</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">predict_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
+<span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">future_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">saved_model</span><span class="op">$</span><span class="va">means</span>, by <span class="op">=</span> <span class="st">"location"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>samples <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">mean_cases</span>, <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">mean_cases</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Note: We use <code><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble()</a></code> in the training function because <code>summarise(.by = ...)</code> needs a tibble to collapse across the time dimension.</p>
 </div>
 <div class="section level3">
-<h3 id="building-documentation">Building Documentation<a class="anchor" aria-label="anchor" href="#building-documentation"></a>
+<h3 id="step-5-validate-the-implementation">Step 5: Validate the Implementation<a class="anchor" aria-label="anchor" href="#step-5-validate-the-implementation"></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/validate_model_io.html">validate_model_io</a></span><span class="op">(</span><span class="va">train_fn</span>, <span class="va">predict_fn</span>, <span class="va">data</span><span class="op">)</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">success</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">n_predictions</span></span>
+<span><span class="co">#&gt; [1] 21</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="step-6-create-the-cli">Step 6: Create the CLI<a class="anchor" aria-label="anchor" href="#step-6-create-the-cli"></a>
+</h3>
+<p>Once validation passes, wrap your model in a CLI. Create a file called <code>model.R</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/knutdrand/chap_r_sdk" class="external-link">chap.r.sdk</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">means</span> <span class="op">&lt;-</span> <span class="va">training_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>mean_cases <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">disease_cases</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">location</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>means <span class="op">=</span> <span class="va">means</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">predict_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
+<span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">future_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">saved_model</span><span class="op">$</span><span class="va">means</span>, by <span class="op">=</span> <span class="st">"location"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>samples <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">mean_cases</span>, <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">mean_cases</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="reference/create_chap_cli.html">create_chap_cli</a></span><span class="op">(</span><span class="va">train_fn</span>, <span class="va">predict_fn</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p><strong>Usage:</strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Train the model</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R train training_data.csv</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co"># Generate predictions</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict historic.csv future.csv model.rds</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co"># Display model info</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
+<p>The CLI automatically handles CSV loading, tsibble conversion, model saving, and prediction output.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="related-jira-epic">Related Jira Epic<a class="anchor" aria-label="anchor" href="#related-jira-epic"></a>
+<h2 id="probabilistic-models">Probabilistic Models<a class="anchor" aria-label="anchor" href="#probabilistic-models"></a>
 </h2>
-<p>This project is tracked in Jira: <a href="https://dhis2.atlassian.net/browse/CLIM-201" class="external-link">CLIM-201 - CHAP R SDK Development</a></p>
+<p>For probabilistic forecasting, include multiple Monte Carlo samples:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">predict_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
+<span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n_samples</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
+<span></span>
+<span>  <span class="va">future_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">saved_model</span><span class="op">$</span><span class="va">means</span>, by <span class="op">=</span> <span class="st">"location"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>      samples <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="va">n_samples</span>, lambda <span class="op">=</span> <span class="va">mean_cases</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">mean_cases</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+<h2 id="working-with-samples">Working with Samples<a class="anchor" aria-label="anchor" href="#working-with-samples"></a>
 </h2>
-<p>Contributions are welcome! Please follow R package development best practices and tidyverse style guidelines.</p>
+<p>The SDK provides utility functions for sample-based predictions:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Convert nested samples to wide format</span></span>
+<span><span class="va">wide_preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predictions_to_wide.html">predictions_to_wide</a></span><span class="op">(</span><span class="va">nested_preds</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert to long format for scoringutils</span></span>
+<span><span class="va">long_preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predictions_to_long.html">predictions_to_long</a></span><span class="op">(</span><span class="va">nested_preds</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compute quantiles for hub submissions</span></span>
+<span><span class="va">quantile_preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predictions_to_quantiles.html">predictions_to_quantiles</a></span><span class="op">(</span><span class="va">nested_preds</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Add summary statistics (mean, median, CIs)</span></span>
+<span><span class="va">preds_with_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predictions_summary.html">predictions_summary</a></span><span class="op">(</span><span class="va">nested_preds</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+<h2 id="learn-more">Learn More<a class="anchor" aria-label="anchor" href="#learn-more"></a>
 </h2>
-<p>See LICENSE file for details.</p>
+<ul>
+<li><a href="https://knutdrand.github.io/chap_r_sdk/">Full documentation</a></li>
+<li><a href="https://knutdrand.github.io/chap_r_sdk/articles/model-development-tutorial.html">Model development tutorial</a></li>
+<li><a href="https://knutdrand.github.io/chap_r_sdk/reference/index.html">Function reference</a></li>
+</ul>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -325,7 +391,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/knutdrand/chap_r_sdk/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/knutdrand/chap_r_sdk/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

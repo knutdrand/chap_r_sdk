@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   getting-started: getting-started.html
   model-development-tutorial: model-development-tutorial.html
-last_built: 2025-12-05T07:58Z
+last_built: 2025-12-05T08:05Z
 urls:
   reference: https://knutdrand.github.io/chap_r_sdk/reference
   article: https://knutdrand.github.io/chap_r_sdk/articles
