@@ -160,15 +160,81 @@ key:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     0    2013 Apr     72.5             25.0    <span style="text-decoration: underline;">282</span>683. -      Oudomxai 2.83<span style="color: #949494;">e</span>5</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: month &lt;dbl&gt;, ID_year &lt;dbl&gt;, ID_spat &lt;chr&gt;</span></span></span></code></pre></div>
-<p>Your predictions must include a <code>samples</code> list-column. For
-deterministic models, use a single sample per row.</p>
+<p><strong>Example predictions</strong> - what your model should
+output:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">predictions</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 3</span></span></span>
+<span><span class="co">#&gt;    time_period location     samples      </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2013-04     Bokeo        <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2013-05     Bokeo        <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2013-06     Bokeo        <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2013-04     Champasak    <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2013-05     Champasak    <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2013-06     Champasak    <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2013-04     LouangNamtha <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2013-05     LouangNamtha <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2013-06     LouangNamtha <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2013-04     Oudomxai     <span style="color: #949494;">&lt;dbl [1,000]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre></div>
+<p>The predictions tibble has a <code>samples</code> list-column where
+each element is a numeric vector. Let’s look at the structure:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Each row has a vector of samples</span></span>
+<span><span class="va">data</span><span class="op">$</span><span class="va">predictions</span><span class="op">$</span><span class="va">samples</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt;    [1] 15  7  3  9  7 19  2  2 11  5  5  3  9 24  0 18  4  3  6 62  3  0  4  4</span></span>
+<span><span class="co">#&gt;   [25] 13  0 44  2  4 19  1  5  3 27  5  0  1  4  7  5  3 11  7 17 16  3 10  1</span></span>
+<span><span class="co">#&gt;   [49] 12  2  0  4  4  2 20  4  7  3  8 11  5  3 16 22  9  7  3  3  0  2  4 12</span></span>
+<span><span class="co">#&gt;   [73]  9  6  3  6  4 12  2  0  6  8 16  5 14  3  0 10  5 10  5  1  0  1  0  3</span></span>
+<span><span class="co">#&gt;   [97]  3  6  4  1  0  3 18 13  6  9  9 19  7  8  1  5 13  3  8 18  1 19  0 23</span></span>
+<span><span class="co">#&gt;  [121]  4 30  2  2 11  0  0  5  7  0  7 10  4  1  8  4 13  1 21 11  1  9 13  3</span></span>
+<span><span class="co">#&gt;  [145] 14  4  2 28 17  1  7  7  9 19 12  3  2  4  6  4  3  0  0  9  0  7  6  4</span></span>
+<span><span class="co">#&gt;  [169]  6  3 17 11  8 15  3  5  3 13 18  4  0 11  2 48  7  5 26  5  5  3  5  2</span></span>
+<span><span class="co">#&gt;  [193]  4  4 16  9 15  9  6  2  2 10  7  7  3  8 11 17  6  6 10  0  8  6  4 27</span></span>
+<span><span class="co">#&gt;  [217]  1 37  0  2  0 14  1 29  8  1 16  9  2  9  6  6  7 10  5 28 15  1  7  1</span></span>
+<span><span class="co">#&gt;  [241]  1 17 12  3  6  8 10 35 22  7  2  0 13  4  1  6 20  3  1  7  1  7 11  4</span></span>
+<span><span class="co">#&gt;  [265] 37  1 13  2 31  1 47  6  1  0  3  1  0 11  8 12  1  7  4  5  3 16  7 14</span></span>
+<span><span class="co">#&gt;  [289]  2 15  1  7  1  2 13  2 10  3  2 10  0  1 17  5  1  2  1 17 23  2  8  2</span></span>
+<span><span class="co">#&gt;  [313]  7  2  2  4  1  3  5  6  0  1 11  4  4  7 22  7 10  7 10 12 31 10  1  2</span></span>
+<span><span class="co">#&gt;  [337] 16  0 11  2  0  0  6 18  1  2  6  0  3  1  3 23 15  9  0  1 21 14  0  4</span></span>
+<span><span class="co">#&gt;  [361]  1  2 17  5 25  0 14  3 13  0  0  8  3 14  3  3  2  7  7  2  3  3  2 12</span></span>
+<span><span class="co">#&gt;  [385]  2  5  8  8 14 12 11  9  1  3 26  5  9 12  3  8 15  0  5  2 10  8  6  3</span></span>
+<span><span class="co">#&gt;  [409] 15  3  3  3 13 27  0  5 11  4  5  6  3  4  6 28  5 11  4  0  0  0  1  1</span></span>
+<span><span class="co">#&gt;  [433] 11 29  0  6  1 10  8  5  1  2  0  4  1 13  9  5  6  0 11  1  9 18  7  8</span></span>
+<span><span class="co">#&gt;  [457]  3  0  2 10  3  5 10  1 16 74  3  2  1 14  1  2  0  0  6  3 12  7  6 10</span></span>
+<span><span class="co">#&gt;  [481] 10  9  3  6  4 16  0  2  2  1 16  9  6  2  7  3 10 10  1  3  2  6  8  6</span></span>
+<span><span class="co">#&gt;  [505] 13  2 18  3  2  0 40  1  7  4  5  2 10  2  2 16  4  0 10  7  5 12 15  3</span></span>
+<span><span class="co">#&gt;  [529] 11 10  2  0  4  1  2 18  0  0 12  4  2  3 10 13  6 17 17  7 19  4  5  2</span></span>
+<span><span class="co">#&gt;  [553]  7 31  0 14  1  5  8 11 14 40 19  5  0  5  5  9  0 20  0  4  2  1  3 18</span></span>
+<span><span class="co">#&gt;  [577]  0  1  1 22  0 24  7  0  3 10 21 12 15  7  0  0  2 14  0  4 29 25  5  7</span></span>
+<span><span class="co">#&gt;  [601]  2  0  5  2  2  3  1  2 10  1 10  4  3  7  1 15  5  6  6 25  2  2  5 52</span></span>
+<span><span class="co">#&gt;  [625]  1  7  1 23  8  4  3 17  9 10  6  6 10  9  6  0  1  4  0 17  2  7 49  7</span></span>
+<span><span class="co">#&gt;  [649]  8  8  1 12 45  1  9  1  2  4  0  2 10 10  0  3 22  2  4 16  8  0  3  8</span></span>
+<span><span class="co">#&gt;  [673]  4 11  8  7  2  7 19  7  5 13  3 11  2  2 23  7  2  8  2 17  4  1  2  4</span></span>
+<span><span class="co">#&gt;  [697]  0 11  8  0  8  8  3  5  6  7  7  1  1  9  7 13  5 12 10 17  8  2  2  5</span></span>
+<span><span class="co">#&gt;  [721]  8  0  0  2 15 14  6  4  5 29 13  9  3  3 16  2  2  7  2  1  7  1  0 26</span></span>
+<span><span class="co">#&gt;  [745]  7  2  4  0  5 11  4 12  8  0 11  1  1  3  2 12  3  3  1 10 12  7  2 15</span></span>
+<span><span class="co">#&gt;  [769]  4  2  3  1  5  2  1  5  1 11 17  2  2  3  7  5 23  9 14  0 27 35  0  2</span></span>
+<span><span class="co">#&gt;  [793]  1  0  2  3  1 10  6  5  0 13 16  4 11  1  5  0  1  1  3  3 14  4  5 16</span></span>
+<span><span class="co">#&gt;  [817]  7  4 10  0  6  1 22 14 12  0  1  5  0  1 40 11  4  8  0  4  9  3  8  1</span></span>
+<span><span class="co">#&gt;  [841]  5  9  6 13  0  5 22  1  7  2  7  6  3  2  5  3  5  6  6  2  2  5  0  1</span></span>
+<span><span class="co">#&gt;  [865]  4  4  4 15 60  5  5 14  6 14 12  3 22  7  3  5  7 10  4 35 11 17 17  4</span></span>
+<span><span class="co">#&gt;  [889] 11  4 12  7 21 30  8  2 21  6 17  9  4 24 11  0  3 28 14  3  3  4  1  9</span></span>
+<span><span class="co">#&gt;  [913] 30 10 10  7  5  4  2  1 10 13 12  9  3 13  1  1 13  4  8 11  1  8  8  2</span></span>
+<span><span class="co">#&gt;  [937] 11  5 17  2 12  0  3 13  8  7  2  3  4 17  2  3  4  4  4 16  4  3  8 10</span></span>
+<span><span class="co">#&gt;  [961]  0  4  2  5  3  1  4  2  3  4  5  3  4 12 14  3  4 15  2  3 23  7 13  5</span></span>
+<span><span class="co">#&gt;  [985]  4 13 17  0 11 13 15  6 11  1 20 23  2 12 11  2</span></span></code></pre></div>
+<p>For probabilistic models, each vector contains multiple Monte Carlo
+samples (e.g., 1000). For deterministic models, use a single sample per
+row: <code>samples = list(c(42))</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="step-3-validate-before-implementing">Step 3: Validate Before Implementing<a class="anchor" aria-label="anchor" href="#step-3-validate-before-implementing"></a>
 </h2>
 <p>Before writing any model logic, let’s see what the validation
 expects. Start with stub functions:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>dummy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -192,7 +258,7 @@ expects. Start with stub functions:</p>
 <p>Now let’s implement a minimal model that predicts the historical mean
 for each location. Since all models must return a <code>samples</code>
 list-column, we wrap the single prediction value in a list:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">means</span> <span class="op">&lt;-</span> <span class="va">training_data</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -216,7 +282,7 @@ create the samples column.</p>
 <div class="section level2">
 <h2 id="step-5-validate-the-implementation">Step 5: Validate the Implementation<a class="anchor" aria-label="anchor" href="#step-5-validate-the-implementation"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_model_io.html">validate_model_io</a></span><span class="op">(</span><span class="va">train_fn</span>, <span class="va">predict_fn</span>, <span class="va">data</span><span class="op">)</span></span>
 <span><span class="va">result</span><span class="op">$</span><span class="va">success</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
@@ -228,7 +294,7 @@ create the samples column.</p>
 <h2 id="step-6-validate-against-all-datasets">Step 6: Validate Against All Datasets<a class="anchor" aria-label="anchor" href="#step-6-validate-against-all-datasets"></a>
 </h2>
 <p>The SDK can validate against all available example datasets:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_model_io_all.html">validate_model_io_all</a></span><span class="op">(</span><span class="va">train_fn</span>, <span class="va">predict_fn</span><span class="op">)</span></span>
 <span><span class="co">#&gt; New names:</span></span>
 <span><span class="co">#&gt; New names:</span></span>
@@ -244,7 +310,7 @@ create the samples column.</p>
 </h2>
 <p>Once validation passes, wrap your model in a CLI. Create a file
 called <code>model.R</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/knutdrand/chap_r_sdk" class="external-link">chap.r.sdk</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
@@ -273,14 +339,14 @@ called <code>model.R</code>:</p>
 <h2 id="step-8-use-the-cli">Step 8: Use the CLI<a class="anchor" aria-label="anchor" href="#step-8-use-the-cli"></a>
 </h2>
 <p>Your model is now ready for command-line use:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R train training_data.csv</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co"># Generate predictions</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict historic.csv future.csv model.rds</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co"># Display model info</span></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Train the model</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R train training_data.csv</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co"># Generate predictions</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict historic.csv future.csv model.rds</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co"># Display model info</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
 <p>The CLI automatically handles:</p>
 <ul>
 <li>Loading CSV files</li>
@@ -295,7 +361,7 @@ format)</li>
 </h2>
 <p>For probabilistic forecasting, include multiple Monte Carlo samples
 instead of a single value:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predict_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
 <span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">n_samples</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
@@ -320,7 +386,7 @@ format (<code>sample_0</code>, <code>sample_1</code>, …) for CHAP.</p>
 </h2>
 <p>The SDK provides utility functions for working with sample-based
 predictions:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert nested samples to wide format</span></span>
 <span><span class="va">wide_preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predictions_to_wide.html">predictions_to_wide</a></span><span class="op">(</span><span class="va">nested_preds</span><span class="op">)</span></span>
 <span></span>
