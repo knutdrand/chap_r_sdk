@@ -9,3 +9,5 @@
 ^CLAUDE\.md$
 ^data-raw$
 ^vignettes/articles$
+^doc$
+^Meta$

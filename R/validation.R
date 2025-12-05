@@ -40,26 +40,11 @@ get_example_data <- function(country, frequency) {
     stop("Test data not found. Make sure the package is properly installed.")
   }
 
-  # Load the data files
-  training_data <- readr::read_csv(
-    file.path(data_dir, "training_data.csv"),
-    show_col_types = FALSE
-  )
-
-  historic_data <- readr::read_csv(
-    file.path(data_dir, "historic_data.csv"),
-    show_col_types = FALSE
-  )
-
-  future_data <- readr::read_csv(
-    file.path(data_dir, "future_data.csv"),
-    show_col_types = FALSE
-  )
-
-  predictions <- readr::read_csv(
-    file.path(data_dir, "predictions.csv"),
-    show_col_types = FALSE
-  )
+  # Load the data files using load_tsibble for consistent handling
+  training_data <- load_tsibble(file.path(data_dir, "training_data.csv"))
+  historic_data <- load_tsibble(file.path(data_dir, "historic_data.csv"))
+  future_data <- load_tsibble(file.path(data_dir, "future_data.csv"))
+  predictions <- load_tsibble(file.path(data_dir, "predictions.csv"))
 
   # Return as named list
   list(
@@ -138,54 +123,23 @@ validate_model_io <- function(train_fn, predict_fn, example_data,
     # Check that predictions is a data frame
     if (!is.data.frame(predictions)) {
       validation_errors <- c(validation_errors,
-                             "Predictions must be a data frame")
+                             "Predictions must be a data frame or tsibble")
     } else {
       n_predictions <- nrow(predictions)
 
-      # Check required columns exist
-      if (!"time_period" %in% names(predictions)) {
+      # Check disease_cases column exists (the actual prediction output)
+      if (!"disease_cases" %in% names(predictions)) {
         validation_errors <- c(validation_errors,
-                               "Predictions missing required column: time_period")
-      }
-      if (!"location" %in% names(predictions)) {
-        validation_errors <- c(validation_errors,
-                               "Predictions missing required column: location")
+                               "Predictions missing required column: disease_cases")
       }
 
       # Check dimensions match expected
-      expected_rows <- nrow(example_data$predictions)
+      expected_rows <- nrow(example_data$future_data)
       actual_rows <- nrow(predictions)
       if (actual_rows != expected_rows) {
         validation_errors <- c(validation_errors,
                                sprintf("Row count mismatch: expected %d, got %d",
                                        expected_rows, actual_rows))
-      }
-
-      # Check time_period × location combinations match
-      if ("time_period" %in% names(predictions) && "location" %in% names(predictions)) {
-        expected_combos <- paste(example_data$predictions$time_period,
-                                 example_data$predictions$location, sep = "|")
-        actual_combos <- paste(predictions$time_period,
-                               predictions$location, sep = "|")
-
-        expected_sorted <- sort(expected_combos)
-        actual_sorted <- sort(actual_combos)
-
-        if (!identical(expected_sorted, actual_sorted)) {
-          missing <- setdiff(expected_sorted, actual_sorted)
-          extra <- setdiff(actual_sorted, expected_sorted)
-
-          if (length(missing) > 0) {
-            validation_errors <- c(validation_errors,
-                                   sprintf("Missing %d time_period×location combinations",
-                                           length(missing)))
-          }
-          if (length(extra) > 0) {
-            validation_errors <- c(validation_errors,
-                                   sprintf("Extra %d time_period×location combinations",
-                                           length(extra)))
-          }
-        }
       }
     }
   }, error = function(e) {

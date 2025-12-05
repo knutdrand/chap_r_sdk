@@ -30,8 +30,8 @@ Every CHAP model requires two functions:
 **Training function:**
 ```r
 train_fn <- function(training_data, model_configuration = list()) {
-
-  # training_data: tibble with time_period, location, disease_cases, covariates
+  # training_data: tsibble with time_period index, location key,
+  #                disease_cases, and covariates
   # model_configuration: optional list of parameters
   # Returns: any model object (list, fitted model, etc.)
 }
@@ -41,11 +41,10 @@ train_fn <- function(training_data, model_configuration = list()) {
 ```r
 predict_fn <- function(historic_data, future_data, saved_model,
                        model_configuration = list()) {
-  # historic_data: tibble with historical observations
-
-  # future_data: tibble with time periods to predict
+  # historic_data: tsibble with historical observations
+  # future_data: tsibble with time periods to predict
   # saved_model: the object returned by train_fn
-  # Returns: tibble with time_period, location, disease_cases columns
+  # Returns: data frame/tsibble with disease_cases column
 }
 ```
 
@@ -58,24 +57,19 @@ data <- get_example_data('laos', 'M')
 names(data)
 ```
 
-The example data contains four components:
+The example data contains four tsibbles. Each has `time_period` as the index and `location` as the key:
 
 **Training data** - what your model learns from:
 ```{r}
-head(data$training_data)
+data$training_data
 ```
 
 **Future data** - time periods to predict (no `disease_cases`):
 ```{r}
-head(data$future_data)
+data$future_data
 ```
 
-**Expected predictions** - what your output should look like:
-```{r}
-head(data$predictions)
-```
-
-Note the key columns: `time_period`, `location`, and `disease_cases`.
+Your predictions must include a `disease_cases` column with the forecasted values.
 
 ## Step 3: Validate Before Implementing
 
@@ -105,6 +99,7 @@ Now let's implement a minimal model that predicts the historical mean for each l
 ```{r implement-model}
 train_fn <- function(training_data, model_configuration = list()) {
   means <- training_data |>
+    as_tibble() |>
     group_by(location) |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
   list(means = means)
@@ -113,13 +108,14 @@ train_fn <- function(training_data, model_configuration = list()) {
 predict_fn <- function(historic_data, future_data, saved_model,
                        model_configuration = list()) {
   future_data |>
+    as_tibble() |>
     left_join(saved_model$means, by = "location") |>
     mutate(disease_cases = mean_cases) |>
     select(-mean_cases)
 }
 ```
 
-That's it! Just 10 lines of actual model logic.
+That's it! Just 12 lines of actual model logic. We convert to tibble before grouping to avoid tsibble key conflicts.
 
 ## Step 5: Validate the Implementation
 
@@ -151,6 +147,7 @@ library(dplyr)
 
 train_fn <- function(training_data, model_configuration = list()) {
   means <- training_data |>
+    as_tibble() |>
     group_by(location) |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
   list(means = means)
@@ -159,6 +156,7 @@ train_fn <- function(training_data, model_configuration = list()) {
 predict_fn <- function(historic_data, future_data, saved_model,
                        model_configuration = list()) {
   future_data |>
+    as_tibble() |>
     left_join(saved_model$means, by = "location") |>
     mutate(disease_cases = mean_cases) |>
     select(-mean_cases)
