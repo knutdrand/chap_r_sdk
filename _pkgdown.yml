@@ -1,0 +1,59 @@
+url: https://knutdrand.github.io/chap_r_sdk/
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
+
+reference:
+  - title: CLI Interface
+    desc: Create command-line interfaces for CHAP models
+    contents:
+      - create_chap_cli
+
+  - title: Configuration
+    desc: Model configuration management
+    contents:
+      - read_model_config
+      - write_model_config
+      - get_config_param
+      - create_config_schema
+      - validate_config
+
+  - title: Model Validation
+    desc: Test and validate CHAP model implementations
+    contents:
+      - run_model_tests
+      - validate_model_io
+      - validate_model_io_all
+      - validate_model_output
+
+  - title: Spatio-Temporal Data
+    desc: Utilities for working with spatio-temporal data
+    contents:
+      - transform_spatiotemporal
+      - aggregate_spatial
+      - aggregate_temporal
+
+  - title: Example Models
+    desc: Reference model implementations
+    contents:
+      - train_mean_model
+      - predict_mean_model
+
+  - title: Utilities
+    desc: Helper functions
+    contents:
+      - get_example_data
+
+articles:
+  - title: Getting Started
+    contents:
+      - getting-started
+
+  - title: Tutorials
+    contents:
+      - model-development-tutorial
