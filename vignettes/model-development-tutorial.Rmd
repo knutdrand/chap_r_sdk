@@ -71,7 +71,19 @@ data$training_data
 data$future_data
 ```
 
-Your predictions must include a `samples` list-column. For deterministic models, use a single sample per row.
+**Example predictions** - what your model should output:
+```{r}
+data$predictions
+```
+
+The predictions tibble has a `samples` list-column where each element is a numeric vector. Let's look at the structure:
+
+```{r}
+# Each row has a vector of samples
+data$predictions$samples[[1]]
+```
+
+For probabilistic models, each vector contains multiple Monte Carlo samples (e.g., 1000). For deterministic models, use a single sample per row: `samples = list(c(42))`.
 
 ## Step 3: Validate Before Implementing
 
