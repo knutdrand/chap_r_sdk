@@ -1,6 +1,6 @@
 # ADR 004: Prediction Samples Data Format
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2025-12-05
 **Decision Makers:** CHAP R SDK Team
 **Related Jira:** CLIM-201 (CHAP R SDK Development)
@@ -404,3 +404,4 @@ scoringutils::score(predictions_long, ...)
 ## Change Log
 
 - 2025-12-05: Initial investigation and decision document
+- 2025-12-05: Accepted. All models must use samples format (even deterministic models with single sample)

@@ -171,22 +171,16 @@ save_model <- function(model, output_path = "model.rds") {
 #' Save predictions to CSV
 #'
 #' Saves prediction results to a CSV file with a status message.
-#' If predictions contain nested sample list-columns, they are automatically
+#' Predictions must have a samples list-column which is automatically
 #' converted to wide format (sample_0, sample_1, ...) for CHAP compatibility.
 #'
-#' @param predictions Predictions data frame or tsibble
+#' @param predictions Predictions tibble with samples list-column
 #' @param output_path Path for output CSV file
 #' @return Path to the saved predictions file
 #' @keywords internal
 save_predictions <- function(predictions, output_path) {
-  # Detect if predictions have nested samples and convert to wide format
-  format <- detect_prediction_format(predictions)
-
-  if (format == "nested") {
-    # Convert nested samples to wide format for CHAP CSV output
-    predictions <- predictions_to_wide(predictions)
-    message("Converted nested samples to wide format for CSV output")
-  }
+  # Convert nested samples to wide format for CHAP CSV output
+  predictions <- predictions_to_wide(predictions)
 
   readr::write_csv(predictions, output_path)
   message("Predictions saved to: ", output_path)

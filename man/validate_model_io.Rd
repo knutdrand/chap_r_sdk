@@ -16,8 +16,7 @@ validate_model_io(
 and returns a trained model object}
 
 \item{predict_fn}{Prediction function that takes (historic_data, future_data, saved_model,
-model_configuration = list()) and returns predictions. Can return either point predictions
-(with disease_cases column) or sample-based predictions (with samples list-column).}
+model_configuration = list()) and returns predictions with a \code{samples} list-column.}
 
 \item{example_data}{Named list containing training_data, historic_data, future_data,
 and predictions (as returned by get_example_data())}
@@ -31,8 +30,7 @@ A list with validation results:
 \item \code{success}: Logical indicating if validation passed
 \item \code{errors}: Character vector of error messages (if any)
 \item \code{n_predictions}: Number of prediction rows returned
-\item \code{prediction_format}: Format of predictions ("point", "samples", or "unknown")
-\item \code{n_samples}: Number of samples per forecast unit (if sample-based)
+\item \code{n_samples}: Number of samples per forecast unit
 }
 }
 \description{
@@ -41,33 +39,37 @@ with a specific example dataset and produce output with the expected structure
 (matching time periods and locations).
 }
 \details{
-Models can return either:
-\itemize{
-\item Point predictions with a \code{disease_cases} column
-\item Sample-based predictions with a \code{samples} list-column containing
-numeric vectors of Monte Carlo samples
-}
+All models must return predictions with a \code{samples} list-column containing
+numeric vectors. For deterministic models, use a single sample per forecast unit
+(e.g., \code{samples = list(c(42))}). For probabilistic models, include multiple
+Monte Carlo samples (e.g., 1000 samples per forecast unit).
 }
 \examples{
 \dontrun{
 # Define simple model functions
 my_train <- function(training_data, model_configuration = list()) {
-  list(mean_cases = mean(training_data$disease_cases, na.rm = TRUE))
+  means <- training_data |>
+    dplyr::group_by(location) |>
+    dplyr::summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
+  list(means = means)
 }
 
 my_predict <- function(historic_data, future_data, saved_model,
                        model_configuration = list()) {
-  future_data$disease_cases <- saved_model$mean_cases
-  future_data
+  future_data |>
+    tibble::as_tibble() |>
+    dplyr::left_join(saved_model$means, by = "location") |>
+    dplyr::mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
+    dplyr::select(-mean_cases)
 }
 
 # Get example data and validate
 example_data <- get_example_data('laos', 'M')
 result <- validate_model_io(my_train, my_predict, example_data)
 if (result$success) {
-  cat("✓ Model validation passed!\n")
+  cat("Model validation passed!\n")
 } else {
-  cat("✗ Validation failed:\n")
+  cat("Validation failed:\n")
   print(result$errors)
 }
 }

@@ -78,11 +78,11 @@ test_that("save_model saves RDS file", {
   unlink(temp_file)
 })
 
-test_that("save_predictions saves CSV file", {
-  predictions <- data.frame(
+test_that("save_predictions saves CSV file with samples converted to wide format", {
+  predictions <- tibble::tibble(
     time_period = 1:5,
     location = rep("A", 5),
-    value = rnorm(5)
+    samples = list(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9), c(10, 11, 12), c(13, 14, 15))
   )
   temp_file <- tempfile(fileext = ".csv")
 
@@ -92,7 +92,9 @@ test_that("save_predictions saves CSV file", {
 
   loaded_predictions <- readr::read_csv(temp_file, show_col_types = FALSE)
   expect_equal(nrow(loaded_predictions), 5)
-  expect_equal(names(loaded_predictions), c("time_period", "location", "value"))
+  # Should have converted samples to wide format
+  expect_true(all(c("time_period", "location", "sample_0", "sample_1", "sample_2") %in% names(loaded_predictions)))
+  expect_false("samples" %in% names(loaded_predictions))
 
   unlink(temp_file)
 })

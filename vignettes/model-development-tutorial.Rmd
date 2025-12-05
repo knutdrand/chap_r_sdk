@@ -44,9 +44,9 @@ predict_fn <- function(historic_data, future_data, saved_model,
   # historic_data: tsibble with historical observations
   # future_data: tsibble with time periods to predict
   # saved_model: the object returned by train_fn
-  # Returns: tibble with either:
-  #   - disease_cases column (point predictions), or
-  #   - samples list-column (probabilistic predictions with Monte Carlo samples)
+  # Returns: tibble with samples list-column containing numeric vectors
+  #   - For deterministic models: single sample per row (e.g., samples = list(c(42)))
+  #   - For probabilistic models: multiple samples per row (e.g., 1000 samples)
 }
 ```
 
@@ -71,7 +71,7 @@ data$training_data
 data$future_data
 ```
 
-Your predictions must include either a `disease_cases` column (point predictions) or a `samples` list-column (probabilistic predictions).
+Your predictions must include a `samples` list-column. For deterministic models, use a single sample per row.
 
 ## Step 3: Validate Before Implementing
 
@@ -92,11 +92,12 @@ result$success
 result$errors
 ```
 
-The validation tells us exactly what's missing: the `disease_cases` column in predictions.
+The validation tells us exactly what's missing: the `samples` list-column in predictions.
 
 ## Step 4: Implement a Simple Mean Model
 
-Now let's implement a minimal model that predicts the historical mean for each location:
+Now let's implement a minimal model that predicts the historical mean for each location.
+Since all models must return a `samples` list-column, we wrap the single prediction value in a list:
 
 ```{r implement-model}
 train_fn <- function(training_data, model_configuration = list()) {
@@ -112,12 +113,12 @@ predict_fn <- function(historic_data, future_data, saved_model,
   future_data |>
     as_tibble() |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = mean_cases) |>
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
     select(-mean_cases)
 }
 ```
 
-That's it! Just 12 lines of actual model logic. We convert to tibble before grouping to avoid tsibble key conflicts.
+That's it! We convert to tibble before grouping to avoid tsibble key conflicts, and wrap each prediction in `list(c(value))` to create the samples column.
 
 ## Step 5: Validate the Implementation
 
@@ -160,7 +161,7 @@ predict_fn <- function(historic_data, future_data, saved_model,
   future_data |>
     as_tibble() |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = mean_cases) |>
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
     select(-mean_cases)
 }
 
@@ -190,9 +191,9 @@ The CLI automatically handles:
 - Saving the model as RDS
 - Writing predictions to CSV (converting nested samples to wide format)
 
-## Probabilistic Predictions (Optional)
+## Probabilistic Models
 
-For probabilistic forecasting, return Monte Carlo samples instead of point predictions:
+For probabilistic forecasting, include multiple Monte Carlo samples instead of a single value:
 
 ```r
 predict_fn <- function(historic_data, future_data, saved_model,
@@ -204,7 +205,7 @@ predict_fn <- function(historic_data, future_data, saved_model,
     left_join(saved_model$means, by = "location") |>
     rowwise() |>
     mutate(
-      # Generate samples from Poisson distribution
+      # Generate 1000 samples from Poisson distribution
       samples = list(rpois(n_samples, lambda = mean_cases))
     ) |>
     ungroup() |>
@@ -212,10 +213,12 @@ predict_fn <- function(historic_data, future_data, saved_model,
 }
 ```
 
-The `samples` column is a list-column where each element is a numeric vector of samples.
+The `samples` column is a list-column where each element is a numeric vector.
 The CLI automatically converts this to wide CSV format (`sample_0`, `sample_1`, ...) for CHAP.
 
-You can also use the conversion functions directly:
+## Working with Samples
+
+The SDK provides utility functions for working with sample-based predictions:
 
 ```r
 # Convert nested samples to wide format

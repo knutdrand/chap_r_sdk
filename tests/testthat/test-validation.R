@@ -77,8 +77,8 @@ test_that("run_model_tests executes full test suite", {
   skip("Not yet implemented")
 })
 
-test_that("validate_model_io passes with correct point prediction model", {
-  # Define simple model functions that work correctly with tsibbles
+test_that("validate_model_io passes with deterministic model (single sample)", {
+  # Define simple model functions that return single sample per forecast unit
   train_fn <- function(training_data, model_configuration = list()) {
     means <- training_data |>
       tibble::as_tibble() |>
@@ -92,7 +92,7 @@ test_that("validate_model_io passes with correct point prediction model", {
     future_data |>
       tibble::as_tibble() |>
       dplyr::left_join(saved_model$means, by = "location") |>
-      dplyr::mutate(disease_cases = mean_cases) |>
+      dplyr::mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
       dplyr::select(-mean_cases)
   }
 
@@ -101,16 +101,15 @@ test_that("validate_model_io passes with correct point prediction model", {
   result <- validate_model_io(train_fn, predict_fn, example_data)
 
   expect_type(result, "list")
-  expect_named(result, c("success", "errors", "n_predictions", "prediction_format", "n_samples"))
+  expect_named(result, c("success", "errors", "n_predictions", "n_samples"))
   expect_true(result$success)
   expect_length(result$errors, 0)
   expect_equal(result$n_predictions, 21)
-  expect_equal(result$prediction_format, "point")
-  expect_true(is.na(result$n_samples))
+  expect_equal(result$n_samples, 1)
 })
 
-test_that("validate_model_io passes with correct sample-based prediction model", {
-  # Define model functions that return sample-based predictions
+test_that("validate_model_io passes with probabilistic model (multiple samples)", {
+  # Define model functions that return multiple samples per forecast unit
   train_fn <- function(training_data, model_configuration = list()) {
     means <- training_data |>
       tibble::as_tibble() |>
@@ -141,18 +140,17 @@ test_that("validate_model_io passes with correct sample-based prediction model",
   expect_true(result$success)
   expect_length(result$errors, 0)
   expect_equal(result$n_predictions, 21)
-  expect_equal(result$prediction_format, "samples")
   expect_equal(result$n_samples, 100)
 })
 
-test_that("validate_model_io detects missing prediction output", {
+test_that("validate_model_io detects missing samples column", {
   train_fn <- function(training_data, model_configuration = list()) {
     list(dummy = 1)
   }
 
   predict_fn <- function(historic_data, future_data, saved_model,
                          model_configuration = list()) {
-    # Return future_data as-is (no disease_cases or samples column)
+    # Return future_data as-is (no samples column)
     tibble::as_tibble(future_data)
   }
 
@@ -161,8 +159,7 @@ test_that("validate_model_io detects missing prediction output", {
 
   expect_false(result$success)
   expect_gt(length(result$errors), 0)
-  # Should mention either disease_cases or samples
-  expect_match(result$errors[1], "disease_cases|samples", ignore.case = TRUE)
+  expect_match(result$errors[1], "samples", ignore.case = TRUE)
 })
 
 test_that("validate_model_io detects row count mismatch", {
@@ -172,9 +169,10 @@ test_that("validate_model_io detects row count mismatch", {
 
   predict_fn <- function(historic_data, future_data, saved_model,
                          model_configuration = list()) {
-    # Return only first row with disease_cases added
+    # Return only first row with samples added
     future_data[1, ] |>
-      dplyr::mutate(disease_cases = 0)
+      tibble::as_tibble() |>
+      dplyr::mutate(samples = list(c(0)))
   }
 
   example_data <- get_example_data('laos', 'M')
@@ -217,7 +215,7 @@ test_that("validate_model_io_all validates all combinations when no params given
     future_data |>
       tibble::as_tibble() |>
       dplyr::left_join(saved_model$means, by = "location") |>
-      dplyr::mutate(disease_cases = mean_cases) |>
+      dplyr::mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
       dplyr::select(-mean_cases)
   }
 

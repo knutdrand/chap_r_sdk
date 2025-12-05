@@ -7,7 +7,7 @@
 save_predictions(predictions, output_path)
 }
 \arguments{
-\item{predictions}{Predictions data frame or tsibble}
+\item{predictions}{Predictions tibble with samples list-column}
 
 \item{output_path}{Path for output CSV file}
 }
@@ -16,7 +16,7 @@ Path to the saved predictions file
 }
 \description{
 Saves prediction results to a CSV file with a status message.
-If predictions contain nested sample list-columns, they are automatically
+Predictions must have a samples list-column which is automatically
 converted to wide format (sample_0, sample_1, ...) for CHAP compatibility.
 }
 \keyword{internal}
