@@ -17,7 +17,7 @@ get_config_param(config, ..., .default = NULL)
 Parameter value or default
 }
 \description{
-Safely extracts a parameter from configuration with default fallback
+Safely extracts a parameter from configuration with default fallback.
 }
 \examples{
 # Simple nested parameter extraction
@@ -28,16 +28,4 @@ print(lr)  # 0.01
 # With default fallback
 missing <- get_config_param(config, "model", "missing", .default = "default")
 print(missing)  # "default"
-
-# Deep nesting
-complex_config <- list(
-  training = list(
-    optimizer = list(
-      type = "adam",
-      params = list(lr = 0.001, beta1 = 0.9)
-    )
-  )
-)
-beta1 <- get_config_param(complex_config, "training", "optimizer", "params", "beta1")
-print(beta1)  # 0.9
 }

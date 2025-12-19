@@ -2,24 +2,71 @@
 % Please edit documentation in R/config.R
 \name{create_config_schema}
 \alias{create_config_schema}
-\title{Expose Model Configuration Schema}
+\title{Create a Model Configuration Schema}
 \usage{
-create_config_schema(config_definition, output_format = "json")
+create_config_schema(
+  title = NULL,
+  description = NULL,
+  properties = list(),
+  required = character(0),
+  additional_properties = TRUE
+)
 }
 \arguments{
-\item{config_definition}{A list or object defining the configuration schema}
+\item{title}{Title for the schema (typically the model name)}
 
-\item{output_format}{The format for the schema (default: "json")}
+\item{description}{Description of the configuration}
+
+\item{properties}{Named list of property definitions created with
+\code{schema_integer()}, \code{schema_number()}, \code{schema_string()},
+\code{schema_boolean()}, \code{schema_enum()}, or \code{schema_array()}}
+
+\item{required}{Character vector of required property names}
+
+\item{additional_properties}{Whether to allow properties not defined in schema
+(default: TRUE for flexibility)}
 }
 \value{
-The configuration schema in the specified format
+A list representing a complete JSON Schema object
 }
 \description{
-Generates and exposes a model configuration schema in a format
-that can be consumed by chap
+Creates a JSON Schema for validating model configuration. The schema defines
+what configuration options a model accepts, their types, constraints, and
+default values.
 }
 \examples{
+# Define a configuration schema
+my_schema <- create_config_schema(
+  title = "My Forecasting Model",
+  description = "Configuration for disease case forecasting",
+  properties = list(
+    n_samples = schema_integer(
+      description = "Number of Monte Carlo samples for predictions",
+      default = 100L,
+      minimum = 1L,
+      maximum = 10000L
+    ),
+    learning_rate = schema_number(
+      description = "Learning rate for model optimization",
+      default = 0.01,
+      minimum = 0,
+      maximum = 1
+    ),
+    method = schema_enum(
+      values = c("arima", "ets", "prophet"),
+      description = "Forecasting method to use",
+      default = "arima"
+    ),
+    use_covariates = schema_boolean(
+      description = "Whether to include additional covariates",
+      default = TRUE
+    )
+  ),
+  required = c("n_samples")
+)
+
+# Use with create_chap_cli
 \dontrun{
-schema <- create_config_schema(config_definition)
+create_chap_cli(train_fn, predict_fn, model_config_schema = my_schema)
 }
 }

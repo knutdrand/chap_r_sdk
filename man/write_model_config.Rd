@@ -17,7 +17,7 @@ write_model_config(config, config_path, indent = 2)
 Invisible NULL
 }
 \description{
-Writes a configuration object to YAML file
+Writes a configuration object to YAML file.
 }
 \examples{
 \dontrun{

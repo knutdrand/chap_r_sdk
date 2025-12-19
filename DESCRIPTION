@@ -17,6 +17,7 @@ BugReports: https://github.com/knutdrand/chap_r_sdk/issues
 Imports:
     dplyr,
     jsonlite,
+    jsonvalidate,
     purrr,
     readr,
     rlang,

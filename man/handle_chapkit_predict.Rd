@@ -8,7 +8,8 @@ handle_chapkit_predict(
   predict_fn,
   args,
   default_config_path,
-  default_model_path
+  default_model_path,
+  schema = NULL
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ handle_chapkit_predict(
 \item{default_config_path}{Default config file path}
 
 \item{default_model_path}{Default model input path}
+
+\item{schema}{Optional JSON Schema for config validation}
 }
 \value{
 Path to saved predictions file

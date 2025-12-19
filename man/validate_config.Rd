@@ -2,23 +2,57 @@
 % Please edit documentation in R/config.R
 \name{validate_config}
 \alias{validate_config}
-\title{Validate Model Configuration}
+\title{Validate Model Configuration Against Schema}
 \usage{
-validate_config(config, schema)
+validate_config(config, schema, error = FALSE)
 }
 \arguments{
-\item{config}{The configuration to validate}
+\item{config}{Configuration to validate (list from YAML or JSON)}
 
-\item{schema}{The schema to validate against}
+\item{schema}{JSON Schema to validate against (from \code{create_config_schema()})}
+
+\item{error}{If TRUE, throws an error on validation failure instead of
+returning a result object (default: FALSE)}
 }
 \value{
-TRUE if valid, otherwise throws an error with details
+A list with:
+\itemize{
+\item \code{valid}: Logical indicating if configuration is valid
+\item \code{errors}: Character vector of error messages (empty if valid)
+}
+If \code{error = TRUE} and validation fails, throws an error instead.
 }
 \description{
-Validates a model configuration against its schema
+Validates a configuration object against a JSON Schema. Returns detailed
+error messages if validation fails.
 }
 \examples{
+# Create a schema
+schema <- create_config_schema(
+  properties = list(
+    n_samples = schema_integer(minimum = 1L),
+    method = schema_enum(values = c("a", "b", "c"))
+  ),
+  required = c("n_samples")
+)
+
+# Valid configuration
+config <- list(n_samples = 100L, method = "a")
+result <- validate_config(config, schema)
+result$valid
+# TRUE
+
+# Invalid configuration (missing required field)
+config <- list(method = "a")
+result <- validate_config(config, schema)
+result$valid
+# FALSE
+result$errors
+# Error message about missing n_samples
+
+# Throw error on invalid config
 \dontrun{
-validate_config(my_config, schema)
+validate_config(list(), schema, error = TRUE)
+# Error: Configuration validation failed: ...
 }
 }

@@ -154,6 +154,37 @@ load_config <- function(config_path) {
   read_model_config(config_path, validate = FALSE)
 }
 
+
+#' Load, Validate, and Apply Defaults to Configuration
+#'
+#' Loads a YAML configuration file, validates it against a schema (if provided),
+#' and applies default values from the schema for any missing properties.
+#'
+#' @param config_path Path to YAML configuration file (can be NULL or empty string)
+#' @param schema JSON Schema to validate against (from \code{create_config_schema()}).
+#'   If NULL, no validation is performed and no defaults are applied.
+#'
+#' @return Parsed configuration as a list with defaults applied. Returns empty
+#'   list if no config file exists and no schema defaults are available.
+#' @keywords internal
+load_and_validate_config <- function(config_path, schema = NULL) {
+  # Load raw config (returns empty list if no file)
+  config <- load_config(config_path)
+
+  # If no schema, return config as-is
+ if (is.null(schema)) {
+    return(config)
+  }
+
+  # Validate against schema (throws error on failure)
+  validate_config(config, schema, error = TRUE)
+
+  # Apply defaults from schema
+  config <- apply_config_defaults(config, schema)
+
+  config
+}
+
 #' Save model to RDS file
 #'
 #' Saves a trained model object to an RDS file with a status message.

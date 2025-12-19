@@ -74,23 +74,21 @@ predict_mean_model <- function(historic_data, future_data, saved_model, model_co
 }
 
 # Configuration schema for the info subcommand
-config_schema <- list(
+# Using the schema helper functions for type-safe validation
+config_schema <- create_config_schema(
   title = "Mean Model Configuration",
-  type = "object",
   description = "Configuration schema for the mean baseline model",
   properties = list(
-    smoothing = list(
-      type = "number",
+    smoothing = schema_number(
       description = "Smoothing parameter (reserved for future use)",
       default = 0.0,
       minimum = 0.0,
       maximum = 1.0
     ),
-    min_observations = list(
-      type = "integer",
+    min_observations = schema_integer(
       description = "Minimum number of observations required per location",
-      default = 1,
-      minimum = 1
+      default = 1L,
+      minimum = 1L
     )
   )
 )

@@ -118,10 +118,23 @@ predict_mean_model <- function(historic_data, future_data, saved_model,
   return(predictions)
 }
 
-config_schema <- list(
+# Define configuration schema with validation
+config_schema <- create_config_schema(
   title = "Mean Model Configuration",
-  type = "object",
-  properties = list()
+  description = "Configuration options for the mean model",
+  properties = list(
+    smoothing = schema_number(
+      description = "Smoothing parameter",
+      default = 0.0,
+      minimum = 0.0,
+      maximum = 1.0
+    ),
+    min_observations = schema_integer(
+      description = "Minimum observations required",
+      default = 1L,
+      minimum = 1L
+    )
+  )
 )
 
 # One line enables full CLI!
@@ -134,9 +147,71 @@ The `create_chap_cli()` function automatically:
 - Parses subcommands (train/predict/info)
 - Loads CSV files and converts to tsibbles
 - Detects time and key columns
-- Parses YAML configuration files
+- Parses and validates YAML configuration files against the schema
+- Applies default values for missing configuration options
 - Loads saved models
 - Saves outputs (RDS for models, CSV for predictions)
+
+### Configuration Schema
+
+The SDK provides helper functions for defining type-safe configuration schemas:
+
+```r
+config_schema <- create_config_schema(
+  title = "My Model Configuration",
+  description = "Configuration options for my model",
+  properties = list(
+    # Integer with range constraint
+    n_samples = schema_integer(
+      description = "Number of Monte Carlo samples",
+      default = 100L,
+      minimum = 1L,
+      maximum = 10000L
+    ),
+    # Number with bounds
+    learning_rate = schema_number(
+      description = "Learning rate",
+      default = 0.01,
+      minimum = 0,
+      maximum = 1
+    ),
+    # Enum (one of fixed choices)
+    method = schema_enum(
+      values = c("arima", "ets", "prophet"),
+      description = "Forecasting method",
+      default = "arima"
+    ),
+    # Boolean flag
+    use_covariates = schema_boolean(
+      description = "Include covariates",
+      default = TRUE
+    ),
+    # String with pattern
+    date_format = schema_string(
+      description = "Date format pattern",
+      pattern = "^%[Ymd]"
+    ),
+    # Array of strings
+    features = schema_array(
+      items = list(type = "string"),
+      description = "Feature names to use"
+    )
+  ),
+  required = c("n_samples")  # Mark required fields
+)
+```
+
+When a user provides a configuration file:
+1. The config is validated against the schema (type checking, range constraints, enum values)
+2. Default values are automatically applied for missing options
+3. Validation errors provide clear messages about what went wrong
+
+Example YAML config file (`config.yaml`):
+```yaml
+n_samples: 500
+learning_rate: 0.05
+method: ets
+```
 
 ### Key Points
 

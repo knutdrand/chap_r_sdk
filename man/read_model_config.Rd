@@ -4,24 +4,36 @@
 \alias{read_model_config}
 \title{Read Model Configuration}
 \usage{
-read_model_config(config_path, schema_path = NULL, validate = TRUE)
+read_model_config(
+  config_path,
+  schema = NULL,
+  validate = TRUE,
+  apply_defaults = TRUE
+)
 }
 \arguments{
 \item{config_path}{Path to YAML configuration file}
 
-\item{schema_path}{Path to JSON schema file (optional)}
+\item{schema}{JSON Schema to validate against (optional)}
 
 \item{validate}{Logical, whether to validate against schema (default: TRUE)}
+
+\item{apply_defaults}{Logical, whether to apply default values from schema
+(default: TRUE)}
 }
 \value{
-List containing parsed configuration
+List containing parsed configuration with defaults applied
 }
 \description{
-Reads a YAML configuration file and optionally validates it against a schema
+Reads a YAML configuration file and optionally validates it against a schema.
 }
 \examples{
 \dontrun{
-config <- read_model_config("model_config.yaml")
-config <- read_model_config("model_config.yaml", "schema.json", validate = TRUE)
+# Read config without validation
+config <- read_model_config("config.yaml")
+
+# Read config with validation
+schema <- create_config_schema(...)
+config <- read_model_config("config.yaml", schema = schema)
 }
 }

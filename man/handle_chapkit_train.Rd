@@ -4,7 +4,13 @@
 \alias{handle_chapkit_train}
 \title{Handle chapkit train subcommand}
 \usage{
-handle_chapkit_train(train_fn, args, default_config_path, default_model_path)
+handle_chapkit_train(
+  train_fn,
+  args,
+  default_config_path,
+  default_model_path,
+  schema = NULL
+)
 }
 \arguments{
 \item{train_fn}{User-provided training function}
@@ -14,6 +20,8 @@ handle_chapkit_train(train_fn, args, default_config_path, default_model_path)
 \item{default_config_path}{Default config file path}
 
 \item{default_model_path}{Default model output path}
+
+\item{schema}{Optional JSON Schema for config validation}
 }
 \value{
 Path to saved model file

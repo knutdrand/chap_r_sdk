@@ -148,8 +148,8 @@ create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
 
   # Dispatch to appropriate handler
   result <- switch(subcommand,
-    "train" = handle_train(train_fn, subcommand_args),
-    "predict" = handle_predict(predict_fn, subcommand_args),
+    "train" = handle_train(train_fn, subcommand_args, model_config_schema),
+    "predict" = handle_predict(predict_fn, subcommand_args, model_config_schema),
     "info" = handle_info(model_config_schema, model_info),
     stop("Invalid subcommand: '", subcommand, "'. Use 'train', 'predict', or 'info'")
   )
@@ -165,9 +165,10 @@ create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
 #'
 #' @param train_fn User-provided training function
 #' @param args Subcommand arguments (training_data path, optional config path, optional --run-info)
+#' @param schema Optional JSON Schema for config validation
 #' @return Path to saved model file
 #' @keywords internal
-handle_train <- function(train_fn, args) {
+handle_train <- function(train_fn, args, schema = NULL) {
   # Extract --run-info if present
   parsed <- extract_run_info_arg(args)
   positional_args <- parsed$positional
@@ -193,8 +194,8 @@ handle_train <- function(train_fn, args) {
   message("Loading training data from: ", training_data_path)
   training_data <- load_tsibble(training_data_path)
 
-  # Load configuration
-  config <- load_config(config_path)
+  # Load configuration with optional validation and defaults
+  config <- load_and_validate_config(config_path, schema)
   if (!is.null(config_path) && config_path != "") {
     message("Loaded configuration from: ", config_path)
   }
@@ -224,9 +225,10 @@ handle_train <- function(train_fn, args) {
 #'
 #' @param predict_fn User-provided prediction function
 #' @param args Subcommand arguments (historic_data, future_data, saved_model, optional config, optional --run-info)
+#' @param schema Optional JSON Schema for config validation
 #' @return Path to saved predictions file
 #' @keywords internal
-handle_predict <- function(predict_fn, args) {
+handle_predict <- function(predict_fn, args, schema = NULL) {
   # Extract --run-info if present
   parsed <- extract_run_info_arg(args)
   positional_args <- parsed$positional
@@ -266,8 +268,8 @@ handle_predict <- function(predict_fn, args) {
   message("Loading model from: ", model_path)
   model <- readRDS(model_path)
 
-  # Load configuration
-  config <- load_config(config_path)
+  # Load configuration with optional validation and defaults
+  config <- load_and_validate_config(config_path, schema)
   if (!is.null(config_path) && config_path != "") {
     message("Loaded configuration from: ", config_path)
   }
@@ -450,8 +452,8 @@ create_chapkit_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
 
   # Dispatch to appropriate handler
   result <- switch(subcommand,
-    "train" = handle_chapkit_train(train_fn, subcommand_args, default_config_path, default_model_path),
-    "predict" = handle_chapkit_predict(predict_fn, subcommand_args, default_config_path, default_model_path),
+    "train" = handle_chapkit_train(train_fn, subcommand_args, default_config_path, default_model_path, model_config_schema),
+    "predict" = handle_chapkit_predict(predict_fn, subcommand_args, default_config_path, default_model_path, model_config_schema),
     "info" = handle_info(model_config_schema, model_info),
     stop("Invalid subcommand: '", subcommand, "'. Use 'train', 'predict', or 'info'")
   )
@@ -508,9 +510,10 @@ parse_named_args <- function(args, defaults = list()) {
 #' @param args Subcommand arguments
 #' @param default_config_path Default config file path
 #' @param default_model_path Default model output path
+#' @param schema Optional JSON Schema for config validation
 #' @return Path to saved model file
 #' @keywords internal
-handle_chapkit_train <- function(train_fn, args, default_config_path, default_model_path) {
+handle_chapkit_train <- function(train_fn, args, default_config_path, default_model_path, schema = NULL) {
   # Parse named arguments with defaults
   parsed <- parse_named_args(args, list(
     data = NULL,
@@ -534,12 +537,17 @@ handle_chapkit_train <- function(train_fn, args, default_config_path, default_mo
   message("Loading training data from: ", parsed$data)
   training_data <- load_tsibble(parsed$data)
 
-  # Load configuration (config file is optional)
+  # Load configuration with optional validation and defaults
   config <- if (file.exists(parsed$config)) {
     message("Loading configuration from: ", parsed$config)
-    load_config(parsed$config)
+    load_and_validate_config(parsed$config, schema)
   } else {
-    list()
+    # Apply defaults from schema even if no config file
+    if (!is.null(schema)) {
+      apply_config_defaults(list(), schema)
+    } else {
+      list()
+    }
   }
 
   # Load run_info from file if provided, otherwise build default
@@ -568,9 +576,10 @@ handle_chapkit_train <- function(train_fn, args, default_config_path, default_mo
 #' @param args Subcommand arguments
 #' @param default_config_path Default config file path
 #' @param default_model_path Default model input path
+#' @param schema Optional JSON Schema for config validation
 #' @return Path to saved predictions file
 #' @keywords internal
-handle_chapkit_predict <- function(predict_fn, args, default_config_path, default_model_path) {
+handle_chapkit_predict <- function(predict_fn, args, default_config_path, default_model_path, schema = NULL) {
   # Parse named arguments with defaults
   parsed <- parse_named_args(args, list(
     historic = NULL,
@@ -613,12 +622,17 @@ handle_chapkit_predict <- function(predict_fn, args, default_config_path, defaul
   message("Loading model from: ", parsed$model)
   model <- readRDS(parsed$model)
 
-  # Load configuration (config file is optional)
+  # Load configuration with optional validation and defaults
   config <- if (file.exists(parsed$config)) {
     message("Loading configuration from: ", parsed$config)
-    load_config(parsed$config)
+    load_and_validate_config(parsed$config, schema)
   } else {
-    list()
+    # Apply defaults from schema even if no config file
+    if (!is.null(schema)) {
+      apply_config_defaults(list(), schema)
+    } else {
+      list()
+    }
   }
 
   # Load run_info from file if provided, otherwise build default

@@ -4,12 +4,14 @@
 \alias{handle_train}
 \title{Handle train subcommand}
 \usage{
-handle_train(train_fn, args)
+handle_train(train_fn, args, schema = NULL)
 }
 \arguments{
 \item{train_fn}{User-provided training function}
 
 \item{args}{Subcommand arguments (training_data path, optional config path, optional --run-info)}
+
+\item{schema}{Optional JSON Schema for config validation}
 }
 \value{
 Path to saved model file
