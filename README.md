@@ -435,6 +435,153 @@ quantile_preds <- predictions_to_quantiles(nested_preds)
 preds_with_summary <- predictions_summary(nested_preds)
 ```
 
+## Configuration Schemas
+
+You can define a configuration schema to validate user-provided settings
+and provide default values. The SDK uses JSON Schema (draft-07) for
+validation.
+
+### Defining a Schema
+
+Use the schema helper functions to define type-safe configuration
+options:
+
+``` r
+my_schema <- create_config_schema(
+  title = "My Model Configuration",
+  description = "Configuration options for my forecasting model",
+  properties = list(
+    # Integer with range constraints
+    n_samples = schema_integer(
+      description = "Number of Monte Carlo samples for predictions",
+      default = 100L,
+      minimum = 1L,
+      maximum = 10000L
+    ),
+    # Number (float) with bounds
+    learning_rate = schema_number(
+      description = "Learning rate for optimization",
+      default = 0.01,
+      minimum = 0,
+      maximum = 1
+    ),
+    # Enum: one of a fixed set of values
+    method = schema_enum(
+      values = c("arima", "ets", "prophet"),
+      description = "Forecasting method to use",
+      default = "arima"
+    ),
+    # Boolean flag
+    use_covariates = schema_boolean(
+      description = "Whether to include covariates in the model",
+      default = TRUE
+    ),
+    # String with optional pattern constraint
+    date_format = schema_string(
+      description = "Date format for output",
+      default = "%Y-%m-%d"
+    ),
+    # Array of values
+    lag_values = schema_array(
+      items = list(type = "integer"),
+      description = "Lag periods to include",
+      default = list(1L, 2L, 3L)
+    )
+  ),
+  required = c("n_samples")  # Mark required fields
+)
+
+# View the schema
+print(my_schema)
+#> CHAP Configuration Schema
+#> =========================
+#> 
+#> Title: My Model Configuration 
+#> Description: Configuration options for my forecasting model 
+#> 
+#> Properties:
+#>   n_samples * (integer) [default: 100]
+#>     Number of Monte Carlo samples for predictions
+#>   learning_rate (number) [default: 0.01]
+#>     Learning rate for optimization
+#>   method (enum(arima, ets, prophet)) [default: "arima"]
+#>     Forecasting method to use
+#>   use_covariates (boolean) [default: true]
+#>     Whether to include covariates in the model
+#>   date_format (string) [default: "%Y-%m-%d"]
+#>     Date format for output
+#>   lag_values (array) [default: [1,2,3]]
+#>     Lag periods to include
+#> 
+#> * = required
+```
+
+### Using the Schema with CLI
+
+Pass the schema to `create_chap_cli()` to enable automatic validation:
+
+``` r
+if (!interactive()) {
+  create_chap_cli(train_fn, predict_fn, model_config_schema = my_schema)
+}
+```
+
+When a user provides a configuration file (YAML or JSON), the CLI will:
+
+1.  **Validate** the config against the schema (type checking, range
+    constraints, enum values)
+2.  **Apply defaults** for any missing optional parameters
+3.  **Report errors** with clear messages if validation fails
+
+Example `config.yaml`:
+
+``` yaml
+n_samples: 500
+learning_rate: 0.05
+method: ets
+```
+
+### Manual Validation
+
+You can also validate configurations manually:
+
+``` r
+# Valid configuration
+config <- list(n_samples = 500L, method = "ets")
+result <- validate_config(config, my_schema)
+result$valid
+#> [1] TRUE
+
+# Invalid configuration (value out of range)
+bad_config <- list(n_samples = -5L)
+result <- validate_config(bad_config, my_schema)
+result$valid
+#> [1] FALSE
+result$errors
+#> [1] "/n_samples: must be >= 1"
+
+# Apply defaults to fill in missing values
+partial_config <- list(n_samples = 200L)
+full_config <- apply_config_defaults(partial_config, my_schema)
+full_config$n_samples      # User value preserved
+#> [1] 200
+full_config$learning_rate  # Default applied
+#> [1] 0.01
+full_config$method         # Default applied
+#> [1] "arima"
+```
+
+### Available Schema Types
+
+| Function | Description | Key Options |
+|----|----|----|
+| `schema_integer()` | Integer values | `minimum`, `maximum`, `default` |
+| `schema_number()` | Numeric (float) values | `minimum`, `maximum`, `default` |
+| `schema_string()` | String values | `min_length`, `max_length`, `pattern`, `default` |
+| `schema_boolean()` | TRUE/FALSE values | `default` |
+| `schema_enum()` | One of fixed choices | `values` (required), `default` |
+| `schema_array()` | Arrays/lists | `items`, `min_items`, `max_items`, `default` |
+
 ## Summary
 
 The development workflow is:
