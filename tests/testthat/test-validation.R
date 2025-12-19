@@ -221,3 +221,83 @@ test_that("validate_model_io_all validates all combinations when no params given
   expect_true("laos_M" %in% names(result$results))
   expect_true(result$success)
 })
+
+# Tests for NaN and negative value validation (CHAP contract requirements)
+test_that("validate_model_io detects NaN values in predictions", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    list(dummy = 1)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    # Return predictions with NaN values
+    future_data |>
+      dplyr::mutate(samples = purrr::map(seq_len(dplyr::n()), ~c(10, NaN, 12)))
+  }
+
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_false(result$success)
+  expect_gt(length(result$errors), 0)
+  expect_match(paste(result$errors, collapse = " "), "NaN", ignore.case = FALSE)
+})
+
+test_that("validate_model_io detects NA values in predictions", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    list(dummy = 1)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    # Return predictions with NA values
+    future_data |>
+      dplyr::mutate(samples = purrr::map(seq_len(dplyr::n()), ~c(10, NA, 12)))
+  }
+
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_false(result$success)
+  expect_gt(length(result$errors), 0)
+  expect_match(paste(result$errors, collapse = " "), "NA", ignore.case = FALSE)
+})
+
+test_that("validate_model_io detects negative values in predictions", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    list(dummy = 1)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    # Return predictions with negative values
+    future_data |>
+      dplyr::mutate(samples = purrr::map(seq_len(dplyr::n()), ~c(10, -5, 12)))
+  }
+
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_false(result$success)
+  expect_gt(length(result$errors), 0)
+  expect_match(paste(result$errors, collapse = " "), "negative", ignore.case = TRUE)
+})
+
+test_that("validate_model_io passes with valid non-negative predictions", {
+  train_fn <- function(training_data, model_configuration = list()) {
+    list(dummy = 1)
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model,
+                         model_configuration = list()) {
+    # Return valid predictions (all non-negative, no NA/NaN)
+    future_data |>
+      dplyr::mutate(samples = purrr::map(seq_len(dplyr::n()), ~c(0, 10, 100)))
+  }
+
+  example_data <- get_example_data('laos', 'M')
+  result <- validate_model_io(train_fn, predict_fn, example_data)
+
+  expect_true(result$success)
+  expect_length(result$errors, 0)
+})

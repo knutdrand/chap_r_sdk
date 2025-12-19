@@ -2,7 +2,9 @@
 
 export(aggregate_spatial)
 export(aggregate_temporal)
+export(build_run_info)
 export(create_chap_cli)
+export(create_chapkit_cli)
 export(create_config_schema)
 export(detect_prediction_format)
 export(get_config_param)

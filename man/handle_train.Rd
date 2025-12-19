@@ -9,7 +9,7 @@ handle_train(train_fn, args)
 \arguments{
 \item{train_fn}{User-provided training function}
 
-\item{args}{Subcommand arguments (training_data path and optional config path)}
+\item{args}{Subcommand arguments (training_data path, optional config path, optional --run-info)}
 }
 \value{
 Path to saved model file

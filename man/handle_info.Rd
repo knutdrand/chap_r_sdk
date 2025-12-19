@@ -4,16 +4,19 @@
 \alias{handle_info}
 \title{Handle info subcommand}
 \usage{
-handle_info(model_config_schema)
+handle_info(model_config_schema, model_info = NULL)
 }
 \arguments{
 \item{model_config_schema}{Optional configuration schema to display}
+
+\item{model_info}{Optional list with model data requirements (period_type,
+allows_additional_continuous_covariates, required_covariates)}
 }
 \value{
 NULL (invisibly)
 }
 \description{
 Internal function that handles the "info" subcommand for create_chap_cli().
-Displays model information and configuration schema if provided.
+Displays model information, data requirements, and configuration schema.
 }
 \keyword{internal}

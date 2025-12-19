@@ -9,7 +9,7 @@ handle_predict(predict_fn, args)
 \arguments{
 \item{predict_fn}{User-provided prediction function}
 
-\item{args}{Subcommand arguments (historic_data, future_data, saved_model, optional config)}
+\item{args}{Subcommand arguments (historic_data, future_data, saved_model, optional config, optional --run-info)}
 }
 \value{
 Path to saved predictions file

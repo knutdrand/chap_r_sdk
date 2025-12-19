@@ -82,6 +82,18 @@ get_example_data <- function(country, frequency) {
 #' (e.g., \code{samples = list(c(42))}). For probabilistic models, include multiple
 #' Monte Carlo samples (e.g., 1000 samples per forecast unit).
 #'
+#' @section Validation Checks:
+#' The following checks are performed on predictions:
+#' \itemize{
+#'   \item Predictions must be a data frame or tibble
+#'   \item Must have a \code{samples} list-column containing numeric vectors
+#'   \item All rows must have the same number of samples
+#'   \item Row count must match the number of rows in \code{future_data}
+#'   \item Predictions must not contain NaN values (CHAP contract requirement)
+#'   \item Predictions must not contain NA values
+#'   \item Predictions must be non-negative (CHAP contract requirement)
+#' }
+#'
 #' @param train_fn Training function that takes (training_data, model_configuration = list())
 #'   and returns a trained model object
 #' @param predict_fn Prediction function that takes (historic_data, future_data, saved_model,
@@ -177,6 +189,28 @@ validate_model_io <- function(train_fn, predict_fn, example_data,
           if (!all(vapply(predictions$samples, is.numeric, logical(1)))) {
             validation_errors <- c(validation_errors,
                                    "All samples must be numeric vectors")
+          }
+
+          # Check for NaN values (required by CHAP contract)
+          all_samples <- unlist(predictions$samples)
+          if (any(is.nan(all_samples))) {
+            n_nan <- sum(is.nan(all_samples))
+            validation_errors <- c(validation_errors,
+                                   sprintf("Predictions must not contain NaN values (found %d)", n_nan))
+          }
+
+          # Check for NA values
+          if (any(is.na(all_samples) & !is.nan(all_samples))) {
+            n_na <- sum(is.na(all_samples) & !is.nan(all_samples))
+            validation_errors <- c(validation_errors,
+                                   sprintf("Predictions must not contain NA values (found %d)", n_na))
+          }
+
+          # Check for non-negative values (required by CHAP contract)
+          if (any(all_samples < 0, na.rm = TRUE)) {
+            n_negative <- sum(all_samples < 0, na.rm = TRUE)
+            validation_errors <- c(validation_errors,
+                                   sprintf("Predictions must be non-negative (found %d negative values)", n_negative))
           }
         }
       }
