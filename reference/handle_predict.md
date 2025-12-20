@@ -8,7 +8,7 @@ predictions.
 ## Usage
 
 ``` r
-handle_predict(predict_fn, args)
+handle_predict(predict_fn, args, schema = NULL)
 ```
 
 ## Arguments
@@ -20,7 +20,11 @@ handle_predict(predict_fn, args)
 - args:
 
   Subcommand arguments (historic_data, future_data, saved_model,
-  optional config)
+  optional config, optional –run-info)
+
+- schema:
+
+  Optional JSON Schema for config validation
 
 ## Value
 

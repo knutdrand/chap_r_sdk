@@ -1,6 +1,6 @@
 # Get Configuration Parameter
 
-Safely extracts a parameter from configuration with default fallback
+Safely extracts a parameter from configuration with default fallback.
 
 ## Usage
 
@@ -39,17 +39,4 @@ print(lr)  # 0.01
 missing <- get_config_param(config, "model", "missing", .default = "default")
 print(missing)  # "default"
 #> [1] "default"
-
-# Deep nesting
-complex_config <- list(
-  training = list(
-    optimizer = list(
-      type = "adam",
-      params = list(lr = 0.001, beta1 = 0.9)
-    )
-  )
-)
-beta1 <- get_config_param(complex_config, "training", "optimizer", "params", "beta1")
-print(beta1)  # 0.9
-#> [1] 0.9
 ```

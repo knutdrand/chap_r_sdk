@@ -1,12 +1,17 @@
 # Read Model Configuration
 
 Reads a YAML configuration file and optionally validates it against a
-schema
+schema.
 
 ## Usage
 
 ``` r
-read_model_config(config_path, schema_path = NULL, validate = TRUE)
+read_model_config(
+  config_path,
+  schema = NULL,
+  validate = TRUE,
+  apply_defaults = TRUE
+)
 ```
 
 ## Arguments
@@ -15,23 +20,31 @@ read_model_config(config_path, schema_path = NULL, validate = TRUE)
 
   Path to YAML configuration file
 
-- schema_path:
+- schema:
 
-  Path to JSON schema file (optional)
+  JSON Schema to validate against (optional)
 
 - validate:
 
   Logical, whether to validate against schema (default: TRUE)
 
+- apply_defaults:
+
+  Logical, whether to apply default values from schema (default: TRUE)
+
 ## Value
 
-List containing parsed configuration
+List containing parsed configuration with defaults applied
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-config <- read_model_config("model_config.yaml")
-config <- read_model_config("model_config.yaml", "schema.json", validate = TRUE)
+# Read config without validation
+config <- read_model_config("config.yaml")
+
+# Read config with validation
+schema <- create_config_schema(...)
+config <- read_model_config("config.yaml", schema = schema)
 } # }
 ```

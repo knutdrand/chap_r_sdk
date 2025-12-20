@@ -58,6 +58,24 @@ sample per forecast unit (e.g., `samples = list(c(42))`). For
 probabilistic models, include multiple Monte Carlo samples (e.g., 1000
 samples per forecast unit).
 
+## Validation Checks
+
+The following checks are performed on predictions:
+
+- Predictions must be a data frame or tibble
+
+- Must have a `samples` list-column containing numeric vectors
+
+- All rows must have the same number of samples
+
+- Row count must match the number of rows in `future_data`
+
+- Predictions must not contain NaN values (CHAP contract requirement)
+
+- Predictions must not contain NA values
+
+- Predictions must be non-negative (CHAP contract requirement)
+
 ## Examples
 
 ``` r

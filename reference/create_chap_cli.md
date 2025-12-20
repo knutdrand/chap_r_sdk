@@ -12,6 +12,7 @@ create_chap_cli(
   train_fn,
   predict_fn,
   model_config_schema = NULL,
+  model_info = NULL,
   args = commandArgs(trailingOnly = TRUE)
 )
 ```
@@ -21,21 +22,25 @@ create_chap_cli(
 - train_fn:
 
   Training function with signature:
-  `function(training_data, model_configuration = list())` where
-  `training_data` is a tsibble and `model_configuration` is a list.
+  `function(training_data, model_configuration = list(), run_info = list())`
+  where `training_data` is a tsibble, `model_configuration` is a list of
+  user-defined configuration options, and `run_info` is a list
+  containing CHAP-provided run information (see Run Info section).
   Should return a model object that will be automatically saved as RDS.
 
 - predict_fn:
 
   Prediction function with signature:
-  `function(historic_data, future_data, saved_model, model_configuration = list())`
+  `function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list())`
   where all data inputs are tsibbles, `saved_model` is a loaded object,
-  and `model_configuration` is a list. Must return a tibble with a
-  `samples` list-column containing numeric vectors. For deterministic
-  models, use a single sample per forecast unit (e.g.,
-  `samples = list(c(42))`). For probabilistic models, include multiple
-  Monte Carlo samples. The CLI automatically converts the nested samples
-  to wide CSV format (sample_0, sample_1, ...) for CHAP.
+  `model_configuration` is a list of user-defined configuration options,
+  and `run_info` is a list containing CHAP-provided run information.
+  Must return a tibble with a `samples` list-column containing numeric
+  vectors. For deterministic models, use a single sample per forecast
+  unit (e.g., `samples = list(c(42))`). For probabilistic models,
+  include multiple Monte Carlo samples. The CLI automatically converts
+  the nested samples to wide CSV format (sample_0, sample_1, ...) for
+  CHAP.
 
   **Important**: `historic_data` may contain more recent observations
   than the original training data. CHAP may call predict with updated
@@ -51,6 +56,13 @@ create_chap_cli(
   Optional model configuration schema (reserved for future use). Can be
   used with the "info" subcommand to display schema information.
 
+- model_info:
+
+  Optional list describing the model's data requirements and
+  capabilities. Used by CHAP to validate data before sending to the
+  model and displayed via the "info" subcommand. See Model Info section
+  for details.
+
 - args:
 
   Command line arguments (defaults to
@@ -65,6 +77,55 @@ Invisible result of the called function
 This is the standard way to create CHAP-compatible CLI scripts,
 providing a single unified interface with subcommand dispatch.
 
+## Model Info
+
+The `model_info` parameter describes what data and configuration the
+model expects. This information is used by CHAP to validate inputs and
+displayed via the "info" subcommand.
+
+- period_type:
+
+  Character. The temporal resolution the model expects ("month", "week",
+  "day"). CHAP will ensure data is provided at this resolution.
+
+- allows_additional_continuous_covariates:
+
+  Logical. If TRUE, the model can accept additional continuous
+  covariates beyond those it specifically requires. CHAP will list these
+  in `run_info$additional_continuous_covariates`.
+
+- required_covariates:
+
+  Character vector. Names of columns that must be present in the data
+  (e.g., `c("population", "rainfall")`). CHAP will validate these exist
+  before calling the model.
+
+## Run Info
+
+The `run_info` parameter is provided by CHAP and passed to both train
+and predict functions. It contains runtime information about the current
+CHAP execution:
+
+- prediction_length:
+
+  Integer. The number of time periods the model is expected to forecast.
+
+- additional_continuous_covariates:
+
+  Character vector. Names of additional covariate columns that the user
+  has specified beyond the standard columns. Models that declared
+  `allows_additional_continuous_covariates = TRUE` in their `model_info`
+  should use these columns.
+
+- future_covariate_origin:
+
+  Character or NULL. Origin/source of future covariate forecasts (e.g.,
+  "chap_baseline", "user_provided").
+
+The run_info is passed to the CLI via the `--run-info` argument pointing
+to a YAML or JSON file. If not provided, a default run_info is
+constructed from the data.
+
 ## Examples
 
 ``` r
@@ -73,8 +134,10 @@ if (FALSE) { # \dontrun{
 library(chap.r.sdk)
 library(dplyr)
 
-train_my_model <- function(training_data, model_configuration = list()) {
+train_my_model <- function(training_data, model_configuration = list(),
+                           run_info = list()) {
   # training_data is already a tsibble - no file I/O needed!
+  # run_info contains prediction_length, n_locations, period_type
   means <- training_data |>
     group_by(location) |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
@@ -82,8 +145,9 @@ train_my_model <- function(training_data, model_configuration = list()) {
 }
 
 predict_my_model <- function(historic_data, future_data, saved_model,
-                              model_configuration = list()) {
+                              model_configuration = list(), run_info = list()) {
   # All inputs are already loaded - no file I/O needed!
+  # run_info contains prediction_length, n_locations, period_type
   # Return samples list-column (single sample for deterministic model)
   future_data |>
     as_tibble() |>
@@ -98,14 +162,21 @@ config_schema <- list(
   properties = list()
 )
 
+model_info <- list(
+  period_type = "month",
+  allows_additional_continuous_covariates = TRUE,
+  required_covariates = c("population", "rainfall")
+)
+
 # Single function call enables full CLI!
 if (!interactive()) {
-  create_chap_cli(train_my_model, predict_my_model, config_schema)
+  create_chap_cli(train_my_model, predict_my_model, config_schema, model_info)
 }
 
 # Command line usage:
-# Rscript model.R train data.csv [config.yaml]
-# Rscript model.R predict historic.csv future.csv model.rds [config.yaml]
-# Rscript model.R info
+# Rscript model.R train data.csv [config.yaml] [--run-info run_info.yaml]
+# Rscript model.R predict historic.csv future.csv model.rds [config.yaml] [--run-info run_info.yaml]
+# Rscript model.R info                    # Human-readable YAML output
+# Rscript model.R info --format json      # Machine-readable JSON for chapkit
 } # }
 ```

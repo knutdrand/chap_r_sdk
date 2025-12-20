@@ -7,7 +7,7 @@ training function, and saves the resulting model.
 ## Usage
 
 ``` r
-handle_train(train_fn, args)
+handle_train(train_fn, args, schema = NULL)
 ```
 
 ## Arguments
@@ -18,7 +18,12 @@ handle_train(train_fn, args)
 
 - args:
 
-  Subcommand arguments (training_data path and optional config path)
+  Subcommand arguments (training_data path, optional config path,
+  optional –run-info)
+
+- schema:
+
+  Optional JSON Schema for config validation
 
 ## Value
 

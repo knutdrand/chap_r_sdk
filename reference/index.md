@@ -6,6 +6,10 @@ Create command-line interfaces for CHAP models
 
 - [`create_chap_cli()`](https://knutdrand.github.io/chap_r_sdk/reference/create_chap_cli.md)
   : Create Unified CHAP CLI
+- [`create_chapkit_cli()`](https://knutdrand.github.io/chap_r_sdk/reference/create_chapkit_cli.md)
+  : Create Chapkit-Compatible CLI
+- [`build_run_info()`](https://knutdrand.github.io/chap_r_sdk/reference/build_run_info.md)
+  : Build default run_info object from data
 
 ## Configuration
 
@@ -18,9 +22,34 @@ Model configuration management
 - [`get_config_param()`](https://knutdrand.github.io/chap_r_sdk/reference/get_config_param.md)
   : Get Configuration Parameter
 - [`create_config_schema()`](https://knutdrand.github.io/chap_r_sdk/reference/create_config_schema.md)
-  : Expose Model Configuration Schema
+  : Create a Model Configuration Schema
 - [`validate_config()`](https://knutdrand.github.io/chap_r_sdk/reference/validate_config.md)
-  : Validate Model Configuration
+  : Validate Model Configuration Against Schema
+- [`apply_config_defaults()`](https://knutdrand.github.io/chap_r_sdk/reference/apply_config_defaults.md)
+  : Apply Default Values from Schema to Configuration
+- [`get_schema_defaults()`](https://knutdrand.github.io/chap_r_sdk/reference/get_schema_defaults.md)
+  : Extract Default Values from Schema
+
+## Configuration Schema Builders
+
+Helper functions to build JSON Schema configuration schemas
+
+- [`schema_string()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_string.md)
+  : Define a String Schema Property
+- [`schema_number()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_number.md)
+  : Define a Number Schema Property
+- [`schema_integer()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_integer.md)
+  : Define an Integer Schema Property
+- [`schema_boolean()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_boolean.md)
+  : Define a Boolean Schema Property
+- [`schema_array()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_array.md)
+  : Define an Array Schema Property
+- [`schema_enum()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_enum.md)
+  : Define an Enum Schema Property
+- [`schema_to_json()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_to_json.md)
+  : Convert Schema to JSON
+- [`print(`*`<chap_config_schema>`*`)`](https://knutdrand.github.io/chap_r_sdk/reference/print.chap_config_schema.md)
+  : Print Schema Summary
 
 ## Model Validation
 

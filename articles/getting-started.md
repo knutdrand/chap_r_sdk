@@ -107,7 +107,7 @@ You don’t need to write code for:
 - Saving outputs → [`saveRDS()`](https://rdrr.io/r/base/readRDS.html)
   for models, CSV for predictions
 - Parsing YAML configs →
-  [`yaml::yaml.load_file()`](https://rdrr.io/pkg/yaml/man/yaml.load.html)
+  [`yaml::yaml.load_file()`](https://yaml.r-lib.org/reference/yaml.load.html)
 
 ### 3. Focus on Business Logic
 
@@ -237,4 +237,4 @@ Automatic format detection
 
 - **Issues**: <https://github.com/knutdrand/chap_r_sdk/issues>
 - **Documentation**:
-  [`help(package = "chap.r.sdk")`](https://rdrr.io/pkg/chap.r.sdk/man)
+  [`help(package = "chap.r.sdk")`](https://knutdrand.github.io/chap_r_sdk/reference)

@@ -92,6 +92,18 @@ numeric vectors. For deterministic models, use a single sample per forecast unit
 (e.g., <code>samples = list(c(42))</code>). For probabilistic models, include multiple
 Monte Carlo samples (e.g., 1000 samples per forecast unit).</p>
     </div>
+    <div class="section level2">
+    <h2 id="validation-checks">Validation Checks<a class="anchor" aria-label="anchor" href="#validation-checks"></a></h2>
+
+
+<p>The following checks are performed on predictions:</p><ul><li><p>Predictions must be a data frame or tibble</p></li>
+<li><p>Must have a <code>samples</code> list-column containing numeric vectors</p></li>
+<li><p>All rows must have the same number of samples</p></li>
+<li><p>Row count must match the number of rows in <code>future_data</code></p></li>
+<li><p>Predictions must not contain NaN values (CHAP contract requirement)</p></li>
+<li><p>Predictions must not contain NA values</p></li>
+<li><p>Predictions must be non-negative (CHAP contract requirement)</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

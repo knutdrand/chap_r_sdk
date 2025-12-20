@@ -1,6 +1,6 @@
 # Write Model Configuration
 
-Writes a configuration object to YAML file
+Writes a configuration object to YAML file.
 
 ## Usage
 

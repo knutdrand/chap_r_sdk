@@ -16,9 +16,9 @@ validation
 **Implementation Status**: - ✅ `yaml` package in `Imports`
 (DESCRIPTION:21) - ✅ `ajv` package in `Suggests` (DESCRIPTION:25) - ✅
 Using
-[`yaml::yaml.load_file()`](https://rdrr.io/pkg/yaml/man/yaml.load.html)
+[`yaml::yaml.load_file()`](https://yaml.r-lib.org/reference/yaml.load.html)
 in R/config.R:24 - ✅ Using
-[`yaml::as.yaml()`](https://rdrr.io/pkg/yaml/man/as.yaml.html) for
+[`yaml::as.yaml()`](https://yaml.r-lib.org/reference/as.yaml.html) for
 serialization in R/config.R:72 - ✅ Using
 [`ajv::ajv.validate()`](https://rdrr.io/pkg/ajv/man/ajv.validate.html)
 for schema validation in R/config.R:39 - ✅ All YAML functions properly
