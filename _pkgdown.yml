@@ -9,8 +9,19 @@ home:
 
 navbar:
   structure:
-    left:  [intro, reference, articles, news]
+    left:  [getting-started, tutorials, reference, news]
     right: [search, github]
+  components:
+    getting-started:
+      text: Getting Started
+      href: articles/getting-started.html
+    tutorials:
+      text: Tutorials
+      menu:
+        - text: Building Your First CHAP Model
+          href: articles/model-development-tutorial.html
+        - text: Working with Spatio-Temporal Data
+          href: articles/spatio-temporal-data.html
 
 reference:
   - title: CLI Interface
@@ -80,13 +91,3 @@ reference:
     desc: Helper functions
     contents:
       - get_example_data
-
-articles:
-  - title: Getting Started
-    contents:
-      - getting-started
-
-  - title: Tutorials
-    contents:
-      - model-development-tutorial
-      - spatio-temporal-data

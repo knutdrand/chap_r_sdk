@@ -14,24 +14,35 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Installation
+
+Install the development version from GitHub:
+
+```{r eval=FALSE}
+# install.packages("remotes")
+remotes::install_github("knutdrand/chap_r_sdk")
+```
+
+Load the package:
+
 ```{r setup}
 library(chap.r.sdk)
 ```
 
-## Introduction
+## What is the CHAP R SDK?
 
-The `chap.r.sdk` package provides infrastructure for developing CHAP-compatible disease forecasting models. It simplifies model development by handling common tasks like file I/O, configuration management, and CLI creation.
+The `chap.r.sdk` package provides infrastructure for developing disease forecasting models compatible with the [CHAP platform](https://github.com/dhis2/chap-core). CHAP (Climate and Health Analytics Platform) enables health ministries to run predictive models for disease surveillance.
 
-### Key Features
+This SDK simplifies model development by handling:
 
-- **Unified CLI**: Single function call to create command-line interfaces
-- **Automatic file handling**: CSV loading, tsibble conversion, model saving
-- **Configuration management**: YAML config parsing with schema validation
-- **Auto-detection**: Automatically finds time and key columns in your data
+- **CLI creation**: Command-line interfaces for train/predict workflows
+- **File I/O**: Automatic CSV loading, tsibble conversion, output formatting
+- **Configuration**: YAML/JSON config parsing with schema validation
+- **Validation**: Test suites to verify CHAP compatibility
 
 ## Quick Start
 
-The recommended pattern for creating a CHAP-compatible model uses the `create_chap_cli()` function:
+The recommended pattern uses `create_chap_cli()` to create a complete command-line interface:
 
 ```{r eval=FALSE}
 library(chap.r.sdk)
@@ -39,7 +50,6 @@ library(dplyr)
 
 # Define training function - receives loaded tsibble, not file paths
 train_my_model <- function(training_data, model_configuration = list()) {
-  # Calculate mean disease cases per location
   means <- training_data |>
     group_by(location) |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
@@ -50,10 +60,10 @@ train_my_model <- function(training_data, model_configuration = list()) {
 # Define prediction function - all inputs already loaded
 predict_my_model <- function(historic_data, future_data, saved_model,
                               model_configuration = list()) {
-  # Join future data with model predictions
   predictions <- future_data |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = mean_cases)
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
+    select(-mean_cases)
 
   return(predictions)
 }
@@ -66,8 +76,7 @@ if (!interactive()) {
 
 ### Command Line Usage
 
-Once you have a model script (e.g., `model.R`), you can use it from the command line:
-
+Save the above code as `model.R`, then use from the command line:
 ```bash
 # Train the model
 Rscript model.R train training_data.csv
@@ -79,157 +88,145 @@ Rscript model.R predict historic_data.csv future_data.csv model.rds
 Rscript model.R info
 ```
 
-## Model Development Workflow
-
-### 1. Define Model Functions
+## Model Function Interface
 
 Your model needs two functions:
 
-**Training function:**
-- Input: `training_data` (tsibble), `model_configuration` (list)
-- Output: Model object (will be saved as RDS)
+### Training Function
 
-**Prediction function:**
-- Input: `historic_data` (tsibble), `future_data` (tsibble), `saved_model` (object), `model_configuration` (list)
-- Output: Predictions (tsibble or data frame, saved as CSV)
-- **Note**: `historic_data` may be more recent than the training data. Time series models should refit to `historic_data` before forecasting. See `examples/arima_model/` for a demonstration.
-
-### 2. What the SDK Handles Automatically
-
-You don't need to write code for:
-
-- Loading CSV files → `readr::read_csv()`
-- Converting to tsibbles → `tsibble::as_tsibble()`
-- Detecting time columns → automatically finds `time_period`, `date`, `week`, etc.
-- Detecting key columns → automatically finds `location`, `region`, etc.
-- Loading models → `readRDS()`
-- Saving outputs → `saveRDS()` for models, CSV for predictions
-- Parsing YAML configs → `yaml::yaml.load_file()`
-
-### 3. Focus on Business Logic
-
-Your functions only contain the model logic:
-
-```{r eval=FALSE}
+```r
 train_fn <- function(training_data, model_configuration = list()) {
-  # training_data is already a tsibble - ready to use!
-  # Your model training code here
-  return(model)
+  # training_data: tsibble with time_period index, location key, disease_cases
+  # model_configuration: optional list of parameters from config file
+  # Returns: model object (saved as RDS)
 }
 ```
 
-No file I/O boilerplate needed.
+### Prediction Function
 
-## Configuration Management
+```r
+predict_fn <- function(historic_data, future_data, saved_model,
+                       model_configuration = list()) {
+  # historic_data: tsibble with historical observations
+  # future_data: tsibble with time periods to predict (no disease_cases)
+  # saved_model: object returned by train_fn
+  # Returns: tibble with samples list-column
+}
+```
+
+**Important**: `historic_data` may contain more recent observations than training data. Time series models should refit to `historic_data` before forecasting.
+
+## What the SDK Handles
+
+You don't need to write code for:
+
+| Task | SDK handles it |
+|------|----------------|
+| Loading CSV files | `readr::read_csv()` |
+| Converting to tsibbles | `tsibble::as_tsibble()` |
+| Detecting time columns | Finds `time_period`, `date`, `week`, etc. |
+| Detecting key columns | Finds `location`, `region`, etc. |
+| Loading/saving models | `readRDS()` / `saveRDS()` |
+| Parsing configs | `yaml::yaml.load_file()` |
+
+Your functions only contain business logic - no file I/O boilerplate.
+
+## Data Format
+
+### Training/Historic Data
+
+CSV with time, location, target, and covariates:
+
+```
+time_period,location,disease_cases,population,rainfall
+2023-01,LocationA,45,10000,120.5
+2023-02,LocationA,52,10000,85.2
+2023-01,LocationB,78,15000,130.1
+```
+
+### Future Data
+
+Same structure without the target variable:
+
+```
+time_period,location,population,rainfall
+2023-05,LocationA,10000,95.0
+2023-06,LocationA,10000,110.3
+```
+
+### Prediction Output
+
+Tibble with `samples` list-column containing numeric vectors:
+
+```r
+# Deterministic: single value per row
+tibble(
+  time_period = "2023-05",
+  location = "LocationA",
+  samples = list(c(42))
+)
+
+# Probabilistic: multiple Monte Carlo samples
+tibble(
+  time_period = "2023-05",
+  location = "LocationA",
+  samples = list(rpois(1000, lambda = 42))
+)
+```
+
+## Configuration
 
 ### Reading Configuration Files
 
 ```{r eval=FALSE}
-# Automatic via create_chap_cli() - config loaded and passed to functions
-# Or manual:
+# Via CLI - config passed automatically to your functions
+Rscript model.R train data.csv config.yaml
+
+# Or read manually:
 config <- read_model_config("config.yaml")
 ```
 
 ### Safe Parameter Extraction
 
 ```{r}
-# Example configuration
 config <- list(
   model = list(
-    params = list(
-      learning_rate = 0.01,
-      epochs = 100
-    )
+    params = list(learning_rate = 0.01, epochs = 100)
   )
 )
 
-# Extract nested parameters safely
+# Extract nested parameters with defaults
 lr <- get_config_param(config, "model", "params", "learning_rate", .default = 0.001)
 print(lr)
 
-# Returns default if not found
-missing <- get_config_param(config, "model", "missing_param", .default = "default_value")
+# Returns default if path not found
+missing <- get_config_param(config, "model", "missing", .default = "default")
 print(missing)
 ```
 
 ### Configuration Schema
 
-Define a schema for the `info` subcommand:
+Define a schema for validation and the `info` subcommand:
 
 ```{r eval=FALSE}
-config_schema <- list(
+config_schema <- create_config_schema(
   title = "My Model Configuration",
-  type = "object",
   properties = list(
-    learning_rate = list(
-      type = "number",
-      default = 0.01,
-      minimum = 0,
-      maximum = 1
-    ),
-    epochs = list(
-      type = "integer",
-      default = 100,
-      minimum = 1
-    )
+    n_samples = schema_integer(default = 100L, minimum = 1L),
+    learning_rate = schema_number(default = 0.01, minimum = 0, maximum = 1)
   )
 )
 
-create_chap_cli(train_fn, predict_fn, config_schema)
+create_chap_cli(train_fn, predict_fn, model_config_schema = config_schema)
 ```
-
-## Data Format
-
-### Training Data
-
-CSV file with:
-- **Time column**: `time_period`, `date`, `week`, `month`, etc.
-- **Key columns**: `location`, `region`, `district`, etc. (optional for univariate)
-- **Target variable**: `disease_cases` or your outcome variable
-- **Covariates**: Any additional columns
-
-Example:
-```
-time_period,location,disease_cases,population
-2023-01,LocationA,45,10000
-2023-02,LocationA,52,10000
-2023-01,LocationB,78,15000
-2023-02,LocationB,82,15000
-```
-
-### Future Data
-
-Same structure as training data, but without the target variable:
-
-```
-time_period,location,population
-2023-05,LocationA,10000
-2023-06,LocationA,10000
-2023-05,LocationB,15000
-2023-06,LocationB,15000
-```
-
-## Complete Example
-
-See `examples/mean_model/model.R` in the package for a complete working example implementing a baseline mean model.
-
-## Migrating from Legacy Pattern
-
-If you have existing code using `create_train_cli()` and `create_predict_cli()`, these functions still work but are deprecated. See the package documentation for migration guidance.
-
-**Benefits of migrating to unified CLI:**
-- 41% less code
-- Single file instead of separate train.R and predict.R
-- No file I/O boilerplate
-- Automatic format detection
 
 ## Next Steps
 
-- Explore the included examples: `system.file("examples", package = "chap.r.sdk")`
-- Read the function documentation: `?create_chap_cli`
-- Check the GitHub repository: https://github.com/knutdrand/chap_r_sdk
+- **[Building Your First CHAP Model](model-development-tutorial.html)**: Step-by-step tutorial with validation
+- **[Working with Spatio-Temporal Data](spatio-temporal-data.html)**: Utilities for aggregation and transformation
+- **[Function Reference](../reference/index.html)**: Complete API documentation
 
 ## Getting Help
 
-- **Issues**: https://github.com/knutdrand/chap_r_sdk/issues
-- **Documentation**: `help(package = "chap.r.sdk")`
+- **Issues**: [GitHub Issues](https://github.com/knutdrand/chap_r_sdk/issues)
+- **CHAP Platform**: [github.com/dhis2/chap-core](https://github.com/dhis2/chap-core)
