@@ -121,7 +121,8 @@
 #' # Command line usage:
 #' # Rscript model.R train data.csv [config.yaml] [--run-info run_info.yaml]
 #' # Rscript model.R predict historic.csv future.csv model.rds [config.yaml] [--run-info run_info.yaml]
-#' # Rscript model.R info
+#' # Rscript model.R info                    # Human-readable YAML output
+#' # Rscript model.R info --format json      # Machine-readable JSON for chapkit
 #' }
 create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
                             model_info = NULL,
@@ -140,7 +141,7 @@ create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
     stop("Usage: Rscript model.R <train|predict|info> [arguments...]\n",
          "  train:   Rscript model.R train <training_data> [model_config]\n",
          "  predict: Rscript model.R predict <historic_data> <future_data> <saved_model> [model_config]\n",
-         "  info:    Rscript model.R info")
+         "  info:    Rscript model.R info [--format yaml|json]")
   }
 
   subcommand <- tolower(args[1])
@@ -150,7 +151,11 @@ create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
   result <- switch(subcommand,
     "train" = handle_train(train_fn, subcommand_args, model_config_schema),
     "predict" = handle_predict(predict_fn, subcommand_args, model_config_schema),
-    "info" = handle_info(model_config_schema, model_info),
+    "info" = {
+      # Parse --format argument for info subcommand
+      info_args <- parse_named_args(subcommand_args, list(format = "yaml"))
+      handle_info(model_config_schema, model_info, format = info_args$format)
+    },
     stop("Invalid subcommand: '", subcommand, "'. Use 'train', 'predict', or 'info'")
   )
 
@@ -300,44 +305,91 @@ handle_predict <- function(predict_fn, args, schema = NULL) {
 #' @param model_config_schema Optional configuration schema to display
 #' @param model_info Optional list with model data requirements (period_type,
 #'   allows_additional_continuous_covariates, required_covariates)
+#' @param format Output format: "yaml" (default, human-readable) or "json"
+#'   (machine-readable for chapkit integration)
 #' @return NULL (invisibly)
 #' @keywords internal
-handle_info <- function(model_config_schema, model_info = NULL) {
-  cat("Model Information\n")
-  cat("=================\n\n")
+handle_info <- function(model_config_schema, model_info = NULL, format = "yaml") {
+  # Validate format
 
-  # Display model info (data requirements)
-  if (!is.null(model_info)) {
-    cat("Data Requirements:\n")
+  format <- match.arg(format, c("yaml", "json"))
 
-    if (!is.null(model_info$period_type)) {
-      cat("  period_type: ", model_info$period_type, "\n", sep = "")
-    }
-
-    if (!is.null(model_info$allows_additional_continuous_covariates)) {
-      cat("  allows_additional_continuous_covariates: ",
-          tolower(as.character(model_info$allows_additional_continuous_covariates)), "\n", sep = "")
-    }
-
-    if (!is.null(model_info$required_covariates) && length(model_info$required_covariates) > 0) {
-      cat("  required_covariates:\n")
-      for (cov in model_info$required_covariates) {
-        cat("    - ", cov, "\n", sep = "")
-      }
-    }
-
+  if (format == "json") {
+    # Structured JSON output for chapkit integration
+    output <- build_info_json(model_config_schema, model_info)
+    cat(jsonlite::toJSON(output, auto_unbox = TRUE, pretty = TRUE, null = "null"))
     cat("\n")
-  }
-
-  # Display configuration schema
-  if (is.null(model_config_schema)) {
-    cat("No configuration schema defined.\n")
   } else {
-    cat("Configuration Schema:\n")
-    cat(yaml::as.yaml(model_config_schema))
+    # Human-readable YAML output (original behavior)
+    cat("Model Information\n")
+    cat("=================\n\n")
+
+    # Display model info (data requirements)
+    if (!is.null(model_info)) {
+      cat("Data Requirements:\n")
+
+      if (!is.null(model_info$period_type)) {
+        cat("  period_type: ", model_info$period_type, "\n", sep = "")
+      }
+
+      if (!is.null(model_info$allows_additional_continuous_covariates)) {
+        cat("  allows_additional_continuous_covariates: ",
+            tolower(as.character(model_info$allows_additional_continuous_covariates)), "\n", sep = "")
+      }
+
+      if (!is.null(model_info$required_covariates) && length(model_info$required_covariates) > 0) {
+        cat("  required_covariates:\n")
+        for (cov in model_info$required_covariates) {
+          cat("    - ", cov, "\n", sep = "")
+        }
+      }
+
+      cat("\n")
+    }
+
+    # Display configuration schema
+    if (is.null(model_config_schema)) {
+      cat("No configuration schema defined.\n")
+    } else {
+      cat("Configuration Schema:\n")
+      cat(yaml::as.yaml(model_config_schema))
+    }
   }
 
   invisible(NULL)
+}
+
+#' Build structured JSON output for info command
+#'
+#' Creates a structured output combining service_info and config_schema
+#' for programmatic consumption by chapkit.
+#'
+#' @param model_config_schema Optional configuration schema
+#' @param model_info Optional list with model data requirements
+#' @return A list with service_info and config_schema fields
+#' @keywords internal
+build_info_json <- function(model_config_schema, model_info = NULL) {
+  # Build service_info from model_info
+
+  service_info <- list(
+    period_type = if (!is.null(model_info$period_type)) model_info$period_type else "any",
+    required_covariates = if (!is.null(model_info$required_covariates)) {
+      as.list(model_info$required_covariates)
+    } else {
+      list()
+    },
+    allows_additional_continuous_covariates = if (!is.null(model_info$allows_additional_continuous_covariates)) {
+      model_info$allows_additional_continuous_covariates
+    } else {
+      FALSE
+    }
+  )
+
+  # Build output structure
+  list(
+    service_info = service_info,
+    config_schema = model_config_schema
+  )
 }
 
 #' Create Chapkit-Compatible CLI
@@ -395,8 +447,10 @@ handle_info <- function(model_config_schema, model_info = NULL) {
 #'
 #' ## Info Command
 #' ```
-#' Rscript model.R info
+#' Rscript model.R info [--format yaml|json]
 #' ```
+#' - `--format`: Output format, either "yaml" (default, human-readable) or "json"
+#'   (machine-readable for chapkit integration)
 #'
 #' ## Chapkit Integration
 #' Configure ShellModelRunner in chapkit:
@@ -444,7 +498,7 @@ create_chapkit_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
     stop("Usage: Rscript model.R <train|predict|info> [arguments...]\n",
          "  train:   Rscript model.R train --data <path> [--config <path>] [--model <path>]\n",
          "  predict: Rscript model.R predict --historic <path> --future <path> --output <path> [--config <path>] [--model <path>]\n",
-         "  info:    Rscript model.R info")
+         "  info:    Rscript model.R info [--format yaml|json]")
   }
 
   subcommand <- tolower(args[1])
@@ -454,7 +508,11 @@ create_chapkit_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
   result <- switch(subcommand,
     "train" = handle_chapkit_train(train_fn, subcommand_args, default_config_path, default_model_path, model_config_schema),
     "predict" = handle_chapkit_predict(predict_fn, subcommand_args, default_config_path, default_model_path, model_config_schema),
-    "info" = handle_info(model_config_schema, model_info),
+    "info" = {
+      # Parse --format argument for info subcommand
+      info_args <- parse_named_args(subcommand_args, list(format = "yaml"))
+      handle_info(model_config_schema, model_info, format = info_args$format)
+    },
     stop("Invalid subcommand: '", subcommand, "'. Use 'train', 'predict', or 'info'")
   )
 

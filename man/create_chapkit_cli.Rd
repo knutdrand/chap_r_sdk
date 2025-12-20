@@ -80,8 +80,12 @@ which manages workspaces and file paths automatically.
 
 \subsection{Info Command}{
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Rscript model.R info
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Rscript model.R info [--format yaml|json]
 }\if{html}{\out{</div>}}
+\itemize{
+\item \code{--format}: Output format, either "yaml" (default, human-readable) or "json"
+(machine-readable for chapkit integration)
+}
 }
 
 \subsection{Chapkit Integration}{

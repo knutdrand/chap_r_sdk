@@ -143,6 +143,7 @@ if (!interactive()) {
 # Command line usage:
 # Rscript model.R train data.csv [config.yaml] [--run-info run_info.yaml]
 # Rscript model.R predict historic.csv future.csv model.rds [config.yaml] [--run-info run_info.yaml]
-# Rscript model.R info
+# Rscript model.R info                    # Human-readable YAML output
+# Rscript model.R info --format json      # Machine-readable JSON for chapkit
 }
 }

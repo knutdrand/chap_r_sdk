@@ -17,6 +17,8 @@ reference:
     desc: Create command-line interfaces for CHAP models
     contents:
       - create_chap_cli
+      - create_chapkit_cli
+      - build_run_info
 
   - title: Configuration
     desc: Model configuration management
@@ -26,6 +28,20 @@ reference:
       - get_config_param
       - create_config_schema
       - validate_config
+      - apply_config_defaults
+      - get_schema_defaults
+
+  - title: Configuration Schema Builders
+    desc: Helper functions to build JSON Schema configuration schemas
+    contents:
+      - schema_string
+      - schema_number
+      - schema_integer
+      - schema_boolean
+      - schema_array
+      - schema_enum
+      - schema_to_json
+      - print.chap_config_schema
 
   - title: Model Validation
     desc: Test and validate CHAP model implementations

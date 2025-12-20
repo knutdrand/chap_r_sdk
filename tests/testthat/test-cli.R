@@ -299,6 +299,130 @@ test_that("handle_info works with both model_info and schema", {
   expect_match(output_text, "Configuration Schema")
 })
 
+# Tests for JSON output format (chapkit integration)
+test_that("handle_info outputs valid JSON with --format json", {
+  model_info <- list(
+    period_type = "month",
+    allows_additional_continuous_covariates = TRUE,
+    required_covariates = c("population", "rainfall")
+  )
+  schema <- list(
+    title = "Test Schema",
+    type = "object",
+    properties = list(
+      param1 = list(type = "integer", default = 5)
+    )
+  )
+
+  output <- capture.output(handle_info(schema, model_info, format = "json"))
+  output_text <- paste(output, collapse = "\n")
+
+  # Parse as JSON - should not error
+  parsed <- jsonlite::fromJSON(output_text)
+
+  # Check service_info structure
+  expect_true("service_info" %in% names(parsed))
+  expect_equal(parsed$service_info$period_type, "month")
+  expect_true(parsed$service_info$allows_additional_continuous_covariates)
+  expect_equal(parsed$service_info$required_covariates, c("population", "rainfall"))
+
+  # Check config_schema structure
+  expect_true("config_schema" %in% names(parsed))
+  expect_equal(parsed$config_schema$title, "Test Schema")
+})
+
+test_that("handle_info JSON format provides defaults when model_info is NULL", {
+  schema <- list(title = "Test Schema")
+
+  output <- capture.output(handle_info(schema, NULL, format = "json"))
+  output_text <- paste(output, collapse = "\n")
+
+  parsed <- jsonlite::fromJSON(output_text)
+
+  # Should have default values
+
+  expect_equal(parsed$service_info$period_type, "any")
+  expect_false(parsed$service_info$allows_additional_continuous_covariates)
+  expect_equal(parsed$service_info$required_covariates, list())
+})
+
+test_that("handle_info JSON format handles NULL schema", {
+  model_info <- list(period_type = "week")
+
+  output <- capture.output(handle_info(NULL, model_info, format = "json"))
+  output_text <- paste(output, collapse = "\n")
+
+  parsed <- jsonlite::fromJSON(output_text)
+
+  expect_equal(parsed$service_info$period_type, "week")
+  expect_null(parsed$config_schema)
+})
+
+test_that("build_info_json creates correct structure", {
+  model_info <- list(
+    period_type = "day",
+    allows_additional_continuous_covariates = FALSE,
+    required_covariates = c("temperature")
+  )
+  schema <- list(title = "My Schema")
+
+  result <- build_info_json(schema, model_info)
+
+  expect_true(is.list(result))
+  expect_equal(names(result), c("service_info", "config_schema"))
+  expect_equal(result$service_info$period_type, "day")
+  expect_false(result$service_info$allows_additional_continuous_covariates)
+  expect_equal(result$service_info$required_covariates, list("temperature"))
+  expect_equal(result$config_schema$title, "My Schema")
+})
+
+test_that("create_chap_cli info subcommand respects --format json", {
+  train_fn <- function(training_data, model_configuration = list(), run_info = list()) list()
+  predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) tibble::tibble()
+
+  model_info <- list(period_type = "month")
+  schema <- list(title = "Test")
+
+  output <- capture.output(
+    create_chap_cli(train_fn, predict_fn, schema, model_info, args = c("info", "--format", "json"))
+  )
+  output_text <- paste(output, collapse = "\n")
+
+  # Should be valid JSON
+  parsed <- jsonlite::fromJSON(output_text)
+  expect_equal(parsed$service_info$period_type, "month")
+})
+
+test_that("create_chapkit_cli info subcommand respects --format json", {
+  train_fn <- function(training_data, model_configuration = list(), run_info = list()) list()
+  predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) tibble::tibble()
+
+  model_info <- list(period_type = "week", required_covariates = c("rainfall"))
+  schema <- list(title = "Chapkit Test")
+
+  output <- capture.output(
+    create_chapkit_cli(train_fn, predict_fn, schema, model_info, args = c("info", "--format", "json"))
+  )
+  output_text <- paste(output, collapse = "\n")
+
+  # Should be valid JSON
+  parsed <- jsonlite::fromJSON(output_text)
+  expect_equal(parsed$service_info$period_type, "week")
+  expect_equal(parsed$service_info$required_covariates, "rainfall")
+  expect_equal(parsed$config_schema$title, "Chapkit Test")
+})
+
+test_that("handle_info defaults to yaml format", {
+  schema <- list(title = "Test Schema")
+
+  # Without format argument, should produce YAML
+  output <- capture.output(handle_info(schema, NULL))
+  output_text <- paste(output, collapse = "\n")
+
+  expect_match(output_text, "Model Information")
+  expect_match(output_text, "Configuration Schema")
+})
+
 # Tests for build_run_info and detect_period_type
 test_that("detect_period_type identifies yearmonth", {
   values <- tsibble::yearmonth(c("2020-01", "2020-02"))

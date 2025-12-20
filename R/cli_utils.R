@@ -213,6 +213,23 @@ save_predictions <- function(predictions, output_path) {
   # Convert nested samples to wide format for CHAP CSV output
   predictions <- predictions_to_wide(predictions)
 
+  # Convert time_period to ISO format if it's a yearmonth/yearweek/yearquarter
+  if ("time_period" %in% colnames(predictions)) {
+    time_vals <- predictions$time_period
+    if (inherits(time_vals, "yearmonth")) {
+      predictions$time_period <- format(time_vals, "%Y-%m")
+    } else if (inherits(time_vals, "yearweek")) {
+      predictions$time_period <- format(time_vals, "%Y-W%V")
+    } else if (inherits(time_vals, "yearquarter")) {
+      predictions$time_period <- format(time_vals, "%Y-Q%q")
+    }
+  }
+
+  # Sort by location and time_period to ensure consistent ordering for CHAP
+  if (all(c("location", "time_period") %in% colnames(predictions))) {
+    predictions <- dplyr::arrange(predictions, .data$location, .data$time_period)
+  }
+
   readr::write_csv(predictions, output_path)
   message("Predictions saved to: ", output_path)
   return(output_path)

@@ -4,13 +4,16 @@
 \alias{handle_info}
 \title{Handle info subcommand}
 \usage{
-handle_info(model_config_schema, model_info = NULL)
+handle_info(model_config_schema, model_info = NULL, format = "yaml")
 }
 \arguments{
 \item{model_config_schema}{Optional configuration schema to display}
 
 \item{model_info}{Optional list with model data requirements (period_type,
 allows_additional_continuous_covariates, required_covariates)}
+
+\item{format}{Output format: "yaml" (default, human-readable) or "json"
+(machine-readable for chapkit integration)}
 }
 \value{
 NULL (invisibly)
