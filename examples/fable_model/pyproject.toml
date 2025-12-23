@@ -1,0 +1,22 @@
+[project]
+name = "fable-ets-model"
+version = "0.1.0"
+description = "Fable ETS model for disease prediction"
+requires-python = ">=3.13"
+dependencies = [
+    "chapkit @ git+https://github.com/dhis2-chap/chapkit.git@feat/r-sdk-integration",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+only-include = ["main.py"]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["main.py", "model.R", "pyproject.toml"]

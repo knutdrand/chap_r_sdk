@@ -36,6 +36,8 @@ Suggests:
     lubridate,
     slider,
     sf,
-    cubble
+    cubble,
+    renv,
+    pak
 Config/testthat/edition: 3
 VignetteBuilder: knitr

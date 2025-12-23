@@ -1,0 +1,24 @@
+# renv library (packages installed locally)
+renv/library/
+renv/staging/
+renv/python/
+renv/sandbox/
+
+# Keep renv activation script
+!renv/activate.R
+
+# R session files
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj.user
+
+# Model artifacts
+model.rds
+predictions.csv
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/

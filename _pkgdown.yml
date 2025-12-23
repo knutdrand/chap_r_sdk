@@ -87,6 +87,14 @@ reference:
       - train_mean_model
       - predict_mean_model
 
+  - title: Environment
+    desc: Docker and renv environment configuration for containerized models
+    contents:
+      - init_chap_env
+      - generate_dockerfile
+      - detect_system_deps
+      - read_renv_r_version
+
   - title: Utilities
     desc: Helper functions
     contents:
