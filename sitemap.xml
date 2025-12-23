@@ -26,9 +26,13 @@
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/detect_key_columns.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/detect_period_type.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/detect_prediction_format.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/detect_system_deps.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/detect_time_column.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/extract_run_info_arg.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/generate_dockerfile.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/generate_dockerfile_content.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/get_config_param.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/get_environment_info.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/get_example_data.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/get_schema_defaults.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/handle_chapkit_predict.html</loc></url>
@@ -38,6 +42,7 @@
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/handle_train.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/has_prediction_samples.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/index.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/init_chap_env.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/load_and_validate_config.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/load_config.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/load_predictions.html</loc></url>
@@ -53,7 +58,9 @@
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/predictions_to_quantiles.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/predictions_to_wide.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/print.chap_config_schema.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/read_chap_yml.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/read_model_config.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/read_renv_r_version.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/run_model_tests.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/save_model.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/save_predictions.html</loc></url>
@@ -70,6 +77,7 @@
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/validate_model_io.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/validate_model_io_all.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/validate_model_output.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/write_default_chap_yml.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/write_model_config.html</loc></url>
 </urlset>
 

@@ -105,6 +105,20 @@ Reference model implementations
 - [`predict_mean_model()`](https://knutdrand.github.io/chap_r_sdk/reference/predict_mean_model.md)
   : Predict using mean model
 
+## Environment
+
+Docker and renv environment configuration for containerized models
+
+- [`init_chap_env()`](https://knutdrand.github.io/chap_r_sdk/reference/init_chap_env.md)
+  : Initialize CHAP model environment
+- [`generate_dockerfile()`](https://knutdrand.github.io/chap_r_sdk/reference/generate_dockerfile.md)
+  : Generate Dockerfile for CHAP model
+- [`detect_system_deps()`](https://knutdrand.github.io/chap_r_sdk/reference/detect_system_deps.md)
+  : Detect system dependencies from renv packages
+- [`read_renv_r_version()`](https://knutdrand.github.io/chap_r_sdk/reference/read_renv_r_version.md)
+  : Environment configuration for CHAP models. Read R version from
+  renv.lock
+
 ## Utilities
 
 Helper functions

@@ -1,7 +1,7 @@
 # Build structured JSON output for info command
 
-Creates a structured output combining service_info and config_schema for
-programmatic consumption by chapkit.
+Creates a structured output combining service_info, config_schema, and
+environment info for programmatic consumption by chapkit.
 
 ## Usage
 
@@ -21,4 +21,4 @@ build_info_json(model_config_schema, model_info = NULL)
 
 ## Value
 
-A list with service_info and config_schema fields
+A list with service_info, config_schema, and environment fields
