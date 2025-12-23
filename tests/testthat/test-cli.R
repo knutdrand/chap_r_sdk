@@ -369,7 +369,7 @@ test_that("build_info_json creates correct structure", {
   result <- build_info_json(schema, model_info)
 
   expect_true(is.list(result))
-  expect_equal(names(result), c("service_info", "config_schema"))
+  expect_equal(names(result), c("service_info", "config_schema", "environment"))
   expect_equal(result$service_info$period_type, "day")
   expect_false(result$service_info$allows_additional_continuous_covariates)
   expect_equal(result$service_info$required_covariates, list("temperature"))

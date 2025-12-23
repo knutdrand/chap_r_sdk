@@ -361,12 +361,12 @@ handle_info <- function(model_config_schema, model_info = NULL, format = "yaml")
 
 #' Build structured JSON output for info command
 #'
-#' Creates a structured output combining service_info and config_schema
-#' for programmatic consumption by chapkit.
+#' Creates a structured output combining service_info, config_schema, and
+#' environment info for programmatic consumption by chapkit.
 #'
 #' @param model_config_schema Optional configuration schema
 #' @param model_info Optional list with model data requirements
-#' @return A list with service_info and config_schema fields
+#' @return A list with service_info, config_schema, and environment fields
 #' @keywords internal
 build_info_json <- function(model_config_schema, model_info = NULL) {
   # Build service_info from model_info
@@ -385,10 +385,23 @@ build_info_json <- function(model_config_schema, model_info = NULL) {
     }
   )
 
+  # Get environment info (from environment.R)
+  environment_info <- tryCatch(
+    get_environment_info(),
+    error = function(e) {
+      list(
+        r_version = NULL,
+        has_renv_lock = FALSE,
+        system_deps = list()
+      )
+    }
+  )
+
   # Build output structure
   list(
     service_info = service_info,
-    config_schema = model_config_schema
+    config_schema = model_config_schema,
+    environment = environment_info
   )
 }
 
