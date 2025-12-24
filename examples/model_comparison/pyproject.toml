@@ -1,0 +1,19 @@
+[project]
+name = "fable-model-comparison"
+version = "0.1.0"
+description = "Systematic comparison of fable forecasting models for CHAP"
+requires-python = ">=3.13"
+dependencies = [
+    "chapkit @ git+https://github.com/dhis2-chap/chapkit.git@feat/r-sdk-integration",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+only-include = ["main.py"]
