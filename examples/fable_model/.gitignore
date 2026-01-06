@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# renv
+renv/library/
+renv/staging/
+renv/sandbox/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/.cache/

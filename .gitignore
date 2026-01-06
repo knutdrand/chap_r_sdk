@@ -61,3 +61,13 @@ rsconnect/
 .mcp.json
 /doc/
 /Meta/
+
+# renv
+renv/library/
+renv/staging/
+renv/sandbox/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/.cache/
