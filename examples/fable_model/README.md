@@ -229,9 +229,37 @@ Based on metrics, consider:
 | `use_covariates` | boolean | false | Use climate covariates |
 | `covariate_lag` | integer | 1 | Lag for covariates in months |
 
-## Requirements
+## Environment Setup
 
-### R packages
+This example uses **renv** for reproducible R package management.
+
+### First-time Setup
+
+```bash
+cd examples/fable_model
+
+# Restore R dependencies
+Rscript -e 'renv::restore()'
+
+# Install Python dependencies
+uv sync
+```
+
+### Updating Dependencies
+
+If you add new R packages:
+
+```bash
+# Install the package
+Rscript -e 'renv::install("package_name")'
+
+# Update the lockfile
+Rscript -e 'renv::snapshot()'
+```
+
+### Requirements
+
+#### R packages (managed by renv)
 - chap.r.sdk
 - fable
 - fabletools
@@ -240,7 +268,7 @@ Based on metrics, consider:
 - lubridate
 - distributional
 
-### Python
+#### Python
 - Python >= 3.13
 - chapkit (from feat/r-sdk-integration branch)
 
