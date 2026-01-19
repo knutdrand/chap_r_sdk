@@ -259,3 +259,254 @@ test_that("detect_system_deps returns empty for no packages", {
   result <- detect_system_deps(temp_lock)
   expect_equal(result, character(0))
 })
+
+# ============================================================================
+# schema_to_user_options Tests
+# ============================================================================
+
+test_that("schema_to_user_options returns NULL for NULL schema", {
+  expect_null(schema_to_user_options(NULL))
+})
+
+test_that("schema_to_user_options returns NULL for schema without properties", {
+  schema <- list(type = "object")
+  expect_null(schema_to_user_options(schema))
+})
+
+test_that("schema_to_user_options returns NULL for empty properties", {
+  schema <- list(type = "object", properties = list())
+  expect_null(schema_to_user_options(schema))
+})
+
+test_that("schema_to_user_options maps integer type correctly", {
+  schema <- list(
+    type = "object",
+    properties = list(
+      n_samples = list(
+        type = "integer",
+        title = "Sample Count",
+        description = "Number of samples",
+        default = 100
+      )
+    )
+  )
+
+  result <- schema_to_user_options(schema)
+
+  expect_equal(result$n_samples$type, "integer")
+  expect_equal(result$n_samples$title, "Sample Count")
+  expect_equal(result$n_samples$description, "Number of samples")
+  expect_equal(result$n_samples$default, 100)
+})
+
+test_that("schema_to_user_options passes through number type", {
+  schema <- list(
+    type = "object",
+    properties = list(
+      learning_rate = list(
+        type = "number",
+        default = 0.01
+      )
+    )
+  )
+
+  result <- schema_to_user_options(schema)
+  expect_equal(result$learning_rate$type, "number")
+})
+
+test_that("schema_to_user_options passes through string and boolean types", {
+  schema <- list(
+    type = "object",
+    properties = list(
+      method = list(type = "string", default = "ets"),
+      verbose = list(type = "boolean", default = TRUE)
+    )
+  )
+
+  result <- schema_to_user_options(schema)
+
+  expect_equal(result$method$type, "string")
+  expect_equal(result$method$default, "ets")
+  expect_equal(result$verbose$type, "boolean")
+  expect_equal(result$verbose$default, TRUE)
+})
+
+test_that("schema_to_user_options handles multiple properties", {
+  schema <- list(
+    type = "object",
+    properties = list(
+      param1 = list(type = "integer"),
+      param2 = list(type = "string"),
+      param3 = list(type = "number")
+    )
+  )
+
+  result <- schema_to_user_options(schema)
+
+  expect_equal(length(result), 3)
+  expect_true(all(c("param1", "param2", "param3") %in% names(result)))
+})
+
+# ============================================================================
+# generate_mlproject Tests
+# ============================================================================
+
+test_that("generate_mlproject creates basic MLproject file", {
+  old_wd <- getwd()
+  temp_dir <- tempfile()
+  dir.create(temp_dir)
+  setwd(temp_dir)
+  on.exit({
+    setwd(old_wd)
+    unlink(temp_dir, recursive = TRUE)
+  })
+
+  result <- generate_mlproject(model_name = "test_model", output_path = "MLproject")
+
+  expect_true(file.exists("MLproject"))
+  expect_equal(result, "MLproject")
+
+  mlproject <- yaml::read_yaml("MLproject")
+  expect_equal(mlproject$name, "test_model")
+  expect_equal(mlproject$renv_env, "renv.lock")
+})
+
+test_that("generate_mlproject includes entry points", {
+  old_wd <- getwd()
+  temp_dir <- tempfile()
+  dir.create(temp_dir)
+  setwd(temp_dir)
+  on.exit({
+    setwd(old_wd)
+    unlink(temp_dir, recursive = TRUE)
+  })
+
+  generate_mlproject(model_name = "test_model")
+  mlproject <- yaml::read_yaml("MLproject")
+
+  # Check train entry point
+  expect_true("train" %in% names(mlproject$entry_points))
+  expect_true("train_data" %in% names(mlproject$entry_points$train$parameters))
+  expect_true("model" %in% names(mlproject$entry_points$train$parameters))
+  expect_match(mlproject$entry_points$train$command, "train --data")
+
+  # Check predict entry point
+  expect_true("predict" %in% names(mlproject$entry_points))
+  expect_true("historic_data" %in% names(mlproject$entry_points$predict$parameters))
+  expect_true("future_data" %in% names(mlproject$entry_points$predict$parameters))
+  expect_true("out_file" %in% names(mlproject$entry_points$predict$parameters))
+  expect_match(mlproject$entry_points$predict$command, "predict --historic")
+})
+
+test_that("generate_mlproject includes user_options from config_schema", {
+  old_wd <- getwd()
+  temp_dir <- tempfile()
+  dir.create(temp_dir)
+  setwd(temp_dir)
+  on.exit({
+    setwd(old_wd)
+    unlink(temp_dir, recursive = TRUE)
+  })
+
+  config_schema <- list(
+    type = "object",
+    properties = list(
+      n_samples = list(
+        type = "integer",
+        title = "Number of samples",
+        default = 100
+      )
+    )
+  )
+
+  generate_mlproject(model_name = "test_model", config_schema = config_schema)
+  mlproject <- yaml::read_yaml("MLproject")
+
+  expect_true("user_options" %in% names(mlproject))
+  expect_true("n_samples" %in% names(mlproject$user_options))
+  expect_equal(mlproject$user_options$n_samples$type, "integer")
+  expect_equal(mlproject$user_options$n_samples$default, 100)
+})
+
+test_that("generate_mlproject includes config parameter when schema provided", {
+  old_wd <- getwd()
+  temp_dir <- tempfile()
+  dir.create(temp_dir)
+  setwd(temp_dir)
+  on.exit({
+    setwd(old_wd)
+    unlink(temp_dir, recursive = TRUE)
+  })
+
+  config_schema <- list(
+    type = "object",
+    properties = list(param1 = list(type = "string"))
+  )
+
+  generate_mlproject(model_name = "test_model", config_schema = config_schema)
+  mlproject <- yaml::read_yaml("MLproject")
+
+  # Config parameter should be in entry points
+  expect_true("model_config" %in% names(mlproject$entry_points$train$parameters))
+  expect_true("model_config" %in% names(mlproject$entry_points$predict$parameters))
+
+  # Commands should include --config flag
+  expect_match(mlproject$entry_points$train$command, "--config")
+  expect_match(mlproject$entry_points$predict$command, "--config")
+})
+
+test_that("generate_mlproject excludes config parameter without schema", {
+  old_wd <- getwd()
+  temp_dir <- tempfile()
+  dir.create(temp_dir)
+  setwd(temp_dir)
+  on.exit({
+    setwd(old_wd)
+    unlink(temp_dir, recursive = TRUE)
+  })
+
+  generate_mlproject(model_name = "test_model")
+  mlproject <- yaml::read_yaml("MLproject")
+
+  # Config parameter should NOT be in entry points
+  expect_false("model_config" %in% names(mlproject$entry_points$train$parameters))
+  expect_false("model_config" %in% names(mlproject$entry_points$predict$parameters))
+
+  # Commands should not include --config flag
+  expect_false(grepl("--config", mlproject$entry_points$train$command))
+  expect_false(grepl("--config", mlproject$entry_points$predict$command))
+})
+
+test_that("generate_mlproject uses custom model script", {
+  old_wd <- getwd()
+  temp_dir <- tempfile()
+  dir.create(temp_dir)
+  setwd(temp_dir)
+  on.exit({
+    setwd(old_wd)
+    unlink(temp_dir, recursive = TRUE)
+  })
+
+  generate_mlproject(model_script = "my_custom_model.R", model_name = "test_model")
+  mlproject <- yaml::read_yaml("MLproject")
+
+  expect_match(mlproject$entry_points$train$command, "my_custom_model.R")
+  expect_match(mlproject$entry_points$predict$command, "my_custom_model.R")
+})
+
+test_that("generate_mlproject auto-detects model name from directory", {
+  old_wd <- getwd()
+  temp_dir <- tempfile(pattern = "my_model_dir_")
+  dir.create(temp_dir)
+  setwd(temp_dir)
+  on.exit({
+    setwd(old_wd)
+    unlink(temp_dir, recursive = TRUE)
+  })
+
+  generate_mlproject()
+  mlproject <- yaml::read_yaml("MLproject")
+
+  # Model name should match directory name
+  expect_equal(mlproject$name, basename(temp_dir))
+})

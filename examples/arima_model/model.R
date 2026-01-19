@@ -10,8 +10,8 @@
 # (rainfall and temperature lags).
 #
 # Usage:
-#   Rscript model.R train training_data.csv
-#   Rscript model.R predict historic.csv future.csv model.rds
+#   Rscript model.R train --data training_data.csv
+#   Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
 #   Rscript model.R info
 
 library(chap.r.sdk)
@@ -206,7 +206,7 @@ config_schema <- list(
   )
 )
 
-# Enable CLI with single function call
+# Enable CLI with single function call (chapkit-style named arguments for MLproject compatibility)
 if (!interactive()) {
-  create_chap_cli(train_arima, predict_arima, config_schema)
+  create_chapkit_cli(train_arima, predict_arima, config_schema)
 }

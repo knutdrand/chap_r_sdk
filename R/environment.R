@@ -413,3 +413,170 @@ get_environment_info <- function(lockfile_path = "renv.lock") {
     system_deps = system_deps
   )
 }
+
+
+#' Convert JSON Schema to chap-core user_options format
+#'
+#' Converts a JSON Schema properties object to the user_options format
+#' expected by chap-core's MLproject files. JSON Schema types are passed
+#' through directly as they match chap-core's expected types.
+#'
+#' @param config_schema A JSON Schema object with properties
+#' @return A list in chap-core user_options format, or NULL if no schema
+#' @keywords internal
+schema_to_user_options <- function(config_schema) {
+  if (is.null(config_schema) || is.null(config_schema$properties)) {
+    return(NULL)
+  }
+
+  properties <- config_schema$properties
+  if (length(properties) == 0) {
+    return(NULL)
+  }
+
+  user_options <- list()
+
+  for (param_name in names(properties)) {
+    prop <- properties[[param_name]]
+
+    option <- list(type = prop$type)
+
+    # Add title if present
+    if (!is.null(prop$title)) {
+      option$title <- prop$title
+    }
+
+    # Add description if present
+    if (!is.null(prop$description)) {
+      option$description <- prop$description
+    }
+
+    # Add default if present
+    if (!is.null(prop$default)) {
+      option$default <- prop$default
+    }
+
+    user_options[[param_name]] <- option
+  }
+
+  user_options
+}
+
+
+#' Generate MLproject file for chap-core compatibility
+#'
+#' Creates an MLproject file that allows chap-core to run R models directly
+#' using renv for environment management. The generated file follows chap-core's
+#' expected format with train and predict entry points.
+#'
+#' @param model_script Path to the R model script (default: "model.R")
+#' @param model_name Name of the model. If NULL, auto-detected from the
+#'   directory name
+#' @param config_schema Optional JSON Schema for model configuration.
+#'   Will be converted to chap-core's user_options format
+#' @param output_path Where to write the MLproject file (default: "MLproject")
+#' @param include_config Whether to include config parameter in entry points
+#'   (default: TRUE if config_schema is provided)
+#' @return Invisible path to created MLproject file
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Generate basic MLproject
+#' generate_mlproject()
+#'
+#' # Generate with model name and config schema
+#' config_schema <- list(
+#'   type = "object",
+#'   properties = list(
+#'     n_samples = list(
+#'       type = "integer",
+#'       title = "Number of samples",
+#'       description = "Number of Monte Carlo samples",
+#'       default = 100
+#'     )
+#'   )
+#' )
+#' generate_mlproject(model_name = "my_arima_model", config_schema = config_schema)
+#' }
+#'
+#' @seealso \code{\link{create_chapkit_cli}} for creating the CLI that this
+#'   MLproject file will invoke
+generate_mlproject <- function(model_script = "model.R",
+                                model_name = NULL,
+                                config_schema = NULL,
+                                output_path = "MLproject",
+                                include_config = !is.null(config_schema)) {
+
+  # Auto-detect model name from directory if not provided
+  if (is.null(model_name)) {
+    model_name <- basename(getwd())
+  }
+
+  # Convert config_schema to user_options format
+  user_options <- schema_to_user_options(config_schema)
+
+  # Build MLproject content
+  mlproject <- list(
+    name = model_name,
+    renv_env = "renv.lock"
+  )
+
+  # Add user_options if present
+  if (!is.null(user_options)) {
+    mlproject$user_options <- user_options
+  }
+
+  # Build entry points
+  # Train entry point
+  train_params <- list(
+    train_data = "str",
+    model = "str"
+  )
+
+  train_command <- sprintf("Rscript %s train --data {train_data} --model {model}",
+                            model_script)
+
+  if (include_config) {
+    train_params$model_config <- list(type = "str", default = "")
+    train_command <- sprintf("%s --config {model_config}", train_command)
+  }
+
+  # Predict entry point
+  predict_params <- list(
+    historic_data = "str",
+    future_data = "str",
+    model = "str",
+    out_file = "str"
+  )
+
+  predict_command <- sprintf(
+    "Rscript %s predict --historic {historic_data} --future {future_data} --model {model} --output {out_file}",
+    model_script
+  )
+
+  if (include_config) {
+    predict_params$model_config <- list(type = "str", default = "")
+    predict_command <- sprintf("%s --config {model_config}", predict_command)
+  }
+
+  mlproject$entry_points <- list(
+    train = list(
+      parameters = train_params,
+      command = train_command
+    ),
+    predict = list(
+      parameters = predict_params,
+      command = predict_command
+    )
+  )
+
+  # Write MLproject file as YAML
+  yaml::write_yaml(mlproject, output_path)
+
+  message("Generated MLproject: ", output_path)
+  message("\nThe MLproject file enables chap-core to run this model via:")
+  message("  chap evaluate --model-name ./ --dataset-csv data.csv")
+
+  invisible(output_path)
+}

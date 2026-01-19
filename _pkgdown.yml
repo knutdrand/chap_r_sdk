@@ -92,6 +92,7 @@ reference:
     contents:
       - init_chap_env
       - generate_dockerfile
+      - generate_mlproject
       - detect_system_deps
       - read_renv_r_version
 
