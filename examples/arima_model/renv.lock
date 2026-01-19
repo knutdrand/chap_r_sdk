@@ -326,7 +326,7 @@
       "RemoteUsername": "knutdrand",
       "RemoteRepo": "chap_r_sdk",
       "RemoteRef": "main",
-      "RemoteSha": "b2c0976e5c7defd26b6f15b1cde3ec4ac950d2e9"
+      "RemoteSha": "b2c0976faca51bd1ca984ecb5d876d782e98d259"
     },
     "cli": {
       "Package": "cli",

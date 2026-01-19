@@ -14,19 +14,12 @@ entry_points:
     parameters:
       train_data: str
       model: str
-      model_config:
-        type: str
-        default: ''
-    command: Rscript model.R train --data {train_data} --model {model} --config
-      {model_config}
+    command: Rscript model.R train --data {train_data} --model {model}
   predict:
     parameters:
       historic_data: str
       future_data: str
       model: str
       out_file: str
-      model_config:
-        type: str
-        default: ''
     command: Rscript model.R predict --historic {historic_data} --future {future_data}
-      --model {model} --output {out_file} --config {model_config}
+      --model {model} --output {out_file}
