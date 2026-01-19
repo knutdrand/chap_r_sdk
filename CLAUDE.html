@@ -69,11 +69,46 @@
 <li>Focus on spatio-temporal data compatibility</li>
 </ul></div>
 <div class="section level2">
+<h2 id="environment-management-renv">Environment Management (renv)<a class="anchor" aria-label="anchor" href="#environment-management-renv"></a></h2>
+<p>This project uses <strong>renv</strong> for reproducible dependency management at multiple levels:</p>
+<div class="section level3">
+<h3 id="package-development-root-level">Package Development (root level)<a class="anchor" aria-label="anchor" href="#package-development-root-level"></a></h3>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Restore development environment</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">restore</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># After adding new dependencies</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/snapshot.html" class="external-link">snapshot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="example-models">Example Models<a class="anchor" aria-label="anchor" href="#example-models"></a></h3>
+<p>Each example in <code>examples/</code> has its own isolated renv environment:</p>
+<ul><li>
+<code>examples/fable_model/</code> - fable forecasting with renv</li>
+<li>
+<code>examples/mean_model_docker/</code> - Docker integration with renv</li>
+<li>
+<code>examples/model_comparison/</code> - Multi-model comparison with renv</li>
+</ul><p>To work with an example:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="bu">cd</span> examples/fable_model</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'renv::restore()'</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="docker-integration">Docker Integration<a class="anchor" aria-label="anchor" href="#docker-integration"></a></h3>
+<p>The SDK provides functions for Docker + renv workflows:</p>
+<ul><li>
+<code><a href="reference/init_chap_env.html">init_chap_env()</a></code> - Initialize renv for a new model</li>
+<li>
+<code><a href="reference/generate_dockerfile.html">generate_dockerfile()</a></code> - Auto-generate Dockerfile from renv.lock</li>
+</ul><p>See <code>examples/mean_model_docker/README.md</code> for details.</p>
+</div>
+</div>
+<div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h2>
 <div class="section level3">
 <h3 id="mean-model-example">Mean Model Example<a class="anchor" aria-label="anchor" href="#mean-model-example"></a></h3>
 <p>The standard pattern for models is shown in <code>examples/mean_model/model.R</code>. This uses the unified CLI interface:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://knutdrand.github.io/chap_r_sdk/">chap.r.sdk</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
@@ -108,9 +143,9 @@
 <span>  <span class="fu"><a href="reference/create_chap_cli.html">create_chap_cli</a></span><span class="op">(</span><span class="va">train_my_model</span>, <span class="va">predict_my_model</span>, <span class="va">config_schema</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><strong>Usage:</strong></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">Rscript</span> model.R train data.csv <span class="pp">[</span><span class="ss">config.yaml</span><span class="pp">]</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict historic.csv future.csv model.rds <span class="pp">[</span><span class="ss">config.yaml</span><span class="pp">]</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">Rscript</span> model.R train data.csv <span class="pp">[</span><span class="ss">config.yaml</span><span class="pp">]</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict historic.csv future.csv model.rds <span class="pp">[</span><span class="ss">config.yaml</span><span class="pp">]</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
 <p><strong>Key Benefits:</strong> - <strong>Zero file I/O boilerplate</strong> - handled automatically - <strong>Single file</strong> - train and predict together - <strong>Automatic detection</strong> of time and key columns - <strong>Subcommand dispatch</strong> built-in</p>
 <p>See <code>examples/mean_model/README.md</code> for detailed documentation.</p>
 </div>
@@ -129,7 +164,7 @@
 <div class="section level2">
 <h2 id="standard-r-package-commands">Standard R Package Commands<a class="anchor" aria-label="anchor" href="#standard-r-package-commands"></a></h2>
 <p>Once the package structure is established, typical commands will be:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Development workflow</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span>        <span class="co"># Load package for interactive development</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span>        <span class="co"># Generate documentation from roxygen2 comments</span></span>

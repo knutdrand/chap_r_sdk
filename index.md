@@ -88,6 +88,32 @@ Install from GitHub:
 remotes::install_github("knutdrand/chap_r_sdk")
 ```
 
+## Development Setup
+
+This project uses [renv](https://rstudio.github.io/renv/) for
+reproducible dependency management.
+
+### For Contributors
+
+``` r
+# Clone the repository and restore dependencies
+renv::restore()
+
+# Standard development workflow
+devtools::load_all()
+devtools::test()
+devtools::check()
+```
+
+### For Model Examples
+
+Each example in `examples/` has its own renv environment:
+
+``` bash
+cd examples/fable_model
+Rscript -e 'renv::restore()'
+```
+
 ## Getting Help
 
 - **Documentation**:

@@ -47,6 +47,47 @@ implementing:
 - All functions should be well-documented with roxygen2 comments
 - Focus on spatio-temporal data compatibility
 
+## Environment Management (renv)
+
+This project uses **renv** for reproducible dependency management at
+multiple levels:
+
+### Package Development (root level)
+
+``` r
+# Restore development environment
+renv::restore()
+
+# After adding new dependencies
+renv::snapshot()
+```
+
+### Example Models
+
+Each example in `examples/` has its own isolated renv environment:
+
+- `examples/fable_model/` - fable forecasting with renv
+- `examples/mean_model_docker/` - Docker integration with renv
+- `examples/model_comparison/` - Multi-model comparison with renv
+
+To work with an example:
+
+``` bash
+cd examples/fable_model
+Rscript -e 'renv::restore()'
+```
+
+### Docker Integration
+
+The SDK provides functions for Docker + renv workflows:
+
+- [`init_chap_env()`](https://knutdrand.github.io/chap_r_sdk/reference/init_chap_env.md) -
+  Initialize renv for a new model
+- [`generate_dockerfile()`](https://knutdrand.github.io/chap_r_sdk/reference/generate_dockerfile.md) -
+  Auto-generate Dockerfile from renv.lock
+
+See `examples/mean_model_docker/README.md` for details.
+
 ## Examples
 
 ### Mean Model Example
