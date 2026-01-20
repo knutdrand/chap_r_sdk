@@ -386,7 +386,6 @@ First, set up renv for reproducible dependencies:
 
 ``` r
 renv::init()
-renv::install(c("dplyr", "purrr"))
 renv::install("knutdrand/chap_r_sdk")
 renv::snapshot()
 ```
@@ -396,10 +395,7 @@ renv::snapshot()
 ``` r
 library(chap.r.sdk)
 
-generate_mlproject(
-  model_name = "my_mean_model",
-  config_schema = my_schema
-)
+generate_mlproject(model_name = "my_mean_model")
 ```
 
 This creates an `MLproject` file like:
@@ -407,11 +403,6 @@ This creates an `MLproject` file like:
 ``` yaml
 name: my_mean_model
 renv_env: renv.lock
-user_options:
-  n_samples:
-    type: integer
-    description: Number of Monte Carlo samples for predictions
-    default: 100
 entry_points:
   train:
     parameters:
@@ -633,6 +624,56 @@ full_config$method         # Default applied
 | [`schema_boolean()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_boolean.md) | TRUE/FALSE values      | `default`                                        |
 | [`schema_enum()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_enum.md)       | One of fixed choices   | `values` (required), `default`                   |
 | [`schema_array()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_array.md)     | Arrays/lists           | `items`, `min_items`, `max_items`, `default`     |
+
+### Adding Config Schema to MLproject
+
+Once you have defined a configuration schema, you can include it in your
+MLproject file. This exposes your model’s configuration options to
+chap-core users:
+
+``` r
+generate_mlproject(
+  model_name = "my_mean_model",
+  config_schema = my_schema
+)
+```
+
+This adds a `user_options` section to the MLproject file:
+
+``` yaml
+name: my_mean_model
+renv_env: renv.lock
+user_options:
+  n_samples:
+    type: integer
+    description: Number of Monte Carlo samples for predictions
+    default: 100
+  learning_rate:
+    type: float
+    description: Learning rate for optimization
+    default: 0.01
+  method:
+    type: str
+    description: Forecasting method to use
+    default: arima
+entry_points:
+  train:
+    parameters:
+      train_data: str
+      model: str
+    command: Rscript model.R train --data {train_data} --model {model}
+  predict:
+    parameters:
+      historic_data: str
+      future_data: str
+      model: str
+      out_file: str
+    command: Rscript model.R predict --historic {historic_data} --future {future_data}
+      --model {model} --output {out_file}
+```
+
+The `user_options` section allows chap-core to present configuration
+options to users and pass them to your model via a config file.
 
 ## Summary
 
