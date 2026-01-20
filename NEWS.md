@@ -1,3 +1,23 @@
+# chap.r.sdk (development version)
+
+## Breaking Changes
+
+* **CLI consolidated to `create_chap_cli()`**: The `create_chapkit_cli()` function has been removed. All CLI functionality is now provided by `create_chap_cli()`, which uses named arguments (`--data`, `--historic`, `--future`, `--output`) powered by the optparse package.
+
+* **CLI argument style changed**: The CLI now uses named arguments instead of positional arguments:
+  - Train: `Rscript model.R train --data data.csv` (was: `train data.csv`)
+  - Predict: `Rscript model.R predict --historic h.csv --future f.csv --output out.csv` (was: `predict h.csv f.csv model.rds`)
+
+* **optparse dependency added**: The CLI now uses the optparse package for argument parsing, providing better help messages and argument validation.
+
+## Enhancements
+
+* `create_chap_cli()` now supports both short (`-d`) and long (`--data`) option forms
+* Improved error messages for missing required arguments
+* Better help text via `Rscript model.R train --help`
+
+---
+
 # chap.r.sdk 0.1.0
 
 ## Initial CRAN Release

@@ -97,7 +97,7 @@ model_info <- list(
 
 # Enable CLI
 if (!interactive()) {
-  create_chapkit_cli(
+  create_chap_cli(
     train_fn = train_mean_model,
     predict_fn = predict_mean_model,
     model_config_schema = config_schema,

@@ -30,7 +30,7 @@ This section documents the complete workflow for developing an R model compatibl
 
 ### Step 1: Create the R Model
 
-Create a model.R file using the `create_chapkit_cli()` function from chap.r.sdk:
+Create a model.R file using the `create_chap_cli()` function from chap.r.sdk:
 
 ```r
 library(chap.r.sdk)
@@ -69,7 +69,7 @@ model_info <- list(
 
 # Enable CLI
 if (!interactive()) {
-  create_chapkit_cli(train_fn, predict_fn, config_schema, model_info)
+  create_chap_cli(train_fn, predict_fn, config_schema, model_info)
 }
 ```
 

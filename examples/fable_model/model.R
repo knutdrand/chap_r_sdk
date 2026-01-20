@@ -364,8 +364,7 @@ model_info <- list(
 # Enable CLI with single function call
 # Only run if script is executed directly (not sourced for testing)
 if (!interactive() && !isTRUE(getOption("chap.r.sdk.testing"))) {
-  # Use chapkit CLI for named argument support
-  create_chapkit_cli(
+  create_chap_cli(
     train_fn = train_ets,
     predict_fn = predict_ets,
     model_config_schema = config_schema,

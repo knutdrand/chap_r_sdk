@@ -1,11 +1,12 @@
-#' Create Unified CHAP CLI
+#' Create CHAP CLI
 #'
-#' Creates a unified command-line interface for both training and prediction.
-#' Automatically handles all file I/O, parsing, and conversion. Model functions
-#' receive loaded tsibbles and configuration lists, not file paths.
+#' Creates a command-line interface for CHAP-compatible models using optparse.
+#' Uses named arguments (--data, --historic, --future, --output) for clear,
+#' explicit command-line usage. Config and model paths have sensible defaults
+#' but can be overridden.
 #'
-#' This is the standard way to create CHAP-compatible CLI scripts, providing
-#' a single unified interface with subcommand dispatch.
+#' This CLI style is designed for integration with chapkit's ML service framework,
+#' which manages workspaces and file paths automatically.
 #'
 #' @param train_fn Training function with signature:
 #'   \code{function(training_data, model_configuration = list(), run_info = list())} where
@@ -36,6 +37,8 @@
 #' @param model_info Optional list describing the model's data requirements and capabilities.
 #'   Used by CHAP to validate data before sending to the model and displayed via the "info"
 #'   subcommand. See Model Info section for details.
+#' @param default_config_path Default path to config file (default: "config.yml")
+#' @param default_model_path Default path to model file (default: "model.rds")
 #' @param args Command line arguments (defaults to \code{commandArgs(trailingOnly = TRUE)})
 #'
 #' @section Model Info:
@@ -48,7 +51,6 @@
 #'     additional continuous covariates beyond those it specifically requires. CHAP will list
 #'     these in \code{run_info$additional_continuous_covariates}.}
 #'   \item{required_covariates}{Character vector. Names of columns that must be present in the
-
 #'     data (e.g., \code{c("population", "rainfall")}). CHAP will validate these exist before
 #'     calling the model.}
 #' }
@@ -73,9 +75,45 @@
 #' @return Invisible result of the called function
 #' @export
 #'
+#' @details
+#' ## Training Command
+#' ```
+#' Rscript model.R train --data <path> [--config <path>] [--model <path>] [--run-info <path>]
+#' ```
+#' - `--data`: Path to training data CSV (required)
+#' - `--config`: Path to YAML config file (default: config.yml)
+#' - `--model`: Path to save trained model (default: model.rds)
+#' - `--run-info`: Path to run_info YAML/JSON file (optional, provided by CHAP)
+#'
+#' ## Prediction Command
+#' ```
+#' Rscript model.R predict --historic <path> --future <path> --output <path> [--config <path>] [--model <path>] [--run-info <path>]
+#' ```
+#' - `--historic`: Path to historic data CSV (required)
+#' - `--future`: Path to future data CSV (required)
+#' - `--output`: Path to write predictions CSV (required)
+#' - `--config`: Path to YAML config file (default: config.yml)
+#' - `--model`: Path to load trained model (default: model.rds)
+#' - `--run-info`: Path to run_info YAML/JSON file (optional, provided by CHAP)
+#'
+#' ## Info Command
+#' ```
+#' Rscript model.R info [--format yaml|json]
+#' ```
+#' - `--format`: Output format, either "yaml" (default, human-readable) or "json"
+#'   (machine-readable for chapkit integration)
+#'
+#' ## Chapkit Integration
+#' Configure ShellModelRunner in chapkit:
+#' ```python
+#' runner = ShellModelRunner(
+#'     train_command="Rscript model.R train --data {data_file} --run-info {run_info_file}",
+#'     predict_command="Rscript model.R predict --historic {historic_file} --future {future_file} --output {output_file} --run-info {run_info_file}"
+#' )
+#' ```
+#'
 #' @examples
 #' \dontrun{
-#' # In model.R file:
 #' library(chap.r.sdk)
 #' library(dplyr)
 #'
@@ -119,13 +157,15 @@
 #' }
 #'
 #' # Command line usage:
-#' # Rscript model.R train data.csv [config.yaml] [--run-info run_info.yaml]
-#' # Rscript model.R predict historic.csv future.csv model.rds [config.yaml] [--run-info run_info.yaml]
+#' # Rscript model.R train --data data.csv [--config config.yml] [--run-info run_info.yaml]
+#' # Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv [--config config.yml] [--run-info run_info.yaml]
 #' # Rscript model.R info                    # Human-readable YAML output
 #' # Rscript model.R info --format json      # Machine-readable JSON for chapkit
 #' }
 create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
                             model_info = NULL,
+                            default_config_path = "config.yml",
+                            default_model_path = "model.rds",
                             args = commandArgs(trailingOnly = TRUE)) {
 
   # Validate inputs
@@ -139,8 +179,8 @@ create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
   # Parse subcommand
   if (length(args) < 1) {
     stop("Usage: Rscript model.R <train|predict|info> [arguments...]\n",
-         "  train:   Rscript model.R train <training_data> [model_config]\n",
-         "  predict: Rscript model.R predict <historic_data> <future_data> <saved_model> [model_config]\n",
+         "  train:   Rscript model.R train --data <path> [--config <path>] [--model <path>]\n",
+         "  predict: Rscript model.R predict --historic <path> --future <path> --output <path> [--config <path>] [--model <path>]\n",
          "  info:    Rscript model.R info [--format yaml|json]")
   }
 
@@ -149,17 +189,138 @@ create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
 
   # Dispatch to appropriate handler
   result <- switch(subcommand,
-    "train" = handle_train(train_fn, subcommand_args, model_config_schema),
-    "predict" = handle_predict(predict_fn, subcommand_args, model_config_schema),
+    "train" = {
+      parser <- make_train_parser(default_config_path, default_model_path)
+      opts <- optparse::parse_args(parser, args = subcommand_args)
+      handle_train(train_fn, opts, model_config_schema)
+    },
+    "predict" = {
+      parser <- make_predict_parser(default_config_path, default_model_path)
+      opts <- optparse::parse_args(parser, args = subcommand_args)
+      handle_predict(predict_fn, opts, model_config_schema)
+    },
     "info" = {
-      # Parse --format argument for info subcommand
-      info_args <- parse_named_args(subcommand_args, list(format = "yaml"))
-      handle_info(model_config_schema, model_info, format = info_args$format)
+      parser <- make_info_parser()
+      opts <- optparse::parse_args(parser, args = subcommand_args)
+      handle_info(model_config_schema, model_info, format = opts$format)
     },
     stop("Invalid subcommand: '", subcommand, "'. Use 'train', 'predict', or 'info'")
   )
 
   invisible(result)
+}
+
+#' Create optparse parser for train subcommand
+#'
+#' @param default_config_path Default config file path
+#' @param default_model_path Default model output path
+#' @return An OptionParser object
+#' @keywords internal
+make_train_parser <- function(default_config_path = "config.yml",
+                               default_model_path = "model.rds") {
+  optparse::OptionParser(
+    usage = "usage: %prog train [options]",
+    description = "Train the model on provided data",
+    option_list = list(
+      optparse::make_option(
+        c("-d", "--data"),
+        type = "character",
+        default = NULL,
+        help = "Path to training data CSV (required)"
+      ),
+      optparse::make_option(
+        c("-c", "--config"),
+        type = "character",
+        default = default_config_path,
+        help = paste0("Path to YAML config file [default: ", default_config_path, "]")
+      ),
+      optparse::make_option(
+        c("-m", "--model"),
+        type = "character",
+        default = default_model_path,
+        help = paste0("Path to save trained model [default: ", default_model_path, "]")
+      ),
+      optparse::make_option(
+        c("-r", "--run-info"),
+        type = "character",
+        default = NULL,
+        dest = "run_info",
+        help = "Path to run_info YAML/JSON file (optional, provided by CHAP)"
+      )
+    )
+  )
+}
+
+#' Create optparse parser for predict subcommand
+#'
+#' @param default_config_path Default config file path
+#' @param default_model_path Default model input path
+#' @return An OptionParser object
+#' @keywords internal
+make_predict_parser <- function(default_config_path = "config.yml",
+                                 default_model_path = "model.rds") {
+  optparse::OptionParser(
+    usage = "usage: %prog predict [options]",
+    description = "Generate predictions using a trained model",
+    option_list = list(
+      optparse::make_option(
+        c("-H", "--historic"),
+        type = "character",
+        default = NULL,
+        help = "Path to historic data CSV (required)"
+      ),
+      optparse::make_option(
+        c("-f", "--future"),
+        type = "character",
+        default = NULL,
+        help = "Path to future data CSV (required)"
+      ),
+      optparse::make_option(
+        c("-o", "--output"),
+        type = "character",
+        default = NULL,
+        help = "Path to write predictions CSV (required)"
+      ),
+      optparse::make_option(
+        c("-c", "--config"),
+        type = "character",
+        default = default_config_path,
+        help = paste0("Path to YAML config file [default: ", default_config_path, "]")
+      ),
+      optparse::make_option(
+        c("-m", "--model"),
+        type = "character",
+        default = default_model_path,
+        help = paste0("Path to load trained model [default: ", default_model_path, "]")
+      ),
+      optparse::make_option(
+        c("-r", "--run-info"),
+        type = "character",
+        default = NULL,
+        dest = "run_info",
+        help = "Path to run_info YAML/JSON file (optional, provided by CHAP)"
+      )
+    )
+  )
+}
+
+#' Create optparse parser for info subcommand
+#'
+#' @return An OptionParser object
+#' @keywords internal
+make_info_parser <- function() {
+  optparse::OptionParser(
+    usage = "usage: %prog info [options]",
+    description = "Display model information and configuration schema",
+    option_list = list(
+      optparse::make_option(
+        c("-F", "--format"),
+        type = "character",
+        default = "yaml",
+        help = "Output format: yaml (human-readable) or json (machine-readable) [default: yaml]"
+      )
+    )
+  )
 }
 
 #' Handle train subcommand
@@ -169,44 +330,41 @@ create_chap_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
 #' and saves the resulting model.
 #'
 #' @param train_fn User-provided training function
-#' @param args Subcommand arguments (training_data path, optional config path, optional --run-info)
+#' @param opts Parsed options from optparse
 #' @param schema Optional JSON Schema for config validation
 #' @return Path to saved model file
 #' @keywords internal
-handle_train <- function(train_fn, args, schema = NULL) {
-  # Extract --run-info if present
-  parsed <- extract_run_info_arg(args)
-  positional_args <- parsed$positional
-  run_info_path <- parsed$run_info_path
-
-  # Parse positional arguments
-  if (length(positional_args) < 1) {
-    stop("Usage: Rscript model.R train <training_data> [model_config] [--run-info <path>]")
+handle_train <- function(train_fn, opts, schema = NULL) {
+  # Validate required arguments
+  if (is.null(opts$data)) {
+    stop("Missing required argument: --data <path>\n",
+         "Usage: Rscript model.R train --data <path> [--config <path>] [--model <path>] [--run-info <path>]")
   }
-
-  training_data_path <- positional_args[1]
-  config_path <- if (length(positional_args) >= 2) positional_args[2] else NULL
 
   # Validate files exist
-  if (!file.exists(training_data_path)) {
-    stop("Training data file not found: ", training_data_path)
-  }
-  if (!is.null(config_path) && config_path != "" && !file.exists(config_path)) {
-    stop("Configuration file not found: ", config_path)
+  if (!file.exists(opts$data)) {
+    stop("Training data file not found: ", opts$data)
   }
 
   # Load and parse data
-  message("Loading training data from: ", training_data_path)
-  training_data <- load_tsibble(training_data_path)
+  message("Loading training data from: ", opts$data)
+  training_data <- load_tsibble(opts$data)
 
   # Load configuration with optional validation and defaults
-  config <- load_and_validate_config(config_path, schema)
-  if (!is.null(config_path) && config_path != "") {
-    message("Loaded configuration from: ", config_path)
+  config <- if (file.exists(opts$config)) {
+    message("Loading configuration from: ", opts$config)
+    load_and_validate_config(opts$config, schema)
+  } else {
+    # Apply defaults from schema even if no config file
+    if (!is.null(schema)) {
+      apply_config_defaults(list(), schema)
+    } else {
+      list()
+    }
   }
 
   # Load run_info from file if provided, otherwise build default
-  run_info <- load_run_info(run_info_path, training_data = training_data)
+  run_info <- load_run_info(opts$run_info, training_data = training_data)
 
   # Call training function
   message("Training model...")
@@ -217,7 +375,7 @@ handle_train <- function(train_fn, args, schema = NULL) {
   })
 
   # Save model
-  model_path <- save_model(model, output_path = "model.rds")
+  model_path <- save_model(model, output_path = opts$model)
 
   return(model_path)
 }
@@ -229,58 +387,58 @@ handle_train <- function(train_fn, args, schema = NULL) {
 #' prediction function, and saves the resulting predictions.
 #'
 #' @param predict_fn User-provided prediction function
-#' @param args Subcommand arguments (historic_data, future_data, saved_model, optional config, optional --run-info)
+#' @param opts Parsed options from optparse
 #' @param schema Optional JSON Schema for config validation
 #' @return Path to saved predictions file
 #' @keywords internal
-handle_predict <- function(predict_fn, args, schema = NULL) {
-  # Extract --run-info if present
-  parsed <- extract_run_info_arg(args)
-  positional_args <- parsed$positional
-  run_info_path <- parsed$run_info_path
+handle_predict <- function(predict_fn, opts, schema = NULL) {
+  # Validate required arguments
+  missing_args <- c()
+  if (is.null(opts$historic)) missing_args <- c(missing_args, "--historic")
+  if (is.null(opts$future)) missing_args <- c(missing_args, "--future")
+  if (is.null(opts$output)) missing_args <- c(missing_args, "--output")
 
-  # Parse positional arguments
-  if (length(positional_args) < 3) {
-    stop("Usage: Rscript model.R predict <historic_data> <future_data> <saved_model> [model_config] [--run-info <path>]")
+  if (length(missing_args) > 0) {
+    stop("Missing required argument(s): ", paste(missing_args, collapse = ", "), "\n",
+         "Usage: Rscript model.R predict --historic <path> --future <path> --output <path> [--config <path>] [--model <path>] [--run-info <path>]")
   }
-
-  historic_path <- positional_args[1]
-  future_path <- positional_args[2]
-  model_path <- positional_args[3]
-  config_path <- if (length(positional_args) >= 4) positional_args[4] else NULL
 
   # Validate files exist
-  if (!file.exists(historic_path)) {
-    stop("Historic data file not found: ", historic_path)
+  if (!file.exists(opts$historic)) {
+    stop("Historic data file not found: ", opts$historic)
   }
-  if (!file.exists(future_path)) {
-    stop("Future data file not found: ", future_path)
+  if (!file.exists(opts$future)) {
+    stop("Future data file not found: ", opts$future)
   }
-  if (!file.exists(model_path)) {
-    stop("Model file not found: ", model_path)
-  }
-  if (!is.null(config_path) && config_path != "" && !file.exists(config_path)) {
-    stop("Configuration file not found: ", config_path)
+  if (!file.exists(opts$model)) {
+    stop("Model file not found: ", opts$model)
   }
 
   # Load data
-  message("Loading historic data from: ", historic_path)
-  historic_data <- load_tsibble(historic_path)
+  message("Loading historic data from: ", opts$historic)
+  historic_data <- load_tsibble(opts$historic)
 
-  message("Loading future data from: ", future_path)
-  future_data <- load_tsibble(future_path)
+  message("Loading future data from: ", opts$future)
+  future_data <- load_tsibble(opts$future)
 
-  message("Loading model from: ", model_path)
-  model <- readRDS(model_path)
+  message("Loading model from: ", opts$model)
+  model <- readRDS(opts$model)
 
   # Load configuration with optional validation and defaults
-  config <- load_and_validate_config(config_path, schema)
-  if (!is.null(config_path) && config_path != "") {
-    message("Loaded configuration from: ", config_path)
+  config <- if (file.exists(opts$config)) {
+    message("Loading configuration from: ", opts$config)
+    load_and_validate_config(opts$config, schema)
+  } else {
+    # Apply defaults from schema even if no config file
+    if (!is.null(schema)) {
+      apply_config_defaults(list(), schema)
+    } else {
+      list()
+    }
   }
 
   # Load run_info from file if provided, otherwise build default
-  run_info <- load_run_info(run_info_path, training_data = historic_data, future_data = future_data)
+  run_info <- load_run_info(opts$run_info, training_data = historic_data, future_data = future_data)
 
   # Call prediction function
   message("Generating predictions...")
@@ -290,11 +448,10 @@ handle_predict <- function(predict_fn, args, schema = NULL) {
     stop("Prediction failed: ", e$message, call. = FALSE)
   })
 
-  # Save predictions
-  predictions_path <- sub("\\.rds$", "_predictions.csv", model_path)
-  save_predictions(predictions, predictions_path)
+  # Save predictions to specified output path
+  save_predictions(predictions, opts$output)
 
-  return(predictions_path)
+  return(opts$output)
 }
 
 #' Handle info subcommand
@@ -402,361 +559,6 @@ build_info_json <- function(model_config_schema, model_info = NULL) {
     service_info = service_info,
     config_schema = model_config_schema,
     environment = environment_info
-  )
-}
-
-#' Create Chapkit-Compatible CLI
-#'
-#' Creates a command-line interface compatible with chapkit's ShellModelRunner.
-#' Uses named arguments (--data, --historic, --future, --output) instead of
-#' positional arguments. Config and model paths have sensible defaults but
-#' can be overridden.
-#'
-#' This CLI style is designed for integration with chapkit's ML service framework,
-#' which manages workspaces and file paths automatically.
-#'
-#' @param train_fn Training function with signature:
-#'   \code{function(training_data, model_configuration = list(), run_info = list())} where
-#'   \code{training_data} is a tsibble, \code{model_configuration} is a list of user-defined
-#'   configuration options, and \code{run_info} is a list containing CHAP-provided run
-#'   information (see \code{\link{create_chap_cli}} for details).
-#'   Should return a model object that will be automatically saved as RDS.
-#' @param predict_fn Prediction function with signature:
-#'   \code{function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list())}
-#'   where all data inputs are tsibbles, \code{saved_model} is a loaded object,
-#'   \code{model_configuration} is a list of user-defined configuration options,
-#'   and \code{run_info} is a list containing CHAP-provided run information.
-#'   Must return a tibble with a \code{samples} list-column containing numeric vectors.
-#' @param model_config_schema Optional model configuration schema (for info subcommand).
-#' @param model_info Optional list describing the model's data requirements and capabilities.
-#'   See \code{\link{create_chap_cli}} for details on the model_info structure.
-#' @param default_config_path Default path to config file (default: "config.yml")
-#' @param default_model_path Default path to model file (default: "model.rds")
-#' @param args Command line arguments (defaults to \code{commandArgs(trailingOnly = TRUE)})
-#'
-#' @return Invisible result of the called function
-#' @export
-#'
-#' @details
-#' ## Training Command
-#' ```
-#' Rscript model.R train --data <path> [--config <path>] [--model <path>] [--run-info <path>]
-#' ```
-#' - `--data`: Path to training data CSV (required)
-#' - `--config`: Path to YAML config file (default: config.yml)
-#' - `--model`: Path to save trained model (default: model.rds)
-#' - `--run-info`: Path to run_info YAML/JSON file (optional, provided by CHAP)
-#'
-#' ## Prediction Command
-#' ```
-#' Rscript model.R predict --historic <path> --future <path> --output <path> [--config <path>] [--model <path>] [--run-info <path>]
-#' ```
-#' - `--historic`: Path to historic data CSV (required)
-#' - `--future`: Path to future data CSV (required)
-#' - `--output`: Path to write predictions CSV (required)
-#' - `--config`: Path to YAML config file (default: config.yml)
-#' - `--model`: Path to load trained model (default: model.rds)
-#' - `--run-info`: Path to run_info YAML/JSON file (optional, provided by CHAP)
-#'
-#' ## Info Command
-#' ```
-#' Rscript model.R info [--format yaml|json]
-#' ```
-#' - `--format`: Output format, either "yaml" (default, human-readable) or "json"
-#'   (machine-readable for chapkit integration)
-#'
-#' ## Chapkit Integration
-#' Configure ShellModelRunner in chapkit:
-#' ```python
-#' runner = ShellModelRunner(
-#'     train_command="Rscript model.R train --data {data_file} --run-info {run_info_file}",
-#'     predict_command="Rscript model.R predict --historic {historic_file} --future {future_file} --output {output_file} --run-info {run_info_file}"
-#' )
-#' ```
-#'
-#' @examples
-#' \dontrun{
-#' library(chap.r.sdk)
-#'
-#' train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
-#'   list(mean = mean(training_data$disease_cases, na.rm = TRUE))
-#' }
-#'
-#' predict_fn <- function(historic_data, future_data, saved_model,
-#'                        model_configuration = list(), run_info = list()) {
-#'   future_data |>
-#'     dplyr::mutate(samples = purrr::map(seq_len(dplyr::n()), ~c(saved_model$mean)))
-#' }
-#'
-#' if (!interactive()) {
-#'   create_chapkit_cli(train_fn, predict_fn)
-#' }
-#' }
-create_chapkit_cli <- function(train_fn, predict_fn, model_config_schema = NULL,
-                                model_info = NULL,
-                                default_config_path = "config.yml",
-                                default_model_path = "model.rds",
-                                args = commandArgs(trailingOnly = TRUE)) {
-
-  # Validate inputs
-  if (!is.function(train_fn)) {
-    stop("train_fn must be a function")
-  }
-  if (!is.function(predict_fn)) {
-    stop("predict_fn must be a function")
-  }
-
-  # Parse subcommand
-  if (length(args) < 1) {
-    stop("Usage: Rscript model.R <train|predict|info> [arguments...]\n",
-         "  train:   Rscript model.R train --data <path> [--config <path>] [--model <path>]\n",
-         "  predict: Rscript model.R predict --historic <path> --future <path> --output <path> [--config <path>] [--model <path>]\n",
-         "  info:    Rscript model.R info [--format yaml|json]")
-  }
-
-  subcommand <- tolower(args[1])
-  subcommand_args <- if (length(args) > 1) args[-1] else character(0)
-
-  # Dispatch to appropriate handler
-  result <- switch(subcommand,
-    "train" = handle_chapkit_train(train_fn, subcommand_args, default_config_path, default_model_path, model_config_schema),
-    "predict" = handle_chapkit_predict(predict_fn, subcommand_args, default_config_path, default_model_path, model_config_schema),
-    "info" = {
-      # Parse --format argument for info subcommand
-      info_args <- parse_named_args(subcommand_args, list(format = "yaml"))
-      handle_info(model_config_schema, model_info, format = info_args$format)
-    },
-    stop("Invalid subcommand: '", subcommand, "'. Use 'train', 'predict', or 'info'")
-  )
-
-  invisible(result)
-}
-
-#' Parse named arguments from command line
-#'
-#' Parses command line arguments in the form --name value or --name=value.
-#'
-#' @param args Character vector of command line arguments
-#' @param defaults Named list of default values for arguments
-#' @return Named list of parsed argument values
-#' @keywords internal
-parse_named_args <- function(args, defaults = list()) {
-  result <- defaults
-
-  i <- 1
-  while (i <= length(args)) {
-    arg <- args[i]
-
-    if (startsWith(arg, "--")) {
-      # Check for --name=value format
-      if (grepl("=", arg)) {
-        parts <- strsplit(arg, "=", fixed = TRUE)[[1]]
-        name <- sub("^--", "", parts[1])
-        value <- paste(parts[-1], collapse = "=")
-        result[[name]] <- value
-      } else {
-        # --name value format
-        name <- sub("^--", "", arg)
-        if (i < length(args) && !startsWith(args[i + 1], "--")) {
-          result[[name]] <- args[i + 1]
-          i <- i + 1
-        } else {
-          # Flag without value (boolean)
-          result[[name]] <- TRUE
-        }
-      }
-    }
-    i <- i + 1
-  }
-
-  return(result)
-}
-
-#' Handle chapkit train subcommand
-#'
-#' Internal function that handles the "train" subcommand for create_chapkit_cli().
-#' Uses named arguments (--data, --config, --model).
-#'
-#' @param train_fn User-provided training function
-#' @param args Subcommand arguments
-#' @param default_config_path Default config file path
-#' @param default_model_path Default model output path
-#' @param schema Optional JSON Schema for config validation
-#' @return Path to saved model file
-#' @keywords internal
-handle_chapkit_train <- function(train_fn, args, default_config_path, default_model_path, schema = NULL) {
-  # Parse named arguments with defaults
-  parsed <- parse_named_args(args, list(
-    data = NULL,
-    config = default_config_path,
-    model = default_model_path,
-    "run-info" = NULL
-  ))
-
-  # Validate required arguments
-  if (is.null(parsed$data)) {
-    stop("Missing required argument: --data <path>\n",
-         "Usage: Rscript model.R train --data <path> [--config <path>] [--model <path>] [--run-info <path>]")
-  }
-
-  # Validate files exist
-  if (!file.exists(parsed$data)) {
-    stop("Training data file not found: ", parsed$data)
-  }
-
-  # Load and parse data
-  message("Loading training data from: ", parsed$data)
-  training_data <- load_tsibble(parsed$data)
-
-  # Load configuration with optional validation and defaults
-  config <- if (file.exists(parsed$config)) {
-    message("Loading configuration from: ", parsed$config)
-    load_and_validate_config(parsed$config, schema)
-  } else {
-    # Apply defaults from schema even if no config file
-    if (!is.null(schema)) {
-      apply_config_defaults(list(), schema)
-    } else {
-      list()
-    }
-  }
-
-  # Load run_info from file if provided, otherwise build default
-  run_info <- load_run_info(parsed$"run-info", training_data = training_data)
-
-  # Call training function
-  message("Training model...")
-  model <- tryCatch({
-    train_fn(training_data, config, run_info)
-  }, error = function(e) {
-    stop("Training failed: ", e$message, call. = FALSE)
-  })
-
-  # Save model
-  model_path <- save_model(model, output_path = parsed$model)
-
-  return(model_path)
-}
-
-#' Handle chapkit predict subcommand
-#'
-#' Internal function that handles the "predict" subcommand for create_chapkit_cli().
-#' Uses named arguments (--historic, --future, --output, --config, --model).
-#'
-#' @param predict_fn User-provided prediction function
-#' @param args Subcommand arguments
-#' @param default_config_path Default config file path
-#' @param default_model_path Default model input path
-#' @param schema Optional JSON Schema for config validation
-#' @return Path to saved predictions file
-#' @keywords internal
-handle_chapkit_predict <- function(predict_fn, args, default_config_path, default_model_path, schema = NULL) {
-  # Parse named arguments with defaults
-  parsed <- parse_named_args(args, list(
-    historic = NULL,
-    future = NULL,
-    output = NULL,
-    config = default_config_path,
-    model = default_model_path,
-    "run-info" = NULL
-  ))
-
-  # Validate required arguments
-  missing_args <- c()
-  if (is.null(parsed$historic)) missing_args <- c(missing_args, "--historic")
-  if (is.null(parsed$future)) missing_args <- c(missing_args, "--future")
-  if (is.null(parsed$output)) missing_args <- c(missing_args, "--output")
-
-  if (length(missing_args) > 0) {
-    stop("Missing required argument(s): ", paste(missing_args, collapse = ", "), "\n",
-         "Usage: Rscript model.R predict --historic <path> --future <path> --output <path> [--config <path>] [--model <path>] [--run-info <path>]")
-  }
-
-  # Validate files exist
-  if (!file.exists(parsed$historic)) {
-    stop("Historic data file not found: ", parsed$historic)
-  }
-  if (!file.exists(parsed$future)) {
-    stop("Future data file not found: ", parsed$future)
-  }
-  if (!file.exists(parsed$model)) {
-    stop("Model file not found: ", parsed$model)
-  }
-
-  # Load data
-  message("Loading historic data from: ", parsed$historic)
-  historic_data <- load_tsibble(parsed$historic)
-
-  message("Loading future data from: ", parsed$future)
-  future_data <- load_tsibble(parsed$future)
-
-  message("Loading model from: ", parsed$model)
-  model <- readRDS(parsed$model)
-
-  # Load configuration with optional validation and defaults
-  config <- if (file.exists(parsed$config)) {
-    message("Loading configuration from: ", parsed$config)
-    load_and_validate_config(parsed$config, schema)
-  } else {
-    # Apply defaults from schema even if no config file
-    if (!is.null(schema)) {
-      apply_config_defaults(list(), schema)
-    } else {
-      list()
-    }
-  }
-
-  # Load run_info from file if provided, otherwise build default
-  run_info <- load_run_info(parsed$"run-info", training_data = historic_data, future_data = future_data)
-
-  # Call prediction function
-  message("Generating predictions...")
-  predictions <- tryCatch({
-    predict_fn(historic_data, future_data, model, config, run_info)
-  }, error = function(e) {
-    stop("Prediction failed: ", e$message, call. = FALSE)
-  })
-
-  # Save predictions to specified output path
-  save_predictions(predictions, parsed$output)
-
-  return(parsed$output)
-}
-
-#' Extract --run-info argument from command line args
-#'
-#' Separates the --run-info argument from positional arguments.
-#'
-#' @param args Character vector of command line arguments
-#' @return A list with:
-#'   \itemize{
-#'     \item \code{positional}: Character vector of positional arguments
-#'     \item \code{run_info_path}: Path to run_info file, or NULL if not provided
-#'   }
-#' @keywords internal
-extract_run_info_arg <- function(args) {
-  run_info_path <- NULL
-  positional <- character(0)
-
-  i <- 1
-  while (i <= length(args)) {
-    arg <- args[i]
-
-    if (arg == "--run-info" && i < length(args)) {
-      run_info_path <- args[i + 1]
-      i <- i + 2
-    } else if (startsWith(arg, "--run-info=")) {
-      run_info_path <- sub("^--run-info=", "", arg)
-      i <- i + 1
-    } else {
-      positional <- c(positional, arg)
-      i <- i + 1
-    }
-  }
-
-  list(
-    positional = positional,
-    run_info_path = run_info_path
   )
 }
 

@@ -284,7 +284,7 @@ model_info <- list(
 # Enable CLI with single function call
 # Only run if script is executed directly (not sourced for testing)
 if (!interactive() && !isTRUE(getOption("chap.r.sdk.testing"))) {
-  create_chapkit_cli(
+  create_chap_cli(
     train_fn = train_model,
     predict_fn = predict_model,
     model_config_schema = config_schema,

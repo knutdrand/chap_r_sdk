@@ -31,7 +31,7 @@ print(f"Discovered config schema: {model_info.config_class.model_json_schema()}"
 # ============================================================================
 # Shell Model Runner
 # ============================================================================
-# Uses chap.r.sdk's create_chapkit_cli() interface with named arguments
+# Uses chap.r.sdk's create_chap_cli() interface with named arguments
 
 MODEL_SCRIPT = SCRIPT_DIR / "model.R"
 
