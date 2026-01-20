@@ -28,7 +28,6 @@ reference:
     desc: Create command-line interfaces for CHAP models
     contents:
       - create_chap_cli
-      - create_chapkit_cli
       - build_run_info
 
   - title: Configuration

@@ -56,6 +56,6 @@ generate_mlproject(model_name = "my_arima_model", config_schema = config_schema)
 
 }
 \seealso{
-\code{\link{create_chapkit_cli}} for creating the CLI that this
+\code{\link{create_chap_cli}} for creating the CLI that this
 MLproject file will invoke
 }

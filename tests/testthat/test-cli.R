@@ -32,7 +32,14 @@ test_that("handle_train passes run_info to train function", {
   temp_dir <- tempdir()
   setwd(temp_dir)
 
-  handle_train(train_fn, c(temp_csv))
+  # Create opts object like optparse would
+  opts <- list(
+    data = temp_csv,
+    config = "config.yml",
+    model = "model.rds",
+    run_info = NULL
+  )
+  handle_train(train_fn, opts)
 
   # Check run_info was passed with CHAP contract fields
   expect_type(run_info_received, "list")
@@ -79,7 +86,16 @@ test_that("handle_predict passes run_info to predict function", {
 
   saveRDS(list(test = "model"), "model.rds")
 
-  handle_predict(predict_fn, c("historic.csv", "future.csv", "model.rds"))
+  # Create opts object like optparse would
+  opts <- list(
+    historic = "historic.csv",
+    future = "future.csv",
+    output = "predictions.csv",
+    config = "config.yml",
+    model = "model.rds",
+    run_info = NULL
+  )
+  handle_predict(predict_fn, opts)
 
   # Check run_info was passed with CHAP contract fields
   expect_type(run_info_received, "list")
@@ -89,7 +105,7 @@ test_that("handle_predict passes run_info to predict function", {
   expect_equal(run_info_received$additional_continuous_covariates, character(0))
 
   # Cleanup
-  unlink(c("historic.csv", "future.csv", "model.rds", "model_predictions.csv"))
+  unlink(c("historic.csv", "future.csv", "model.rds", "predictions.csv"))
   setwd(old_wd)
 })
 
@@ -123,7 +139,14 @@ test_that("handle_train loads run_info from file when provided", {
   temp_dir <- tempdir()
   setwd(temp_dir)
 
-  handle_train(train_fn, c(temp_csv, "--run-info", run_info_yaml))
+  # Create opts object like optparse would
+  opts <- list(
+    data = temp_csv,
+    config = "config.yml",
+    model = "model.rds",
+    run_info = run_info_yaml
+  )
+  handle_train(train_fn, opts)
 
   # Check run_info was loaded from file
   expect_type(run_info_received, "list")
@@ -175,7 +198,16 @@ test_that("handle_predict loads run_info from file when provided", {
     future_covariate_origin = "user_provided"
   ), run_info_json, auto_unbox = TRUE)
 
-  handle_predict(predict_fn, c("historic.csv", "future.csv", "model.rds", "--run-info", run_info_json))
+  # Create opts object like optparse would
+  opts <- list(
+    historic = "historic.csv",
+    future = "future.csv",
+    output = "predictions.csv",
+    config = "config.yml",
+    model = "model.rds",
+    run_info = run_info_json
+  )
+  handle_predict(predict_fn, opts)
 
   # Check run_info was loaded from file
   expect_type(run_info_received, "list")
@@ -184,25 +216,8 @@ test_that("handle_predict loads run_info from file when provided", {
   expect_equal(run_info_received$future_covariate_origin, "user_provided")
 
   # Cleanup
-  unlink(c("historic.csv", "future.csv", "model.rds", "model_predictions.csv", run_info_json))
+  unlink(c("historic.csv", "future.csv", "model.rds", "predictions.csv", run_info_json))
   setwd(old_wd)
-})
-
-test_that("extract_run_info_arg separates --run-info from positional args", {
-  # Test --run-info value format
-  result <- extract_run_info_arg(c("train", "data.csv", "--run-info", "info.yaml"))
-  expect_equal(result$positional, c("train", "data.csv"))
-  expect_equal(result$run_info_path, "info.yaml")
-
-  # Test --run-info=value format
-  result2 <- extract_run_info_arg(c("train", "data.csv", "--run-info=info.json"))
-  expect_equal(result2$positional, c("train", "data.csv"))
-  expect_equal(result2$run_info_path, "info.json")
-
-  # Test no --run-info
-  result3 <- extract_run_info_arg(c("train", "data.csv"))
-  expect_equal(result3$positional, c("train", "data.csv"))
-  expect_null(result3$run_info_path)
 })
 
 test_that("load_run_info loads YAML file", {
@@ -393,25 +408,6 @@ test_that("create_chap_cli info subcommand respects --format json", {
   expect_equal(parsed$service_info$period_type, "month")
 })
 
-test_that("create_chapkit_cli info subcommand respects --format json", {
-  train_fn <- function(training_data, model_configuration = list(), run_info = list()) list()
-  predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) tibble::tibble()
-
-  model_info <- list(period_type = "week", required_covariates = c("rainfall"))
-  schema <- list(title = "Chapkit Test")
-
-  output <- capture.output(
-    create_chapkit_cli(train_fn, predict_fn, schema, model_info, args = c("info", "--format", "json"))
-  )
-  output_text <- paste(output, collapse = "\n")
-
-  # Should be valid JSON
-  parsed <- jsonlite::fromJSON(output_text)
-  expect_equal(parsed$service_info$period_type, "week")
-  expect_equal(parsed$service_info$required_covariates, "rainfall")
-  expect_equal(parsed$config_schema$title, "Chapkit Test")
-})
-
 test_that("handle_info defaults to yaml format", {
   schema <- list(title = "Test Schema")
 
@@ -471,7 +467,7 @@ test_that("build_run_info detects additional continuous covariates", {
   expect_true("population" %in% run_info$additional_continuous_covariates)
 
   # Should NOT include standard columns
- expect_false("time_period" %in% run_info$additional_continuous_covariates)
+  expect_false("time_period" %in% run_info$additional_continuous_covariates)
   expect_false("location" %in% run_info$additional_continuous_covariates)
   expect_false("disease_cases" %in% run_info$additional_continuous_covariates)
 
@@ -544,9 +540,17 @@ test_that("handle_train validates required arguments", {
     return(list(test = "model"))
   }
 
+  # Create opts with missing data
+  opts <- list(
+    data = NULL,
+    config = "config.yml",
+    model = "model.rds",
+    run_info = NULL
+  )
+
   expect_error(
-    handle_train(train_fn, character(0)),
-    "Usage: Rscript model.R train"
+    handle_train(train_fn, opts),
+    "Missing required argument: --data"
   )
 })
 
@@ -555,8 +559,16 @@ test_that("handle_train validates file existence", {
     return(list(test = "model"))
   }
 
+  # Create opts with non-existent file
+  opts <- list(
+    data = "nonexistent_file.csv",
+    config = "config.yml",
+    model = "model.rds",
+    run_info = NULL
+  )
+
   expect_error(
-    handle_train(train_fn, c("nonexistent_file.csv")),
+    handle_train(train_fn, opts),
     "Training data file not found"
   )
 })
@@ -566,9 +578,32 @@ test_that("handle_predict validates required arguments", {
     return(data.frame())
   }
 
+  # Missing --output
+  opts <- list(
+    historic = "h.csv",
+    future = "f.csv",
+    output = NULL,
+    config = "config.yml",
+    model = "model.rds",
+    run_info = NULL
+  )
   expect_error(
-    handle_predict(predict_fn, c("historic.csv", "future.csv")),
-    "Usage: Rscript model.R predict"
+    handle_predict(predict_fn, opts),
+    "Missing required argument.*--output"
+  )
+
+  # Missing multiple
+  opts2 <- list(
+    historic = "h.csv",
+    future = NULL,
+    output = NULL,
+    config = "config.yml",
+    model = "model.rds",
+    run_info = NULL
+  )
+  expect_error(
+    handle_predict(predict_fn, opts2),
+    "Missing required argument.*--future.*--output"
   )
 })
 
@@ -621,7 +656,7 @@ test_that("create_chap_cli train subcommand works end-to-end", {
   temp_dir <- tempdir()
   setwd(temp_dir)
 
-  result <- create_chap_cli(train_fn, predict_fn, args = c("train", temp_csv))
+  result <- create_chap_cli(train_fn, predict_fn, args = c("train", "--data", temp_csv))
 
   expect_true(file.exists("model.rds"))
   expect_equal(result, "model.rds")
@@ -632,160 +667,7 @@ test_that("create_chap_cli train subcommand works end-to-end", {
   unlink(temp_csv)
 })
 
-# Tests for chapkit-compatible CLI
-
-test_that("parse_named_args parses --name value format", {
-  args <- c("--data", "file.csv", "--config", "config.yml")
-  result <- parse_named_args(args)
-
-  expect_equal(result$data, "file.csv")
-  expect_equal(result$config, "config.yml")
-})
-
-test_that("parse_named_args parses --name=value format", {
-  args <- c("--data=file.csv", "--config=config.yml")
-  result <- parse_named_args(args)
-
-  expect_equal(result$data, "file.csv")
-  expect_equal(result$config, "config.yml")
-})
-
-test_that("parse_named_args applies defaults", {
-  args <- c("--data", "file.csv")
-  defaults <- list(data = NULL, config = "default.yml", model = "model.rds")
-  result <- parse_named_args(args, defaults)
-
-  expect_equal(result$data, "file.csv")
-  expect_equal(result$config, "default.yml")
-  expect_equal(result$model, "model.rds")
-})
-
-test_that("parse_named_args handles boolean flags", {
-  args <- c("--verbose", "--data", "file.csv")
-  result <- parse_named_args(args)
-
-  expect_true(result$verbose)
-  expect_equal(result$data, "file.csv")
-})
-
-test_that("parse_named_args handles values with equals signs", {
-  args <- c("--query=a=b=c")
-  result <- parse_named_args(args)
-
-  expect_equal(result$query, "a=b=c")
-})
-
-test_that("create_chapkit_cli validates function inputs", {
-  expect_error(
-    create_chapkit_cli("not_a_function", function() {}, args = c("train")),
-    "train_fn must be a function"
-  )
-
-  expect_error(
-    create_chapkit_cli(function() {}, "not_a_function", args = c("train")),
-    "predict_fn must be a function"
-  )
-})
-
-test_that("create_chapkit_cli requires subcommand argument", {
-  train_fn <- function(training_data, model_configuration = list(), run_info = list()) {}
-  predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) {}
-
-  expect_error(
-    create_chapkit_cli(train_fn, predict_fn, args = character(0)),
-    "Usage: Rscript model.R"
-  )
-})
-
-test_that("create_chapkit_cli rejects invalid subcommand", {
-  train_fn <- function(training_data, model_configuration = list(), run_info = list()) {}
-  predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) {}
-
-  expect_error(
-    create_chapkit_cli(train_fn, predict_fn, args = c("invalid")),
-    "Invalid subcommand"
-  )
-})
-
-test_that("handle_chapkit_train validates required arguments", {
-  train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
-    return(list(test = "model"))
-  }
-
-  expect_error(
-    handle_chapkit_train(train_fn, character(0), "config.yml", "model.rds"),
-    "Missing required argument: --data"
-  )
-})
-
-test_that("handle_chapkit_train validates file existence", {
-  train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
-    return(list(test = "model"))
-  }
-
-  expect_error(
-    handle_chapkit_train(train_fn, c("--data", "nonexistent_file.csv"), "config.yml", "model.rds"),
-    "Training data file not found"
-  )
-})
-
-test_that("handle_chapkit_predict validates required arguments", {
-  predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) {
-    return(data.frame())
-  }
-
-  # Missing --output
-  expect_error(
-    handle_chapkit_predict(predict_fn, c("--historic", "h.csv", "--future", "f.csv"), "config.yml", "model.rds"),
-    "Missing required argument.*--output"
-  )
-
-  # Missing multiple
-  expect_error(
-    handle_chapkit_predict(predict_fn, c("--historic", "h.csv"), "config.yml", "model.rds"),
-    "Missing required argument.*--future.*--output"
-  )
-})
-
-test_that("create_chapkit_cli train subcommand works end-to-end", {
-  # Create mock train function
-  train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
-    expect_s3_class(training_data, "tbl_ts")
-    expect_type(model_configuration, "list")
-    expect_type(run_info, "list")
-    return(list(means = "test_model"))
-  }
-
-  predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) {
-    return(data.frame(prediction = 1))
-  }
-
-  # Create test data file
-  temp_csv <- tempfile(fileext = ".csv")
-  test_data <- data.frame(
-    time_period = 1:4,
-    location = rep(c("A", "B"), each = 2),
-    disease_cases = c(10, 12, 15, 18)
-  )
-  readr::write_csv(test_data, temp_csv)
-
-  # Create temporary directory for output
-  old_wd <- getwd()
-  temp_dir <- tempdir()
-  setwd(temp_dir)
-
-  result <- create_chapkit_cli(train_fn, predict_fn, args = c("train", "--data", temp_csv))
-
-  expect_true(file.exists("model.rds"))
-  expect_equal(result, "model.rds")
-
-  # Cleanup
-  unlink("model.rds")
-  setwd(old_wd)
-  unlink(temp_csv)
-})
-
-test_that("create_chapkit_cli train respects custom model path", {
+test_that("create_chap_cli train respects custom model path", {
   train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
     return(list(means = "test_model"))
   }
@@ -808,7 +690,7 @@ test_that("create_chapkit_cli train respects custom model path", {
   temp_dir <- tempdir()
   setwd(temp_dir)
 
-  result <- create_chapkit_cli(train_fn, predict_fn,
+  result <- create_chap_cli(train_fn, predict_fn,
     args = c("train", "--data", temp_csv, "--model", "custom_model.rds"))
 
   expect_true(file.exists("custom_model.rds"))
@@ -820,7 +702,7 @@ test_that("create_chapkit_cli train respects custom model path", {
   unlink(temp_csv)
 })
 
-test_that("create_chapkit_cli predict subcommand works end-to-end", {
+test_that("create_chap_cli predict subcommand works end-to-end", {
   train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
     return(list(means = data.frame(location = c("A", "B"), mean_cases = c(11, 16.5))))
   }
@@ -853,7 +735,7 @@ test_that("create_chapkit_cli predict subcommand works end-to-end", {
   # Save a model
   saveRDS(list(means = data.frame(location = c("A", "B"), mean_cases = c(11, 16.5))), "model.rds")
 
-  result <- create_chapkit_cli(train_fn, predict_fn,
+  result <- create_chap_cli(train_fn, predict_fn,
     args = c("predict", "--historic", "historic.csv", "--future", "future.csv", "--output", "predictions.csv"))
 
   expect_true(file.exists("predictions.csv"))
@@ -868,7 +750,7 @@ test_that("create_chapkit_cli predict subcommand works end-to-end", {
   setwd(old_wd)
 })
 
-test_that("create_chapkit_cli uses default paths correctly", {
+test_that("create_chap_cli uses default paths correctly", {
   train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
     return(list(test = "model"))
   }
@@ -890,13 +772,13 @@ test_that("create_chapkit_cli uses default paths correctly", {
   readr::write_csv(test_data, "data.csv")
 
   # Test with default model path
-  result <- create_chapkit_cli(train_fn, predict_fn,
+  result <- create_chap_cli(train_fn, predict_fn,
     args = c("train", "--data", "data.csv"))
   expect_equal(result, "model.rds")
   expect_true(file.exists("model.rds"))
 
   # Test with custom default model path
-  result2 <- create_chapkit_cli(train_fn, predict_fn,
+  result2 <- create_chap_cli(train_fn, predict_fn,
     default_model_path = "my_model.rds",
     args = c("train", "--data", "data.csv"))
   expect_equal(result2, "my_model.rds")
@@ -905,4 +787,109 @@ test_that("create_chapkit_cli uses default paths correctly", {
   # Cleanup
   unlink(c("data.csv", "model.rds", "my_model.rds"))
   setwd(old_wd)
+})
+
+# Tests for optparse parser factories
+test_that("make_train_parser creates valid parser", {
+  parser <- make_train_parser()
+  expect_s4_class(parser, "OptionParser")
+})
+
+test_that("make_predict_parser creates valid parser", {
+  parser <- make_predict_parser()
+  expect_s4_class(parser, "OptionParser")
+})
+
+test_that("make_info_parser creates valid parser", {
+  parser <- make_info_parser()
+  expect_s4_class(parser, "OptionParser")
+})
+
+test_that("optparse parses train arguments correctly", {
+  parser <- make_train_parser("default_config.yml", "default_model.rds")
+  opts <- optparse::parse_args(parser, args = c("--data", "train.csv", "--model", "custom.rds"))
+
+  expect_equal(opts$data, "train.csv")
+  expect_equal(opts$config, "default_config.yml")  # default
+  expect_equal(opts$model, "custom.rds")  # overridden
+  expect_null(opts$run_info)
+})
+
+test_that("optparse parses predict arguments correctly", {
+  parser <- make_predict_parser("default_config.yml", "default_model.rds")
+  opts <- optparse::parse_args(parser, args = c(
+    "--historic", "h.csv",
+    "--future", "f.csv",
+    "--output", "out.csv",
+    "--run-info", "info.yaml"
+  ))
+
+  expect_equal(opts$historic, "h.csv")
+  expect_equal(opts$future, "f.csv")
+  expect_equal(opts$output, "out.csv")
+  expect_equal(opts$config, "default_config.yml")  # default
+  expect_equal(opts$model, "default_model.rds")  # default
+  expect_equal(opts$run_info, "info.yaml")
+})
+
+test_that("optparse parses info arguments correctly", {
+  parser <- make_info_parser()
+  opts <- optparse::parse_args(parser, args = c("--format", "json"))
+
+  expect_equal(opts$format, "json")
+})
+
+test_that("optparse uses default format for info", {
+  parser <- make_info_parser()
+  opts <- optparse::parse_args(parser, args = character(0))
+
+  expect_equal(opts$format, "yaml")
+})
+
+test_that("create_chap_cli train with --run-info works end-to-end", {
+  run_info_received <- NULL
+
+  train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
+    run_info_received <<- run_info
+    return(list(test = "model"))
+  }
+
+  predict_fn <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) {
+    return(data.frame(prediction = 1))
+  }
+
+  # Create test data file
+  temp_csv <- tempfile(fileext = ".csv")
+  test_data <- data.frame(
+    time_period = 1:4,
+    location = rep(c("A", "B"), each = 2),
+    disease_cases = c(10, 12, 15, 18)
+  )
+  readr::write_csv(test_data, temp_csv)
+
+  # Create run_info file
+  run_info_yaml <- tempfile(fileext = ".yaml")
+  yaml::write_yaml(list(
+    prediction_length = 3L,
+    additional_continuous_covariates = c("rainfall"),
+    future_covariate_origin = "test_origin"
+  ), run_info_yaml)
+
+  # Create temporary directory for output
+  old_wd <- getwd()
+  temp_dir <- tempdir()
+  setwd(temp_dir)
+
+  result <- create_chap_cli(train_fn, predict_fn,
+    args = c("train", "--data", temp_csv, "--run-info", run_info_yaml))
+
+  expect_true(file.exists("model.rds"))
+  expect_equal(run_info_received$prediction_length, 3L)
+  expect_equal(run_info_received$additional_continuous_covariates, c("rainfall"))
+  expect_equal(run_info_received$future_covariate_origin, "test_origin")
+
+  # Cleanup
+  unlink("model.rds")
+  setwd(old_wd)
+  unlink(c(temp_csv, run_info_yaml))
 })

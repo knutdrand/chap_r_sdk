@@ -4,12 +4,12 @@
 \alias{handle_predict}
 \title{Handle predict subcommand}
 \usage{
-handle_predict(predict_fn, args, schema = NULL)
+handle_predict(predict_fn, opts, schema = NULL)
 }
 \arguments{
 \item{predict_fn}{User-provided prediction function}
 
-\item{args}{Subcommand arguments (historic_data, future_data, saved_model, optional config, optional --run-info)}
+\item{opts}{Parsed options from optparse}
 
 \item{schema}{Optional JSON Schema for config validation}
 }

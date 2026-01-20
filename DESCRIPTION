@@ -18,6 +18,7 @@ Imports:
     dplyr,
     jsonlite,
     jsonvalidate,
+    optparse,
     purrr,
     readr,
     rlang,

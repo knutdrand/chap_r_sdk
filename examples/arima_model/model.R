@@ -210,5 +210,5 @@ config_schema <- list(
 
 # Enable CLI with single function call (chapkit-style named arguments for MLproject compatibility)
 if (!interactive()) {
-  create_chapkit_cli(train_arima, predict_arima, config_schema)
+  create_chap_cli(train_arima, predict_arima, config_schema)
 }

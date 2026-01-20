@@ -95,7 +95,7 @@ config_schema <- create_config_schema(
   )
 )
 
-# Enable CLI with single function call (chapkit-style named arguments for MLproject compatibility)
+# Enable CLI with single function call (named arguments for MLproject compatibility)
 if (!interactive()) {
-  create_chapkit_cli(train_mean_model, predict_mean_model, config_schema)
+  create_chap_cli(train_mean_model, predict_mean_model, config_schema)
 }

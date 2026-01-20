@@ -4,12 +4,12 @@
 \alias{handle_train}
 \title{Handle train subcommand}
 \usage{
-handle_train(train_fn, args, schema = NULL)
+handle_train(train_fn, opts, schema = NULL)
 }
 \arguments{
 \item{train_fn}{User-provided training function}
 
-\item{args}{Subcommand arguments (training_data path, optional config path, optional --run-info)}
+\item{opts}{Parsed options from optparse}
 
 \item{schema}{Optional JSON Schema for config validation}
 }

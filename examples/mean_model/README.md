@@ -30,13 +30,13 @@ The mean model calculates the mean disease cases for each location from the trai
 
 ```bash
 # Train the model
-Rscript examples/mean_model/model.R train examples/mean_model/example_data.csv
+Rscript examples/mean_model/model.R train --data examples/mean_model/example_data.csv
 
 # Generate predictions
 Rscript examples/mean_model/model.R predict \
-  examples/mean_model/example_data.csv \
-  examples/mean_model/future_data.csv \
-  model.rds
+  --historic examples/mean_model/example_data.csv \
+  --future examples/mean_model/future_data.csv \
+  --output predictions.csv
 
 # Display model info and configuration schema
 Rscript examples/mean_model/model.R info
@@ -101,7 +101,7 @@ library(chap.r.sdk)
 library(dplyr)
 
 # Pure business logic - no file I/O!
-train_mean_model <- function(training_data, model_configuration = list()) {
+train_mean_model <- function(training_data, model_configuration = list(), run_info = list()) {
   means <- training_data |>
     group_by(location) |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
@@ -110,10 +110,11 @@ train_mean_model <- function(training_data, model_configuration = list()) {
 }
 
 predict_mean_model <- function(historic_data, future_data, saved_model,
-                                model_configuration = list()) {
+                                model_configuration = list(), run_info = list()) {
   predictions <- future_data |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = mean_cases)
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
+    select(-mean_cases)
 
   return(predictions)
 }
