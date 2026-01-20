@@ -374,6 +374,72 @@ The CLI automatically handles:
 - Saving the model as RDS
 - Writing predictions to CSV (converting nested samples to wide format)
 
+## Step 9: Create MLproject for chap-core
+
+To run your model with chap-core, you need an MLproject file. The SDK
+can generate this automatically using
+[`generate_mlproject()`](https://knutdrand.github.io/chap_r_sdk/reference/generate_mlproject.md).
+
+### Prerequisites
+
+First, set up renv for reproducible dependencies:
+
+``` r
+renv::init()
+renv::install(c("dplyr", "purrr"))
+renv::install("knutdrand/chap_r_sdk")
+renv::snapshot()
+```
+
+### Generate the MLproject File
+
+``` r
+library(chap.r.sdk)
+
+generate_mlproject(
+  model_name = "my_mean_model",
+  config_schema = my_schema
+)
+```
+
+This creates an `MLproject` file like:
+
+``` yaml
+name: my_mean_model
+renv_env: renv.lock
+user_options:
+  n_samples:
+    type: integer
+    description: Number of Monte Carlo samples for predictions
+    default: 100
+entry_points:
+  train:
+    parameters:
+      train_data: str
+      model: str
+    command: Rscript model.R train --data {train_data} --model {model}
+  predict:
+    parameters:
+      historic_data: str
+      future_data: str
+      model: str
+      out_file: str
+    command: Rscript model.R predict --historic {historic_data} --future {future_data}
+      --model {model} --output {out_file}
+```
+
+### Run with chap-core
+
+Once you have the MLproject and renv.lock files, run your model with
+chap-core:
+
+``` bash
+chap evaluate --model-name ./my_model_directory --dataset-csv data.csv
+```
+
+See `examples/arima_model/` for a complete example with renv and
+MLproject.
+
 ## Probabilistic Models
 
 For probabilistic forecasting, include multiple Monte Carlo samples
@@ -588,6 +654,10 @@ The development workflow is:
 
 - See `examples/ewars_model/` for a more complex example with
   configuration
+- See `examples/arima_model/` for a complete example with renv and
+  MLproject integration
+- Read about MLproject generation in
+  [`?generate_mlproject`](https://knutdrand.github.io/chap_r_sdk/reference/generate_mlproject.md)
 - Read about configuration schemas in
   [`?create_config_schema`](https://knutdrand.github.io/chap_r_sdk/reference/create_config_schema.md)
 - Explore spatial-temporal utilities in
