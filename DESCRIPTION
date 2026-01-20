@@ -36,7 +36,6 @@ Suggests:
     lubridate,
     slider,
     sf,
-    cubble,
     renv,
     pak
 Config/testthat/edition: 3
