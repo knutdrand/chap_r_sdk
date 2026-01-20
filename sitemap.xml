@@ -31,6 +31,7 @@
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/extract_run_info_arg.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/generate_dockerfile.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/generate_dockerfile_content.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/generate_mlproject.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/get_config_param.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/get_environment_info.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/get_example_data.html</loc></url>
@@ -71,6 +72,7 @@
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/schema_number.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/schema_string.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/schema_to_json.html</loc></url>
+<url><loc>https://knutdrand.github.io/chap_r_sdk/reference/schema_to_user_options.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/train_mean_model.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/transform_spatiotemporal.html</loc></url>
 <url><loc>https://knutdrand.github.io/chap_r_sdk/reference/validate_config.html</loc></url>

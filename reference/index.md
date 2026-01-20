@@ -113,6 +113,8 @@ Docker and renv environment configuration for containerized models
   : Initialize CHAP model environment
 - [`generate_dockerfile()`](https://knutdrand.github.io/chap_r_sdk/reference/generate_dockerfile.md)
   : Generate Dockerfile for CHAP model
+- [`generate_mlproject()`](https://knutdrand.github.io/chap_r_sdk/reference/generate_mlproject.md)
+  : Generate MLproject file for chap-core compatibility
 - [`detect_system_deps()`](https://knutdrand.github.io/chap_r_sdk/reference/detect_system_deps.md)
   : Detect system dependencies from renv packages
 - [`read_renv_r_version()`](https://knutdrand.github.io/chap_r_sdk/reference/read_renv_r_version.md)

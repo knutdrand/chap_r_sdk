@@ -448,7 +448,7 @@ provides a unified structure:</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/huizezhang-sherry/cubble" class="external-link">cubble</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create a cubble from separate spatial and temporal data</span></span>
-<span><span class="va">cb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://huizezhang-sherry.github.io/cubble/reference/as_cubble.html" class="external-link">as_cubble</a></span><span class="op">(</span></span>
+<span><span class="va">cb</span> <span class="op">&lt;-</span> <span class="fu">as_cubble</span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">training_data</span>,</span>
 <span>  key <span class="op">=</span> <span class="va">location</span>,</span>
 <span>  index <span class="op">=</span> <span class="va">time_period</span>,</span>
@@ -456,8 +456,8 @@ provides a unified structure:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Switch between spatial and temporal views</span></span>
-<span><span class="va">cb_temporal</span> <span class="op">&lt;-</span> <span class="va">cb</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://huizezhang-sherry.github.io/cubble/reference/face.html" class="external-link">face_temporal</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">cb_spatial</span> <span class="op">&lt;-</span> <span class="va">cb</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://huizezhang-sherry.github.io/cubble/reference/face.html" class="external-link">face_spatial</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">cb_temporal</span> <span class="op">&lt;-</span> <span class="va">cb</span> <span class="op">|&gt;</span> <span class="fu">face_temporal</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">cb_spatial</span> <span class="op">&lt;-</span> <span class="va">cb</span> <span class="op">|&gt;</span> <span class="fu">face_spatial</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Useful for linking maps with time series plots</span></span></code></pre></div>
 </div>
