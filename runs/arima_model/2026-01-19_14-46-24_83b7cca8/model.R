@@ -45,9 +45,8 @@ create_lagged_feature <- function(df, feature, lag) {
 #' @param training_data A tsibble with columns: time_period, location,
 #'   disease_cases, rainfall, mean_temperature
 #' @param model_configuration A list with model configuration options
-#' @param run_info A list with CHAP-provided run information (optional)
 #' @return A list of fitted ARIMA models, one per location
-train_arima <- function(training_data, model_configuration = list(), run_info = list()) {
+train_arima <- function(training_data, model_configuration = list()) {
   # Get lag parameter from config or use default
   lag_periods <- model_configuration$lag_periods %||% 3
   n_samples <- model_configuration$n_samples %||% 100
@@ -120,10 +119,9 @@ train_arima <- function(training_data, model_configuration = list(), run_info = 
 #' @param future_data A tsibble with time periods to predict
 #' @param saved_model A model object from train_arima
 #' @param model_configuration A list with model configuration options
-#' @param run_info A list with CHAP-provided run information (optional)
 #' @return A tibble with predictions including a samples list-column
 predict_arima <- function(historic_data, future_data, saved_model,
-                          model_configuration = list(), run_info = list()) {
+                          model_configuration = list()) {
 
   lag_periods <- saved_model$lag_periods
   n_samples <- saved_model$n_samples
@@ -210,5 +208,5 @@ config_schema <- list(
 
 # Enable CLI with single function call (chapkit-style named arguments for MLproject compatibility)
 if (!interactive()) {
-  create_chap_cli(train_arima, predict_arima, config_schema)
+  create_chapkit_cli(train_arima, predict_arima, config_schema)
 }
