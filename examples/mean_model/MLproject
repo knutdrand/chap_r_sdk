@@ -1,0 +1,25 @@
+name: mean_model
+renv_env: renv.lock
+user_options:
+  smoothing:
+    type: number
+    description: Smoothing parameter (reserved for future use)
+    default: 0.0
+  min_observations:
+    type: integer
+    description: Minimum number of observations required per location
+    default: 1.0
+entry_points:
+  train:
+    parameters:
+      train_data: str
+      model: str
+    command: Rscript model.R train --data {train_data} --model {model}
+  predict:
+    parameters:
+      historic_data: str
+      future_data: str
+      model: str
+      out_file: str
+    command: Rscript model.R predict --historic {historic_data} --future {future_data}
+      --model {model} --output {out_file}

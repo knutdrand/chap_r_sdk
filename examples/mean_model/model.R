@@ -11,8 +11,8 @@
 # - Saving results
 #
 # Usage:
-#   Rscript model.R train examples/mean_model/example_data.csv
-#   Rscript model.R predict examples/mean_model/example_data.csv examples/mean_model/future_data.csv model.rds
+#   Rscript model.R train --data training_data.csv
+#   Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
 #   Rscript model.R info
 
 library(chap.r.sdk)
@@ -25,8 +25,9 @@ library(dplyr)
 #'
 #' @param training_data A tsibble with columns: time_period, location, disease_cases, and optional covariates
 #' @param model_configuration A list with model configuration options (currently unused)
+#' @param run_info A list with CHAP-provided run information (optional)
 #' @return A model object (list) containing the location means
-train_mean_model <- function(training_data, model_configuration = list()) {
+train_mean_model <- function(training_data, model_configuration = list(), run_info = list()) {
   # training_data is already a tsibble - no file I/O needed!
 
   # Calculate mean disease cases for each location
@@ -60,8 +61,9 @@ train_mean_model <- function(training_data, model_configuration = list()) {
 #' @param future_data A tsibble with columns: time_period, location, and optional covariates
 #' @param saved_model A model object from train_mean_model containing location means
 #' @param model_configuration A list with model configuration options (currently unused)
+#' @param run_info A list with CHAP-provided run information (optional)
 #' @return A tsibble with predictions including a samples list-column
-predict_mean_model <- function(historic_data, future_data, saved_model, model_configuration = list()) {
+predict_mean_model <- function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list()) {
   # All inputs are already loaded - no file I/O needed!
 
   # Join future data with location means and create predictions with samples column
@@ -93,8 +95,7 @@ config_schema <- create_config_schema(
   )
 )
 
-# Enable CLI with single function call!
-# This automatically handles all file I/O, parsing, and subcommand dispatch
+# Enable CLI with single function call (chapkit-style named arguments for MLproject compatibility)
 if (!interactive()) {
-  create_chap_cli(train_mean_model, predict_mean_model, config_schema)
+  create_chapkit_cli(train_mean_model, predict_mean_model, config_schema)
 }
