@@ -1,0 +1,26 @@
+name: model_comparison
+renv_env: renv.lock
+user_options:
+  model_type:
+    type: string
+    description: The forecasting model to use (ETS, ARIMA, NNETAR, THETA, SNAIVE,
+      COMBINATION)
+    default: ETS
+  n_samples:
+    type: integer
+    description: Number of Monte Carlo samples to generate per forecast
+    default: 100.0
+entry_points:
+  train:
+    parameters:
+      train_data: str
+      model: str
+    command: Rscript model.R train --data {train_data} --model {model}
+  predict:
+    parameters:
+      historic_data: str
+      future_data: str
+      model: str
+      out_file: str
+    command: Rscript model.R predict --historic {historic_data} --future {future_data}
+      --model {model} --output {out_file}
