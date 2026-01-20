@@ -39,6 +39,27 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="chaprsdk-development-version">chap.r.sdk (development version)<a class="anchor" aria-label="anchor" href="#chaprsdk-development-version"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li><p><strong>CLI consolidated to <code><a href="../reference/create_chap_cli.html">create_chap_cli()</a></code></strong>: The <code>create_chapkit_cli()</code> function has been removed. All CLI functionality is now provided by <code><a href="../reference/create_chap_cli.html">create_chap_cli()</a></code>, which uses named arguments (<code>--data</code>, <code>--historic</code>, <code>--future</code>, <code>--output</code>) powered by the optparse package.</p></li>
+<li>
+<p><strong>CLI argument style changed</strong>: The CLI now uses named arguments instead of positional arguments:</p>
+<ul><li>Train: <code>Rscript model.R train --data data.csv</code> (was: <code>train data.csv</code>)</li>
+<li>Predict: <code>Rscript model.R predict --historic h.csv --future f.csv --output out.csv</code> (was: <code>predict h.csv f.csv model.rds</code>)</li>
+</ul></li>
+<li><p><strong>optparse dependency added</strong>: The CLI now uses the optparse package for argument parsing, providing better help messages and argument validation.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-development-version">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/create_chap_cli.html">create_chap_cli()</a></code> now supports both short (<code>-d</code>) and long (<code>--data</code>) option forms</li>
+<li>Improved error messages for missing required arguments</li>
+<li>Better help text via <code>Rscript model.R train --help</code>
+</li>
+</ul><hr></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="chaprsdk-010">chap.r.sdk 0.1.0<a class="anchor" aria-label="anchor" href="#chaprsdk-010"></a></h2>
 <div class="section level3">
 <h3 id="initial-cran-release-0-1-0">Initial CRAN Release<a class="anchor" aria-label="anchor" href="#initial-cran-release-0-1-0"></a></h3>

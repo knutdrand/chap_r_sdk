@@ -8,7 +8,7 @@ predictions.
 ## Usage
 
 ``` r
-handle_predict(predict_fn, args, schema = NULL)
+handle_predict(predict_fn, opts, schema = NULL)
 ```
 
 ## Arguments
@@ -17,10 +17,9 @@ handle_predict(predict_fn, args, schema = NULL)
 
   User-provided prediction function
 
-- args:
+- opts:
 
-  Subcommand arguments (historic_data, future_data, saved_model,
-  optional config, optional –run-info)
+  Parsed options from optparse
 
 - schema:
 

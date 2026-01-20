@@ -111,7 +111,7 @@ a complete command-line interface:</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define training function - receives loaded tsibble, not file paths</span></span>
-<span><span class="va">train_my_model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">train_my_model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">means</span> <span class="op">&lt;-</span> <span class="va">training_data</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">location</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>mean_cases <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">disease_cases</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
@@ -121,7 +121,7 @@ a complete command-line interface:</p>
 <span></span>
 <span><span class="co"># Define prediction function - all inputs already loaded</span></span>
 <span><span class="va">predict_my_model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
-<span>                              <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                              <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">predictions</span> <span class="op">&lt;-</span> <span class="va">future_data</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">saved_model</span><span class="op">$</span><span class="va">means</span>, by <span class="op">=</span> <span class="st">"location"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>samples <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">mean_cases</span>, <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -140,10 +140,10 @@ a complete command-line interface:</p>
 <p>Save the above code as <code>model.R</code>, then use from the
 command line:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R train training_data.csv</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R train <span class="at">--data</span> training_data.csv</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Generate predictions</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict historic_data.csv future_data.csv model.rds</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict <span class="at">--historic</span> historic.csv <span class="at">--future</span> future.csv <span class="at">--output</span> predictions.csv</span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Display model information</span></span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
@@ -157,9 +157,10 @@ command line:</p>
 <h3 id="training-function">Training Function<a class="anchor" aria-label="anchor" href="#training-function"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># training_data: tsibble with time_period index, location key, disease_cases</span></span>
 <span>  <span class="co"># model_configuration: optional list of parameters from config file</span></span>
+<span>  <span class="co"># run_info: runtime info from CHAP (prediction_length, additional_continuous_covariates, etc.)</span></span>
 <span>  <span class="co"># Returns: model object (saved as RDS)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
@@ -168,10 +169,11 @@ command line:</p>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predict_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
-<span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># historic_data: tsibble with historical observations</span></span>
 <span>  <span class="co"># future_data: tsibble with time periods to predict (no disease_cases)</span></span>
 <span>  <span class="co"># saved_model: object returned by train_fn</span></span>
+<span>  <span class="co"># run_info: runtime info from CHAP</span></span>
 <span>  <span class="co"># Returns: tibble with samples list-column</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><strong>Important</strong>: <code>historic_data</code> may contain
@@ -269,7 +271,7 @@ vectors:</p>
 <h3 id="reading-configuration-files">Reading Configuration Files<a class="anchor" aria-label="anchor" href="#reading-configuration-files"></a>
 </h3>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Via CLI - config passed automatically to your functions</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>Rscript model.R train data.csv config.yaml</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>Rscript model.R train <span class="sc">--</span>data data.csv <span class="sc">--</span>config config.yaml</span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a></span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co"># Or read manually:</span></span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>config <span class="ot">&lt;-</span> <span class="fu">read_model_config</span>(<span class="st">"config.yaml"</span>)</span></code></pre></div>

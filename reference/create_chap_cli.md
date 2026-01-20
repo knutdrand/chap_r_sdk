@@ -1,9 +1,9 @@
-# Create Unified CHAP CLI
+# Create CHAP CLI
 
-Creates a unified command-line interface for both training and
-prediction. Automatically handles all file I/O, parsing, and conversion.
-Model functions receive loaded tsibbles and configuration lists, not
-file paths.
+Creates a command-line interface for CHAP-compatible models using
+optparse. Uses named arguments (–data, –historic, –future, –output) for
+clear, explicit command-line usage. Config and model paths have sensible
+defaults but can be overridden.
 
 ## Usage
 
@@ -13,6 +13,8 @@ create_chap_cli(
   predict_fn,
   model_config_schema = NULL,
   model_info = NULL,
+  default_config_path = "config.yml",
+  default_model_path = "model.rds",
   args = commandArgs(trailingOnly = TRUE)
 )
 ```
@@ -63,6 +65,14 @@ create_chap_cli(
   model and displayed via the "info" subcommand. See Model Info section
   for details.
 
+- default_config_path:
+
+  Default path to config file (default: "config.yml")
+
+- default_model_path:
+
+  Default path to model file (default: "model.rds")
+
 - args:
 
   Command line arguments (defaults to
@@ -74,8 +84,54 @@ Invisible result of the called function
 
 ## Details
 
-This is the standard way to create CHAP-compatible CLI scripts,
-providing a single unified interface with subcommand dispatch.
+This CLI style is designed for integration with chapkit's ML service
+framework, which manages workspaces and file paths automatically.
+
+### Training Command
+
+    Rscript model.R train --data <path> [--config <path>] [--model <path>] [--run-info <path>]
+
+- `--data`: Path to training data CSV (required)
+
+- `--config`: Path to YAML config file (default: config.yml)
+
+- `--model`: Path to save trained model (default: model.rds)
+
+- `--run-info`: Path to run_info YAML/JSON file (optional, provided by
+  CHAP)
+
+### Prediction Command
+
+    Rscript model.R predict --historic <path> --future <path> --output <path> [--config <path>] [--model <path>] [--run-info <path>]
+
+- `--historic`: Path to historic data CSV (required)
+
+- `--future`: Path to future data CSV (required)
+
+- `--output`: Path to write predictions CSV (required)
+
+- `--config`: Path to YAML config file (default: config.yml)
+
+- `--model`: Path to load trained model (default: model.rds)
+
+- `--run-info`: Path to run_info YAML/JSON file (optional, provided by
+  CHAP)
+
+### Info Command
+
+    Rscript model.R info [--format yaml|json]
+
+- `--format`: Output format, either "yaml" (default, human-readable) or
+  "json" (machine-readable for chapkit integration)
+
+### Chapkit Integration
+
+Configure ShellModelRunner in chapkit:
+
+    runner = ShellModelRunner(
+        train_command="Rscript model.R train --data {data_file} --run-info {run_info_file}",
+        predict_command="Rscript model.R predict --historic {historic_file} --future {future_file} --output {output_file} --run-info {run_info_file}"
+    )
 
 ## Model Info
 
@@ -130,7 +186,6 @@ constructed from the data.
 
 ``` r
 if (FALSE) { # \dontrun{
-# In model.R file:
 library(chap.r.sdk)
 library(dplyr)
 
@@ -174,8 +229,8 @@ if (!interactive()) {
 }
 
 # Command line usage:
-# Rscript model.R train data.csv [config.yaml] [--run-info run_info.yaml]
-# Rscript model.R predict historic.csv future.csv model.rds [config.yaml] [--run-info run_info.yaml]
+# Rscript model.R train --data data.csv [--config config.yml] [--run-info run_info.yaml]
+# Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv [--config config.yml] [--run-info run_info.yaml]
 # Rscript model.R info                    # Human-readable YAML output
 # Rscript model.R info --format json      # Machine-readable JSON for chapkit
 } # }

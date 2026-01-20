@@ -46,7 +46,7 @@ Invisible path to created MLproject file
 
 ## See also
 
-[`create_chapkit_cli`](https://knutdrand.github.io/chap_r_sdk/reference/create_chapkit_cli.md)
+[`create_chap_cli`](https://knutdrand.github.io/chap_r_sdk/reference/create_chap_cli.md)
 for creating the CLI that this MLproject file will invoke
 
 ## Examples

@@ -100,7 +100,7 @@ library(chap.r.sdk)
 library(dplyr)
 
 # Pure business logic - no file I/O!
-train_my_model <- function(training_data, model_configuration = list()) {
+train_my_model <- function(training_data, model_configuration = list(), run_info = list()) {
   # training_data is already a tsibble
   means <- training_data |>
     group_by(location) |>
@@ -110,11 +110,13 @@ train_my_model <- function(training_data, model_configuration = list()) {
 }
 
 predict_my_model <- function(historic_data, future_data, saved_model,
-                              model_configuration = list()) {
+                              model_configuration = list(), run_info = list()) {
   # All inputs are already loaded
+  # Return predictions with samples list-column
   predictions <- future_data |>
     left_join(saved_model$means, by = "location") |>
-    mutate(disease_cases = mean_cases)
+    mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
+    select(-mean_cases)
 
   return(predictions)
 }
@@ -134,8 +136,8 @@ if (!interactive()) {
 **Usage:**
 
 ``` bash
-Rscript model.R train data.csv [config.yaml]
-Rscript model.R predict historic.csv future.csv model.rds [config.yaml]
+Rscript model.R train --data data.csv [--config config.yaml]
+Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
 Rscript model.R info
 ```
 

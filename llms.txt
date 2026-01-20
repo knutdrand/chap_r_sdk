@@ -130,9 +130,7 @@ Rscript -e 'renv::restore()'
 Create command-line interfaces for CHAP models
 
 - [`create_chap_cli()`](https://knutdrand.github.io/chap_r_sdk/reference/create_chap_cli.md)
-  : Create Unified CHAP CLI
-- [`create_chapkit_cli()`](https://knutdrand.github.io/chap_r_sdk/reference/create_chapkit_cli.md)
-  : Create Chapkit-Compatible CLI
+  : Create CHAP CLI
 - [`build_run_info()`](https://knutdrand.github.io/chap_r_sdk/reference/build_run_info.md)
   : Build default run_info object from data
 

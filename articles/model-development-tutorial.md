@@ -26,10 +26,11 @@ Every CHAP model requires two functions:
 **Training function:**
 
 ``` r
-train_fn <- function(training_data, model_configuration = list()) {
+train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   # training_data: tsibble with time_period index, location key,
   #                disease_cases, and covariates
   # model_configuration: optional list of parameters
+  # run_info: runtime info from CHAP (prediction_length, additional_continuous_covariates)
   # Returns: any model object (list, fitted model, etc.)
 }
 ```
@@ -38,10 +39,11 @@ train_fn <- function(training_data, model_configuration = list()) {
 
 ``` r
 predict_fn <- function(historic_data, future_data, saved_model,
-                       model_configuration = list()) {
+                       model_configuration = list(), run_info = list()) {
   # historic_data: tsibble with historical observations
   # future_data: tsibble with time periods to predict
   # saved_model: the object returned by train_fn
+  # run_info: runtime info from CHAP
   # Returns: tibble with samples list-column containing numeric vectors
   #   - For deterministic models: single sample per row (e.g., samples = list(c(42)))
   #   - For probabilistic models: multiple samples per row (e.g., 1000 samples)
@@ -242,12 +244,12 @@ Before writing any model logic, let’s see what the validation expects.
 Start with stub functions:
 
 ``` r
-train_fn <- function(training_data, model_configuration = list()) {
+train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   list(dummy = 1)
 }
 
 predict_fn <- function(historic_data, future_data, saved_model,
-                       model_configuration = list()) {
+                       model_configuration = list(), run_info = list()) {
   future_data
 }
 
@@ -268,7 +270,7 @@ for each location. Since all models must return a `samples` list-column,
 we wrap the single prediction value in a list:
 
 ``` r
-train_fn <- function(training_data, model_configuration = list()) {
+train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   means <- training_data |>
     as_tibble() |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
@@ -276,7 +278,7 @@ train_fn <- function(training_data, model_configuration = list()) {
 }
 
 predict_fn <- function(historic_data, future_data, saved_model,
-                       model_configuration = list()) {
+                       model_configuration = list(), run_info = list()) {
   future_data |>
     left_join(saved_model$means, by = "location") |>
     mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
@@ -330,7 +332,7 @@ Once validation passes, wrap your model in a CLI. Create a file called
 library(chap.r.sdk)
 library(dplyr)
 
-train_fn <- function(training_data, model_configuration = list()) {
+train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   means <- training_data |>
     as_tibble() |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
@@ -338,7 +340,7 @@ train_fn <- function(training_data, model_configuration = list()) {
 }
 
 predict_fn <- function(historic_data, future_data, saved_model,
-                       model_configuration = list()) {
+                       model_configuration = list(), run_info = list()) {
   future_data |>
     left_join(saved_model$means, by = "location") |>
     mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
@@ -356,10 +358,10 @@ Your model is now ready for command-line use:
 
 ``` bash
 # Train the model
-Rscript model.R train training_data.csv
+Rscript model.R train --data training_data.csv
 
 # Generate predictions
-Rscript model.R predict historic.csv future.csv model.rds
+Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
 
 # Display model info
 Rscript model.R info
@@ -379,7 +381,7 @@ instead of a single value:
 
 ``` r
 predict_fn <- function(historic_data, future_data, saved_model,
-                       model_configuration = list()) {
+                       model_configuration = list(), run_info = list()) {
   n_samples <- 1000
 
   future_data |>

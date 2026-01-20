@@ -7,7 +7,7 @@ training function, and saves the resulting model.
 ## Usage
 
 ``` r
-handle_train(train_fn, args, schema = NULL)
+handle_train(train_fn, opts, schema = NULL)
 ```
 
 ## Arguments
@@ -16,10 +16,9 @@ handle_train(train_fn, args, schema = NULL)
 
   User-provided training function
 
-- args:
+- opts:
 
-  Subcommand arguments (training_data path, optional config path,
-  optional –run-info)
+  Parsed options from optparse
 
 - schema:
 

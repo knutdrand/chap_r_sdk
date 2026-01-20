@@ -42,7 +42,7 @@ library(chap.r.sdk)
 library(dplyr)
 
 # Define training function - receives loaded tsibble, not file paths
-train_my_model <- function(training_data, model_configuration = list()) {
+train_my_model <- function(training_data, model_configuration = list(), run_info = list()) {
   means <- training_data |>
     group_by(location) |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE))
@@ -52,7 +52,7 @@ train_my_model <- function(training_data, model_configuration = list()) {
 
 # Define prediction function - all inputs already loaded
 predict_my_model <- function(historic_data, future_data, saved_model,
-                              model_configuration = list()) {
+                              model_configuration = list(), run_info = list()) {
   predictions <- future_data |>
     left_join(saved_model$means, by = "location") |>
     mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
@@ -73,10 +73,10 @@ Save the above code as `model.R`, then use from the command line:
 
 ``` bash
 # Train the model
-Rscript model.R train training_data.csv
+Rscript model.R train --data training_data.csv
 
 # Generate predictions
-Rscript model.R predict historic_data.csv future_data.csv model.rds
+Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
 
 # Display model information
 Rscript model.R info
@@ -89,9 +89,10 @@ Your model needs two functions:
 ### Training Function
 
 ``` r
-train_fn <- function(training_data, model_configuration = list()) {
+train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   # training_data: tsibble with time_period index, location key, disease_cases
   # model_configuration: optional list of parameters from config file
+  # run_info: runtime info from CHAP (prediction_length, additional_continuous_covariates, etc.)
   # Returns: model object (saved as RDS)
 }
 ```
@@ -100,10 +101,11 @@ train_fn <- function(training_data, model_configuration = list()) {
 
 ``` r
 predict_fn <- function(historic_data, future_data, saved_model,
-                       model_configuration = list()) {
+                       model_configuration = list(), run_info = list()) {
   # historic_data: tsibble with historical observations
   # future_data: tsibble with time periods to predict (no disease_cases)
   # saved_model: object returned by train_fn
+  # run_info: runtime info from CHAP
   # Returns: tibble with samples list-column
 }
 ```
@@ -172,7 +174,7 @@ tibble(
 
 ``` r
 # Via CLI - config passed automatically to your functions
-Rscript model.R train data.csv config.yaml
+Rscript model.R train --data data.csv --config config.yaml
 
 # Or read manually:
 config <- read_model_config("config.yaml")
