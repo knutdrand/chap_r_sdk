@@ -1,12 +1,12 @@
 # EWARS Model Example
 
-This directory contains a complete example of a CHAP-compatible EWARS (Early Warning and Response System) model that has been adapted to use the chap.r.sdk package.
+This directory contains a complete example of a Chap-compatible EWARS (Early Warning and Response System) model that has been adapted to use the chapr package.
 
 ## Overview
 
 The EWARS model is a spatio-temporal disease surveillance model that uses INLA (Integrated Nested Laplace Approximations) for Bayesian inference. This model demonstrates:
 
-1. How to adapt existing models to use the chap.r.sdk CLI infrastructure
+1. How to adapt existing models to use the chapr CLI infrastructure
 2. YAML-based configuration management
 3. Models that combine training and prediction in a single step
 4. Handling of spatio-temporal data with covariates
@@ -25,13 +25,13 @@ The EWARS model is a spatio-temporal disease surveillance model that uses INLA (
 - `predict.R` - Prediction script (trains and predicts)
 - `lib.R` - Helper functions for temporal offset calculations
 - `example_config.yaml` - Sample configuration file
-- `MIGRATION_TO_CHAP_SDK.md` - Detailed migration guide
+- `MIGRATION_TO_Chap_SDK.md` - Detailed migration guide
 
 ## Dependencies
 
 ```r
-# Core CHAP SDK
-library(chap.r.sdk)
+# Core Chap SDK
+library(chapr)
 
 # Statistical modeling
 library(INLA)
@@ -161,7 +161,7 @@ This model doesn't perform a separate training step because:
 
 ### CLI Wrapper Usage
 
-The model uses `create_train_cli()` and `create_predict_cli()` from chap.r.sdk:
+The model uses `create_train_cli()` and `create_predict_cli()` from chapr:
 
 ```r
 # In train.R
@@ -178,7 +178,7 @@ if (!interactive()) {
 This provides:
 - Automatic argument parsing
 - Consistent error handling
-- Standard CHAP interface
+- Standard Chap interface
 - Interactive mode detection
 
 ### Configuration Parsing
@@ -198,14 +198,14 @@ Benefits:
 
 ## Migration from Legacy Code
 
-See `MIGRATION_TO_CHAP_SDK.md` for detailed information about:
+See `MIGRATION_TO_Chap_SDK.md` for detailed information about:
 - Changes from the original implementation
 - Function signature updates
 - CLI interface changes
 - Testing procedures
 - Rollback plan
 
-## Key Differences from Traditional CHAP Models
+## Key Differences from Traditional Chap Models
 
 1. **Combined Train/Predict**: Unlike most models, this one does all work in predict step
 2. **No Separate Model File**: The model is trained fresh each time
@@ -225,7 +225,7 @@ To add new features:
 
 - INLA: [r-inla.org](https://www.r-inla.org/)
 - dlnm: [Distributed Lag Non-linear Models](https://cran.r-project.org/package=dlnm)
-- CHAP SDK: See main repository documentation
+- Chap SDK: See main repository documentation
 
 ## License
 

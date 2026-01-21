@@ -36,7 +36,7 @@ test_that("get_example_data converts sample predictions to nested format", {
   data <- get_example_data('laos', 'M')
 
   # Check if predictions have samples column (nested format)
-  format <- chap.r.sdk::detect_prediction_format(data$predictions)
+  format <- chapr::detect_prediction_format(data$predictions)
 
   # The example data may or may not have samples depending on the dataset
 

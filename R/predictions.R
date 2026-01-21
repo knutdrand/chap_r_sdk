@@ -2,7 +2,7 @@
 #'
 #' Functions for converting between different prediction sample formats.
 #' The SDK uses a nested list-column format internally for efficiency,
-#' with converters to/from wide (CHAP CSV), long (scoringutils), and
+#' with converters to/from wide (Chap CSV), long (scoringutils), and
 #' quantile formats.
 #'
 #' @name predictions
@@ -16,7 +16,7 @@ utils::globalVariables(c("samples", "sample_id", "quantile_values"))
 
 #' Convert Wide Format Predictions to Nested Format
 #'
-#' Converts predictions from CHAP wide CSV format (one column per sample)
+#' Converts predictions from Chap wide CSV format (one column per sample)
 #' to nested list-column format (one row per forecast unit with samples
 #' stored as a numeric vector in a list-column).
 #'
@@ -57,9 +57,9 @@ predictions_from_wide <- function(wide_df) {
   # Extract sample matrix
   sample_matrix <- as.matrix(wide_df[, sample_cols, drop = FALSE])
 
-  # Create nested tibble
+  # Create nested tibble (use .name_repair to suppress "New names" messages)
   result <- wide_df[, meta_cols, drop = FALSE]
-  result <- tibble::as_tibble(result)
+  result <- tibble::as_tibble(result, .name_repair = "minimal")
   result$samples <- lapply(seq_len(nrow(sample_matrix)), function(i) {
     as.numeric(sample_matrix[i, ])
   })
@@ -70,9 +70,9 @@ predictions_from_wide <- function(wide_df) {
 
 #' Convert Nested Format Predictions to Wide Format
 #'
-#' Converts predictions from nested list-column format to CHAP wide CSV
+#' Converts predictions from nested list-column format to Chap wide CSV
 #' format (one column per sample). This is the format expected by the
-#' CHAP platform.
+#' Chap platform.
 #'
 #' @param nested_df A tibble with a 'samples' list-column containing numeric
 #'   vectors of samples
@@ -84,7 +84,7 @@ predictions_from_wide <- function(wide_df) {
 #'
 #' @examples
 #' \dontrun{
-#' # Convert nested predictions to wide format for CHAP
+#' # Convert nested predictions to wide format for Chap
 #' wide_preds <- predictions_to_wide(nested_preds)
 #' write.csv(wide_preds, "predictions.csv", row.names = FALSE)
 #' }

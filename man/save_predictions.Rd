@@ -17,6 +17,6 @@ Path to the saved predictions file
 \description{
 Saves prediction results to a CSV file with a status message.
 Predictions must have a samples list-column which is automatically
-converted to wide format (sample_0, sample_1, ...) for CHAP compatibility.
+converted to wide format (sample_0, sample_1, ...) for Chap compatibility.
 }
 \keyword{internal}

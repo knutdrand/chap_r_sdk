@@ -2,7 +2,7 @@
 # Example script demonstrating get_example_data() function
 
 # Load the package (when installed)
-library(chap.r.sdk)
+library(chapr)
 
 # Get example data for Laos with monthly frequency
 data <- get_example_data('laos', 'M')

@@ -2,7 +2,7 @@
 % Please edit documentation in R/cli.R
 \name{create_chap_cli}
 \alias{create_chap_cli}
-\title{Create CHAP CLI}
+\title{Create Chap CLI}
 \usage{
 create_chap_cli(
   train_fn,
@@ -18,7 +18,7 @@ create_chap_cli(
 \item{train_fn}{Training function with signature:
 \code{function(training_data, model_configuration = list(), run_info = list())} where
 \code{training_data} is a tsibble, \code{model_configuration} is a list of user-defined
-configuration options, and \code{run_info} is a list containing CHAP-provided run
+configuration options, and \code{run_info} is a list containing Chap-provided run
 information (see Run Info section). Should return a model object that will be
 automatically saved as RDS.}
 
@@ -26,15 +26,15 @@ automatically saved as RDS.}
 \code{function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list())}
 where all data inputs are tsibbles, \code{saved_model} is a loaded object,
 \code{model_configuration} is a list of user-defined configuration options,
-and \code{run_info} is a list containing CHAP-provided run information.
+and \code{run_info} is a list containing Chap-provided run information.
 Must return a tibble with a \code{samples} list-column containing numeric vectors.
 For deterministic models, use a single sample per forecast unit
 (e.g., \code{samples = list(c(42))}). For probabilistic models, include multiple
 Monte Carlo samples. The CLI automatically converts the nested samples to wide
-CSV format (sample_0, sample_1, ...) for CHAP.
+CSV format (sample_0, sample_1, ...) for Chap.
 
 \strong{Important}: \code{historic_data} may contain more recent observations than
-the original training data. CHAP may call predict with updated data after the
+the original training data. Chap may call predict with updated data after the
 model was trained. For time series models, you should typically refit the model
 to \code{historic_data} before forecasting. Use \code{saved_model} to store model
 hyperparameters or structure that should persist across predictions, rather than
@@ -45,7 +45,7 @@ this pattern using \code{fable::refit()}.}
 Can be used with the "info" subcommand to display schema information.}
 
 \item{model_info}{Optional list describing the model's data requirements and capabilities.
-Used by CHAP to validate data before sending to the model and displayed via the "info"
+Used by Chap to validate data before sending to the model and displayed via the "info"
 subcommand. See Model Info section for details.}
 
 \item{default_config_path}{Default path to config file (default: "config.yml")}
@@ -58,7 +58,7 @@ subcommand. See Model Info section for details.}
 Invisible result of the called function
 }
 \description{
-Creates a command-line interface for CHAP-compatible models using optparse.
+Creates a command-line interface for Chap-compatible models using optparse.
 Uses named arguments (--data, --historic, --future, --output) for clear,
 explicit command-line usage. Config and model paths have sensible defaults
 but can be overridden.
@@ -74,7 +74,7 @@ which manages workspaces and file paths automatically.
 \item \code{--data}: Path to training data CSV (required)
 \item \code{--config}: Path to YAML config file (default: config.yml)
 \item \code{--model}: Path to save trained model (default: model.rds)
-\item \code{--run-info}: Path to run_info YAML/JSON file (optional, provided by CHAP)
+\item \code{--run-info}: Path to run_info YAML/JSON file (optional, provided by Chap)
 }
 }
 
@@ -88,7 +88,7 @@ which manages workspaces and file paths automatically.
 \item \code{--output}: Path to write predictions CSV (required)
 \item \code{--config}: Path to YAML config file (default: config.yml)
 \item \code{--model}: Path to load trained model (default: model.rds)
-\item \code{--run-info}: Path to run_info YAML/JSON file (optional, provided by CHAP)
+\item \code{--run-info}: Path to run_info YAML/JSON file (optional, provided by Chap)
 }
 }
 
@@ -116,23 +116,23 @@ Configure ShellModelRunner in chapkit:
 \section{Model Info}{
 
 The \code{model_info} parameter describes what data and configuration the model expects.
-This information is used by CHAP to validate inputs and displayed via the "info" subcommand.
+This information is used by Chap to validate inputs and displayed via the "info" subcommand.
 \describe{
 \item{period_type}{Character. The temporal resolution the model expects ("month", "week", "day").
-CHAP will ensure data is provided at this resolution.}
+Chap will ensure data is provided at this resolution.}
 \item{allows_additional_continuous_covariates}{Logical. If TRUE, the model can accept
-additional continuous covariates beyond those it specifically requires. CHAP will list
+additional continuous covariates beyond those it specifically requires. Chap will list
 these in \code{run_info$additional_continuous_covariates}.}
 \item{required_covariates}{Character vector. Names of columns that must be present in the
-data (e.g., \code{c("population", "rainfall")}). CHAP will validate these exist before
+data (e.g., \code{c("population", "rainfall")}). Chap will validate these exist before
 calling the model.}
 }
 }
 
 \section{Run Info}{
 
-The \code{run_info} parameter is provided by CHAP and passed to both train and predict
-functions. It contains runtime information about the current CHAP execution:
+The \code{run_info} parameter is provided by Chap and passed to both train and predict
+functions. It contains runtime information about the current Chap execution:
 \describe{
 \item{prediction_length}{Integer. The number of time periods the model is expected
 to forecast.}
@@ -150,7 +150,7 @@ YAML or JSON file. If not provided, a default run_info is constructed from the d
 
 \examples{
 \dontrun{
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 train_my_model <- function(training_data, model_configuration = list(),
@@ -194,7 +194,8 @@ if (!interactive()) {
 
 # Command line usage:
 # Rscript model.R train --data data.csv [--config config.yml] [--run-info run_info.yaml]
-# Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv [--config config.yml] [--run-info run_info.yaml]
+# Rscript model.R predict --historic historic.csv --future future.csv \
+#     --output predictions.csv [--config config.yml]
 # Rscript model.R info                    # Human-readable YAML output
 # Rscript model.R info --format json      # Machine-readable JSON for chapkit
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/environment.R
 \name{generate_dockerfile}
 \alias{generate_dockerfile}
-\title{Generate Dockerfile for CHAP model}
+\title{Generate Dockerfile for Chap model}
 \usage{
 generate_dockerfile(
   chapkit_version = NULL,

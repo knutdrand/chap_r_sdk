@@ -1,15 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# chap.r.sdk
+# chapr
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/dhis2-chap/chap_r_sdk/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dhis2-chap/chap_r_sdk/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The CHAP R SDK provides tools for building disease forecasting models
-compatible with the [CHAP platform](https://github.com/dhis2/chap-core).
+The Chap R SDK provides tools for building disease forecasting models
+compatible with the [Chap platform](https://github.com/dhis2/chap-core).
 
 ## Documentation
 
@@ -28,17 +28,17 @@ documentation](https://dhis2-chap.github.io/chap_r_sdk/)**
 
 ## What is this?
 
-The CHAP (Climate and Health Analytics Platform) enables health
-ministries to run disease forecasting models. This R SDK helps model
-developers create models that integrate seamlessly with CHAP.
+Chap (Climate Health Analytics Platform) enables health ministries to
+run disease forecasting models. This R SDK helps model developers create
+models that integrate seamlessly with Chap.
 
 ### Who is this for?
 
 - **Epidemiologists and researchers** who want to deploy their R models
-  on CHAP
+  on Chap
 - **Model developers** who need a standardized interface for
   train/predict workflows
-- **Teams** who want to share models with collaborators via CHAP
+- **Teams** who want to share models with collaborators via Chap
 
 ### Key Features
 
@@ -48,15 +48,15 @@ developers create models that integrate seamlessly with CHAP.
   formatting
 - **Configuration schemas**: YAML/JSON config with validation and
   defaults
-- **Model validation**: Test suite to verify CHAP compatibility before
+- **Model validation**: Test suite to verify Chap compatibility before
   deployment
 
 ## Quick Example
 
-A complete CHAP-compatible model in one file:
+A complete Chap-compatible model in one file:
 
 ``` r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
@@ -106,11 +106,16 @@ cd examples/fable_model
 Rscript -e 'renv::restore()'
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and
+guidelines.
+
 ## Getting Help
 
 - **Documentation**:
   [dhis2-chap.github.io/chap_r_sdk](https://dhis2-chap.github.io/chap_r_sdk/)
 - **Issues**: [GitHub
   Issues](https://github.com/dhis2-chap/chap_r_sdk/issues)
-- **CHAP Platform**:
+- **Chap Platform**:
   [github.com/dhis2/chap-core](https://github.com/dhis2/chap-core)

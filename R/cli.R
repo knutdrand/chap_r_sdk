@@ -1,6 +1,6 @@
-#' Create CHAP CLI
+#' Create Chap CLI
 #'
-#' Creates a command-line interface for CHAP-compatible models using optparse.
+#' Creates a command-line interface for Chap-compatible models using optparse.
 #' Uses named arguments (--data, --historic, --future, --output) for clear,
 #' explicit command-line usage. Config and model paths have sensible defaults
 #' but can be overridden.
@@ -11,22 +11,22 @@
 #' @param train_fn Training function with signature:
 #'   \code{function(training_data, model_configuration = list(), run_info = list())} where
 #'   \code{training_data} is a tsibble, \code{model_configuration} is a list of user-defined
-#'   configuration options, and \code{run_info} is a list containing CHAP-provided run
+#'   configuration options, and \code{run_info} is a list containing Chap-provided run
 #'   information (see Run Info section). Should return a model object that will be
 #'   automatically saved as RDS.
 #' @param predict_fn Prediction function with signature:
 #'   \code{function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list())}
 #'   where all data inputs are tsibbles, \code{saved_model} is a loaded object,
 #'   \code{model_configuration} is a list of user-defined configuration options,
-#'   and \code{run_info} is a list containing CHAP-provided run information.
+#'   and \code{run_info} is a list containing Chap-provided run information.
 #'   Must return a tibble with a \code{samples} list-column containing numeric vectors.
 #'   For deterministic models, use a single sample per forecast unit
 #'   (e.g., \code{samples = list(c(42))}). For probabilistic models, include multiple
 #'   Monte Carlo samples. The CLI automatically converts the nested samples to wide
-#'   CSV format (sample_0, sample_1, ...) for CHAP.
+#'   CSV format (sample_0, sample_1, ...) for Chap.
 #'
 #'   **Important**: \code{historic_data} may contain more recent observations than
-#'   the original training data. CHAP may call predict with updated data after the
+#'   the original training data. Chap may call predict with updated data after the
 #'   model was trained. For time series models, you should typically refit the model
 #'   to \code{historic_data} before forecasting. Use \code{saved_model} to store model
 #'   hyperparameters or structure that should persist across predictions, rather than
@@ -35,7 +35,7 @@
 #' @param model_config_schema Optional model configuration schema (reserved for future use).
 #'   Can be used with the "info" subcommand to display schema information.
 #' @param model_info Optional list describing the model's data requirements and capabilities.
-#'   Used by CHAP to validate data before sending to the model and displayed via the "info"
+#'   Used by Chap to validate data before sending to the model and displayed via the "info"
 #'   subcommand. See Model Info section for details.
 #' @param default_config_path Default path to config file (default: "config.yml")
 #' @param default_model_path Default path to model file (default: "model.rds")
@@ -43,21 +43,21 @@
 #'
 #' @section Model Info:
 #' The \code{model_info} parameter describes what data and configuration the model expects.
-#' This information is used by CHAP to validate inputs and displayed via the "info" subcommand.
+#' This information is used by Chap to validate inputs and displayed via the "info" subcommand.
 #' \describe{
 #'   \item{period_type}{Character. The temporal resolution the model expects ("month", "week", "day").
-#'     CHAP will ensure data is provided at this resolution.}
+#'     Chap will ensure data is provided at this resolution.}
 #'   \item{allows_additional_continuous_covariates}{Logical. If TRUE, the model can accept
-#'     additional continuous covariates beyond those it specifically requires. CHAP will list
+#'     additional continuous covariates beyond those it specifically requires. Chap will list
 #'     these in \code{run_info$additional_continuous_covariates}.}
 #'   \item{required_covariates}{Character vector. Names of columns that must be present in the
-#'     data (e.g., \code{c("population", "rainfall")}). CHAP will validate these exist before
+#'     data (e.g., \code{c("population", "rainfall")}). Chap will validate these exist before
 #'     calling the model.}
 #' }
 #'
 #' @section Run Info:
-#' The \code{run_info} parameter is provided by CHAP and passed to both train and predict
-#' functions. It contains runtime information about the current CHAP execution:
+#' The \code{run_info} parameter is provided by Chap and passed to both train and predict
+#' functions. It contains runtime information about the current Chap execution:
 #' \describe{
 #'   \item{prediction_length}{Integer. The number of time periods the model is expected
 #'     to forecast.}
@@ -83,7 +83,7 @@
 #' - `--data`: Path to training data CSV (required)
 #' - `--config`: Path to YAML config file (default: config.yml)
 #' - `--model`: Path to save trained model (default: model.rds)
-#' - `--run-info`: Path to run_info YAML/JSON file (optional, provided by CHAP)
+#' - `--run-info`: Path to run_info YAML/JSON file (optional, provided by Chap)
 #'
 #' ## Prediction Command
 #' ```
@@ -94,7 +94,7 @@
 #' - `--output`: Path to write predictions CSV (required)
 #' - `--config`: Path to YAML config file (default: config.yml)
 #' - `--model`: Path to load trained model (default: model.rds)
-#' - `--run-info`: Path to run_info YAML/JSON file (optional, provided by CHAP)
+#' - `--run-info`: Path to run_info YAML/JSON file (optional, provided by Chap)
 #'
 #' ## Info Command
 #' ```
@@ -114,7 +114,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(chap.r.sdk)
+#' library(chapr)
 #' library(dplyr)
 #'
 #' train_my_model <- function(training_data, model_configuration = list(),
@@ -158,7 +158,8 @@
 #'
 #' # Command line usage:
 #' # Rscript model.R train --data data.csv [--config config.yml] [--run-info run_info.yaml]
-#' # Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv [--config config.yml] [--run-info run_info.yaml]
+#' # Rscript model.R predict --historic historic.csv --future future.csv \
+#' #     --output predictions.csv [--config config.yml]
 #' # Rscript model.R info                    # Human-readable YAML output
 #' # Rscript model.R info --format json      # Machine-readable JSON for chapkit
 #' }
@@ -245,7 +246,7 @@ make_train_parser <- function(default_config_path = "config.yml",
         type = "character",
         default = NULL,
         dest = "run_info",
-        help = "Path to run_info YAML/JSON file (optional, provided by CHAP)"
+        help = "Path to run_info YAML/JSON file (optional, provided by Chap)"
       )
     )
   )
@@ -298,7 +299,7 @@ make_predict_parser <- function(default_config_path = "config.yml",
         type = "character",
         default = NULL,
         dest = "run_info",
-        help = "Path to run_info YAML/JSON file (optional, provided by CHAP)"
+        help = "Path to run_info YAML/JSON file (optional, provided by Chap)"
       )
     )
   )
@@ -565,7 +566,7 @@ build_info_json <- function(model_config_schema, model_info = NULL) {
 #' Load run_info from file or build default
 #'
 #' Loads run_info from a YAML/JSON file if provided, otherwise builds a default
-#' run_info from the data. This is used when CHAP doesn't provide run_info
+#' run_info from the data. This is used when Chap doesn't provide run_info
 #' (e.g., during local testing).
 #'
 #' @param run_info_path Path to run_info YAML/JSON file, or NULL
@@ -611,13 +612,13 @@ load_run_info <- function(run_info_path, training_data = NULL, future_data = NUL
 #' Build default run_info object from data
 #'
 #' Constructs a default run_info list by inferring values from the loaded data.
-#' This is used as a fallback when CHAP doesn't provide a run_info file
+#' This is used as a fallback when Chap doesn't provide a run_info file
 #' (e.g., during local development or testing).
 #'
-#' In production, CHAP provides run_info directly via a file. This function
+#' In production, Chap provides run_info directly via a file. This function
 #' is primarily used for:
 #' \itemize{
-#'   \item Local testing without CHAP
+#'   \item Local testing without Chap
 #'   \item Model validation via \code{validate_model_io()}
 #'   \item Backwards compatibility
 #' }

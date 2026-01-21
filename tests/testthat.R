@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(chap.r.sdk)
+library(chapr)
 
-test_check("chap.r.sdk")
+test_check("chapr")

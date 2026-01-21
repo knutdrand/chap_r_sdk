@@ -13,7 +13,7 @@ library(jsonlite)
 library(INLA)
 library(dlnm)
 library(dplyr)
-library(chap.r.sdk)
+library(chapr)
 library(purrr)
 source("lib.R")
 
@@ -35,7 +35,7 @@ parse_model_configuration <- function(file_path) {
     ))
   }
 
-  # Use chap.r.sdk config reading function
+  # Use chapr config reading function
   config <- read_model_config(file_path, validate = FALSE)
 
   # Ensure fields exist and provide defaults if missing
@@ -196,7 +196,7 @@ predict_chap <- function(historic_data, future_data, saved_model, model_configur
   return(preds_fn)
 }
 
-# Use chap.r.sdk CLI wrapper
+# Use chapr CLI wrapper
 if (!interactive()) {
   create_predict_cli(predict_chap)
 }

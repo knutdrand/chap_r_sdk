@@ -13,7 +13,7 @@ cd examples/arima_model
 Rscript -e 'renv::restore()'
 ```
 
-This installs all required packages (fable, distributional, lubridate, tsibble, dplyr, chap.r.sdk) from the `renv.lock` file.
+This installs all required packages (fable, distributional, lubridate, tsibble, dplyr, chapr) from the `renv.lock` file.
 
 ### Dependencies
 
@@ -23,7 +23,7 @@ All dependencies are tracked in `renv.lock`:
 - `lubridate` - For `yearmonth()` time period handling
 - `tsibble` - Tidy time series data structures
 - `dplyr` - Data manipulation
-- `chap.r.sdk` - CHAP SDK for CLI and utilities
+- `chapr` - Chap SDK for CLI and utilities
 
 ## Usage
 
@@ -68,7 +68,7 @@ The MLproject file specifies:
 
 ## Key Concept: Refitting to Historic Data
 
-When CHAP calls the predict function, `historic_data` may contain **more recent observations** than the original `training_data`. For time series models like ARIMA, this means the model should be **refit** to the historic data before forecasting.
+When Chap calls the predict function, `historic_data` may contain **more recent observations** than the original `training_data`. For time series models like ARIMA, this means the model should be **refit** to the historic data before forecasting.
 
 The workflow in `predict_arima()` is:
 
@@ -130,7 +130,7 @@ These options are also exposed in the MLproject `user_options` section.
 
 Consider this scenario:
 1. Model trained on data from Jan 2020 - Dec 2022
-2. CHAP calls predict in June 2024 with `historic_data` from Jan 2020 - May 2024
+2. Chap calls predict in June 2024 with `historic_data` from Jan 2020 - May 2024
 3. Without refitting: Model uses 2022 state to forecast from 2024 (18-month gap!)
 4. With refitting: Model updates to May 2024 state before forecasting
 

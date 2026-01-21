@@ -1,6 +1,6 @@
 #' CLI Utility Functions
 #'
-#' Internal utility functions for the unified CHAP CLI infrastructure.
+#' Internal utility functions for the unified Chap CLI infrastructure.
 #' These functions handle file I/O, data parsing, and format conversion
 #' automatically so model developers can focus on business logic.
 #'
@@ -203,14 +203,14 @@ save_model <- function(model, output_path = "model.rds") {
 #'
 #' Saves prediction results to a CSV file with a status message.
 #' Predictions must have a samples list-column which is automatically
-#' converted to wide format (sample_0, sample_1, ...) for CHAP compatibility.
+#' converted to wide format (sample_0, sample_1, ...) for Chap compatibility.
 #'
 #' @param predictions Predictions tibble with samples list-column
 #' @param output_path Path for output CSV file
 #' @return Path to the saved predictions file
 #' @keywords internal
 save_predictions <- function(predictions, output_path) {
-  # Convert nested samples to wide format for CHAP CSV output
+  # Convert nested samples to wide format for Chap CSV output
   predictions <- predictions_to_wide(predictions)
 
   # Convert time_period to ISO format if it's a yearmonth/yearweek/yearquarter
@@ -225,7 +225,7 @@ save_predictions <- function(predictions, output_path) {
     }
   }
 
-  # Sort by location and time_period to ensure consistent ordering for CHAP
+  # Sort by location and time_period to ensure consistent ordering for Chap
   if (all(c("location", "time_period") %in% colnames(predictions))) {
     predictions <- dplyr::arrange(predictions, .data$location, .data$time_period)
   }
@@ -257,5 +257,5 @@ load_predictions <- function(file_path, convert_samples = TRUE) {
     }
   }
 
-  tibble::as_tibble(df)
+  tibble::as_tibble(df, .name_repair = "minimal")
 }

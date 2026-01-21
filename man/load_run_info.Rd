@@ -18,7 +18,7 @@ A list containing run_info fields
 }
 \description{
 Loads run_info from a YAML/JSON file if provided, otherwise builds a default
-run_info from the data. This is used when CHAP doesn't provide run_info
+run_info from the data. This is used when Chap doesn't provide run_info
 (e.g., during local testing).
 }
 \keyword{internal}

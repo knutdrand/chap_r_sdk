@@ -24,3 +24,4 @@
 ^PLAN\.md$
 ^runs$
 ^target$
+^model_config\.yaml$

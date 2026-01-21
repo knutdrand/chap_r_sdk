@@ -1,12 +1,13 @@
-Package: chap.r.sdk
-Title: Chap SDK for R
+Package: chapr
+Title: Chap R SDK for Building Disease Forecasting Models
 Version: 0.1.0
 Authors@R:
     person("Knut", "Rand", , "knutdrand@gmail.com", role = c("aut", "cre"))
-Description: Provides convenience functionality for developing chap-compatible
-    models and integrating existing models with chap. Includes utilities for
-    creating command line interfaces, model validation, spatio-temporal data
-    transformations, and configuration schema management.
+Description: Provides convenience functionality for developing Chap-compatible
+    models and integrating existing models with the Chap (Climate Health
+    Analytics Platform) system. Includes utilities for creating command line
+    interfaces, model validation, spatio-temporal data transformations, and
+    configuration schema management.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en-US
