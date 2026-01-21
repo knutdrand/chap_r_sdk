@@ -233,7 +233,7 @@ First, set up renv for reproducible dependencies:
 
 ```r
 renv::init()
-renv::install("knutdrand/chap_r_sdk")
+renv::install("dhis2-chap/chap_r_sdk")
 renv::snapshot()
 ```
 

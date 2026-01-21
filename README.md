@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/knutdrand/chap_r_sdk/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/knutdrand/chap_r_sdk/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/dhis2-chap/chap_r_sdk/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dhis2-chap/chap_r_sdk/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The CHAP R SDK provides tools for building disease forecasting models
@@ -14,16 +14,16 @@ compatible with the [CHAP platform](https://github.com/dhis2/chap-core).
 ## Documentation
 
 **[Read the full
-documentation](https://knutdrand.github.io/chap_r_sdk/)**
+documentation](https://dhis2-chap.github.io/chap_r_sdk/)**
 
 - [Getting
-  Started](https://knutdrand.github.io/chap_r_sdk/articles/getting-started.html) -
+  Started](https://dhis2-chap.github.io/chap_r_sdk/articles/getting-started.html) -
   Installation and quick start guide
 - [Building Your First
-  Model](https://knutdrand.github.io/chap_r_sdk/articles/model-development-tutorial.html) -
+  Model](https://dhis2-chap.github.io/chap_r_sdk/articles/model-development-tutorial.html) -
   Step-by-step tutorial
 - [Function
-  Reference](https://knutdrand.github.io/chap_r_sdk/reference/index.html) -
+  Reference](https://dhis2-chap.github.io/chap_r_sdk/reference/index.html) -
   API documentation
 
 ## What is this?
@@ -93,7 +93,7 @@ Install from GitHub:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("knutdrand/chap_r_sdk")
+remotes::install_github("dhis2-chap/chap_r_sdk")
 ```
 
 ## Development Setup
@@ -125,8 +125,8 @@ Rscript -e 'renv::restore()'
 ## Getting Help
 
 - **Documentation**:
-  [knutdrand.github.io/chap_r_sdk](https://knutdrand.github.io/chap_r_sdk/)
+  [dhis2-chap.github.io/chap_r_sdk](https://dhis2-chap.github.io/chap_r_sdk/)
 - **Issues**: [GitHub
-  Issues](https://github.com/knutdrand/chap_r_sdk/issues)
+  Issues](https://github.com/dhis2-chap/chap_r_sdk/issues)
 - **CHAP Platform**:
   [github.com/dhis2/chap-core](https://github.com/dhis2/chap-core)

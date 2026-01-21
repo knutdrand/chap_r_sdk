@@ -11,9 +11,9 @@ Provides convenience functionality for developing chap-compatible models and int
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://knutdrand.github.io/chap_r_sdk/}
-  \item \url{https://github.com/knutdrand/chap_r_sdk}
-  \item Report bugs at \url{https://github.com/knutdrand/chap_r_sdk/issues}
+  \item \url{https://dhis2-chap.github.io/chap_r_sdk/}
+  \item \url{https://github.com/dhis2-chap/chap_r_sdk}
+  \item Report bugs at \url{https://github.com/dhis2-chap/chap_r_sdk/issues}
 }
 
 }

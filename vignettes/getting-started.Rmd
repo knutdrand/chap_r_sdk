@@ -20,7 +20,7 @@ Install the development version from GitHub:
 
 ```{r eval=FALSE}
 # install.packages("remotes")
-remotes::install_github("knutdrand/chap_r_sdk")
+remotes::install_github("dhis2-chap/chap_r_sdk")
 ```
 
 Load the package:
@@ -230,5 +230,5 @@ create_chap_cli(train_fn, predict_fn, model_config_schema = config_schema)
 
 ## Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/knutdrand/chap_r_sdk/issues)
+- **Issues**: [GitHub Issues](https://github.com/dhis2-chap/chap_r_sdk/issues)
 - **CHAP Platform**: [github.com/dhis2/chap-core](https://github.com/dhis2/chap-core)

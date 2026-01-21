@@ -267,7 +267,7 @@
       "Maintainer": "Knut Rand <knutdrand@gmail.com>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteUsername": "knutdrand",
+      "RemoteUsername": "dhis2-chap",
       "RemoteRepo": "chap_r_sdk",
       "RemoteRef": "main",
       "RemoteSha": "8c745bca10cd7abcd3444ea1b8548233265e3925"
