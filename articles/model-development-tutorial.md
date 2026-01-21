@@ -378,7 +378,7 @@ The CLI automatically handles:
 
 To run your model with chap-core, you need an MLproject file. The SDK
 can generate this automatically using
-[`generate_mlproject()`](https://knutdrand.github.io/chap_r_sdk/reference/generate_mlproject.md).
+[`generate_mlproject()`](https://dhis2-chap.github.io/chap_r_sdk/reference/generate_mlproject.md).
 
 ### Prerequisites
 
@@ -386,7 +386,7 @@ First, set up renv for reproducible dependencies:
 
 ``` r
 renv::init()
-renv::install("knutdrand/chap_r_sdk")
+renv::install("dhis2-chap/chap_r_sdk")
 renv::snapshot()
 ```
 
@@ -560,7 +560,7 @@ print(my_schema)
 ### Using the Schema with CLI
 
 Pass the schema to
-[`create_chap_cli()`](https://knutdrand.github.io/chap_r_sdk/reference/create_chap_cli.md)
+[`create_chap_cli()`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_chap_cli.md)
 to enable automatic validation:
 
 ``` r
@@ -616,14 +616,14 @@ full_config$method         # Default applied
 
 ### Available Schema Types
 
-| Function                                                                                 | Description            | Key Options                                      |
-|------------------------------------------------------------------------------------------|------------------------|--------------------------------------------------|
-| [`schema_integer()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_integer.md) | Integer values         | `minimum`, `maximum`, `default`                  |
-| [`schema_number()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_number.md)   | Numeric (float) values | `minimum`, `maximum`, `default`                  |
-| [`schema_string()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_string.md)   | String values          | `min_length`, `max_length`, `pattern`, `default` |
-| [`schema_boolean()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_boolean.md) | TRUE/FALSE values      | `default`                                        |
-| [`schema_enum()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_enum.md)       | One of fixed choices   | `values` (required), `default`                   |
-| [`schema_array()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_array.md)     | Arrays/lists           | `items`, `min_items`, `max_items`, `default`     |
+| Function                                                                                  | Description            | Key Options                                      |
+|-------------------------------------------------------------------------------------------|------------------------|--------------------------------------------------|
+| [`schema_integer()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_integer.md) | Integer values         | `minimum`, `maximum`, `default`                  |
+| [`schema_number()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_number.md)   | Numeric (float) values | `minimum`, `maximum`, `default`                  |
+| [`schema_string()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_string.md)   | String values          | `min_length`, `max_length`, `pattern`, `default` |
+| [`schema_boolean()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_boolean.md) | TRUE/FALSE values      | `default`                                        |
+| [`schema_enum()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_enum.md)       | One of fixed choices   | `values` (required), `default`                   |
+| [`schema_array()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_array.md)     | Arrays/lists           | `items`, `min_items`, `max_items`, `default`     |
 
 ### Adding Config Schema to MLproject
 
@@ -680,16 +680,16 @@ options to users and pass them to your model via a config file.
 The development workflow is:
 
 1.  **Explore** example data with
-    [`get_example_data()`](https://knutdrand.github.io/chap_r_sdk/reference/get_example_data.md)
+    [`get_example_data()`](https://dhis2-chap.github.io/chap_r_sdk/reference/get_example_data.md)
 2.  **Validate** with stubs using
-    [`validate_model_io()`](https://knutdrand.github.io/chap_r_sdk/reference/validate_model_io.md)
+    [`validate_model_io()`](https://dhis2-chap.github.io/chap_r_sdk/reference/validate_model_io.md)
     to understand requirements
 3.  **Implement** your train and predict functions
 4.  **Validate** the implementation
 5.  **Test** against all datasets with
-    [`validate_model_io_all()`](https://knutdrand.github.io/chap_r_sdk/reference/validate_model_io_all.md)
+    [`validate_model_io_all()`](https://dhis2-chap.github.io/chap_r_sdk/reference/validate_model_io_all.md)
 6.  **Deploy** with
-    [`create_chap_cli()`](https://knutdrand.github.io/chap_r_sdk/reference/create_chap_cli.md)
+    [`create_chap_cli()`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_chap_cli.md)
 
 ## Next Steps
 
@@ -698,8 +698,8 @@ The development workflow is:
 - See `examples/arima_model/` for a complete example with renv and
   MLproject integration
 - Read about MLproject generation in
-  [`?generate_mlproject`](https://knutdrand.github.io/chap_r_sdk/reference/generate_mlproject.md)
+  [`?generate_mlproject`](https://dhis2-chap.github.io/chap_r_sdk/reference/generate_mlproject.md)
 - Read about configuration schemas in
-  [`?create_config_schema`](https://knutdrand.github.io/chap_r_sdk/reference/create_config_schema.md)
+  [`?create_config_schema`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_config_schema.md)
 - Explore spatial-temporal utilities in
-  [`?aggregate_temporal`](https://knutdrand.github.io/chap_r_sdk/reference/aggregate_temporal.md)
+  [`?aggregate_temporal`](https://dhis2-chap.github.io/chap_r_sdk/reference/aggregate_temporal.md)

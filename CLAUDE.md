@@ -81,9 +81,9 @@ Rscript -e 'renv::restore()'
 
 The SDK provides functions for Docker + renv workflows:
 
-- [`init_chap_env()`](https://knutdrand.github.io/chap_r_sdk/reference/init_chap_env.md) -
+- [`init_chap_env()`](https://dhis2-chap.github.io/chap_r_sdk/reference/init_chap_env.md) -
   Initialize renv for a new model
-- [`generate_dockerfile()`](https://knutdrand.github.io/chap_r_sdk/reference/generate_dockerfile.md) -
+- [`generate_dockerfile()`](https://dhis2-chap.github.io/chap_r_sdk/reference/generate_dockerfile.md) -
   Auto-generate Dockerfile from renv.lock
 
 See `examples/mean_model_docker/README.md` for details.
@@ -154,9 +154,9 @@ A complex working example is available in `examples/ewars_model/`. This
 demonstrates:
 
 - YAML configuration parsing with
-  [`read_model_config()`](https://knutdrand.github.io/chap_r_sdk/reference/read_model_config.md)
+  [`read_model_config()`](https://dhis2-chap.github.io/chap_r_sdk/reference/read_model_config.md)
 - Safe parameter extraction with
-  [`get_config_param()`](https://knutdrand.github.io/chap_r_sdk/reference/get_config_param.md)
+  [`get_config_param()`](https://dhis2-chap.github.io/chap_r_sdk/reference/get_config_param.md)
 - Models that combine training and prediction in a single step
 - Handling spatio-temporal data with covariates
 

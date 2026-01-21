@@ -6,7 +6,7 @@ document provides guidelines and instructions for contributing.
 ## Code of Conduct
 
 Please read and follow our [Code of
-Conduct](https://knutdrand.github.io/chap_r_sdk/CODE_OF_CONDUCT.md).
+Conduct](https://dhis2-chap.github.io/chap_r_sdk/CODE_OF_CONDUCT.md).
 
 ## How to Contribute
 
@@ -51,7 +51,7 @@ Feature suggestions are welcome! Please open an issue with:
 
 ``` r
 # Clone the repository
-git clone https://github.com/knutdrand/chap_r_sdk.git
+git clone https://github.com/dhis2-chap/chap_r_sdk.git
 cd chap_r_sdk
 
 # Install development dependencies

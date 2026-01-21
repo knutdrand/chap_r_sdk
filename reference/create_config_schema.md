@@ -29,13 +29,13 @@ create_config_schema(
 - properties:
 
   Named list of property definitions created with
-  [`schema_integer()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_integer.md),
-  [`schema_number()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_number.md),
-  [`schema_string()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_string.md),
-  [`schema_boolean()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_boolean.md),
-  [`schema_enum()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_enum.md),
+  [`schema_integer()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_integer.md),
+  [`schema_number()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_number.md),
+  [`schema_string()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_string.md),
+  [`schema_boolean()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_boolean.md),
+  [`schema_enum()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_enum.md),
   or
-  [`schema_array()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_array.md)
+  [`schema_array()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_array.md)
 
 - required:
 

@@ -9,11 +9,11 @@ transformations, and configuration schema management.
 
 Useful links:
 
-- <https://knutdrand.github.io/chap_r_sdk/>
+- <https://dhis2-chap.github.io/chap_r_sdk/>
 
-- <https://github.com/knutdrand/chap_r_sdk>
+- <https://github.com/dhis2-chap/chap_r_sdk>
 
-- Report bugs at <https://github.com/knutdrand/chap_r_sdk/issues>
+- Report bugs at <https://github.com/dhis2-chap/chap_r_sdk/issues>
 
 ## Author
 

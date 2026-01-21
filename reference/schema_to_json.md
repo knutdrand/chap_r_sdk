@@ -13,7 +13,7 @@ schema_to_json(schema, pretty = TRUE)
 - schema:
 
   Schema created with
-  [`create_config_schema()`](https://knutdrand.github.io/chap_r_sdk/reference/create_config_schema.md)
+  [`create_config_schema()`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_config_schema.md)
 
 - pretty:
 

@@ -64,12 +64,12 @@ create_config_schema <- function(
 
 **Key features:** - R-native syntax for defining properties - Helper
 functions for common types:
-[`schema_integer()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_integer.md),
-[`schema_number()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_number.md),
-[`schema_string()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_string.md),
-[`schema_boolean()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_boolean.md),
-[`schema_array()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_array.md),
-[`schema_enum()`](https://knutdrand.github.io/chap_r_sdk/reference/schema_enum.md) -
+[`schema_integer()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_integer.md),
+[`schema_number()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_number.md),
+[`schema_string()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_string.md),
+[`schema_boolean()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_boolean.md),
+[`schema_array()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_array.md),
+[`schema_enum()`](https://dhis2-chap.github.io/chap_r_sdk/reference/schema_enum.md) -
 Automatic conversion to JSON Schema format - Support for property
 descriptions and default values
 
@@ -78,9 +78,9 @@ descriptions and default values
 ### Step 4: Integrate validation into CLI handlers
 
 Update
-[`load_config()`](https://knutdrand.github.io/chap_r_sdk/reference/load_config.md)
+[`load_config()`](https://dhis2-chap.github.io/chap_r_sdk/reference/load_config.md)
 or add a new
-[`load_and_validate_config()`](https://knutdrand.github.io/chap_r_sdk/reference/load_and_validate_config.md)
+[`load_and_validate_config()`](https://dhis2-chap.github.io/chap_r_sdk/reference/load_and_validate_config.md)
 function that: 1. Loads the YAML config file 2. Validates against the
 model’s schema (if provided) 3. Applies default values from schema 4.
 Returns validated config or throws error
@@ -89,7 +89,7 @@ Update CLI handlers to use schema validation when `model_config_schema`
 is provided.
 
 **Files to modify:** - `R/cli_utils.R` (add
-[`load_and_validate_config()`](https://knutdrand.github.io/chap_r_sdk/reference/load_and_validate_config.md)) -
+[`load_and_validate_config()`](https://dhis2-chap.github.io/chap_r_sdk/reference/load_and_validate_config.md)) -
 `R/cli.R` (update handlers to use validation)
 
 ### Step 5: Add default value application

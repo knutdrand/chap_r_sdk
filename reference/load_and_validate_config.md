@@ -19,7 +19,7 @@ load_and_validate_config(config_path, schema = NULL)
 - schema:
 
   JSON Schema to validate against (from
-  [`create_config_schema()`](https://knutdrand.github.io/chap_r_sdk/reference/create_config_schema.md)).
+  [`create_config_schema()`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_config_schema.md)).
   If NULL, no validation is performed and no defaults are applied.
 
 ## Value

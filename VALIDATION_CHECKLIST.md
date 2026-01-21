@@ -99,25 +99,25 @@ validation)
 **Pattern**: Unified CLI with automatic file I/O handling
 
 **Key Components**: - ✅
-[`create_chap_cli()`](https://knutdrand.github.io/chap_r_sdk/reference/create_chap_cli.md) -
+[`create_chap_cli()`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_chap_cli.md) -
 Main unified CLI function (R/cli.R:178) - ✅
-[`handle_train()`](https://knutdrand.github.io/chap_r_sdk/reference/handle_train.md) -
+[`handle_train()`](https://dhis2-chap.github.io/chap_r_sdk/reference/handle_train.md) -
 Train subcommand handler (R/cli.R:221) - ✅
-[`handle_predict()`](https://knutdrand.github.io/chap_r_sdk/reference/handle_predict.md) -
+[`handle_predict()`](https://dhis2-chap.github.io/chap_r_sdk/reference/handle_predict.md) -
 Predict subcommand handler (R/cli.R:272) - ✅
-[`handle_info()`](https://knutdrand.github.io/chap_r_sdk/reference/handle_info.md) -
+[`handle_info()`](https://dhis2-chap.github.io/chap_r_sdk/reference/handle_info.md) -
 Info subcommand handler (R/cli.R:336) - ✅
-[`load_tsibble()`](https://knutdrand.github.io/chap_r_sdk/reference/load_tsibble.md) -
+[`load_tsibble()`](https://dhis2-chap.github.io/chap_r_sdk/reference/load_tsibble.md) -
 Auto CSV loading with tsibble conversion (R/cli_utils.R:18) - ✅
-[`detect_time_column()`](https://knutdrand.github.io/chap_r_sdk/reference/detect_time_column.md) -
+[`detect_time_column()`](https://dhis2-chap.github.io/chap_r_sdk/reference/detect_time_column.md) -
 Auto time column detection (R/cli_utils.R:41) - ✅
-[`detect_key_columns()`](https://knutdrand.github.io/chap_r_sdk/reference/detect_key_columns.md) -
+[`detect_key_columns()`](https://dhis2-chap.github.io/chap_r_sdk/reference/detect_key_columns.md) -
 Auto spatial key detection (R/cli_utils.R:61) - ✅
-[`load_config()`](https://knutdrand.github.io/chap_r_sdk/reference/load_config.md) -
+[`load_config()`](https://dhis2-chap.github.io/chap_r_sdk/reference/load_config.md) -
 YAML config loading (R/cli_utils.R:82) - ✅
-[`save_model()`](https://knutdrand.github.io/chap_r_sdk/reference/save_model.md) -
+[`save_model()`](https://dhis2-chap.github.io/chap_r_sdk/reference/save_model.md) -
 Model serialization (R/cli_utils.R:95) - ✅
-[`save_predictions()`](https://knutdrand.github.io/chap_r_sdk/reference/save_predictions.md) -
+[`save_predictions()`](https://dhis2-chap.github.io/chap_r_sdk/reference/save_predictions.md) -
 Prediction output (R/cli_utils.R:107)
 
 ### ✅ Deprecation Strategy

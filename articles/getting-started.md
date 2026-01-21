@@ -6,7 +6,7 @@ Install the development version from GitHub:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("knutdrand/chap_r_sdk")
+remotes::install_github("dhis2-chap/chap_r_sdk")
 ```
 
 Load the package:
@@ -34,7 +34,7 @@ This SDK simplifies model development by handling:
 ## Quick Start
 
 The recommended pattern uses
-[`create_chap_cli()`](https://knutdrand.github.io/chap_r_sdk/reference/create_chap_cli.md)
+[`create_chap_cli()`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_chap_cli.md)
 to create a complete command-line interface:
 
 ``` r
@@ -219,18 +219,18 @@ create_chap_cli(train_fn, predict_fn, model_config_schema = config_schema)
 ## Next Steps
 
 - **[Building Your First CHAP
-  Model](https://knutdrand.github.io/chap_r_sdk/articles/model-development-tutorial.md)**:
+  Model](https://dhis2-chap.github.io/chap_r_sdk/articles/model-development-tutorial.md)**:
   Step-by-step tutorial with validation
 - **[Working with Spatio-Temporal
-  Data](https://knutdrand.github.io/chap_r_sdk/articles/spatio-temporal-data.md)**:
+  Data](https://dhis2-chap.github.io/chap_r_sdk/articles/spatio-temporal-data.md)**:
   Utilities for aggregation and transformation
 - **[Function
-  Reference](https://knutdrand.github.io/chap_r_sdk/reference/index.md)**:
+  Reference](https://dhis2-chap.github.io/chap_r_sdk/reference/index.md)**:
   Complete API documentation
 
 ## Getting Help
 
 - **Issues**: [GitHub
-  Issues](https://github.com/knutdrand/chap_r_sdk/issues)
+  Issues](https://github.com/dhis2-chap/chap_r_sdk/issues)
 - **CHAP Platform**:
   [github.com/dhis2/chap-core](https://github.com/dhis2/chap-core)

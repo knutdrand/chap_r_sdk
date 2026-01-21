@@ -41,6 +41,6 @@ is primarily used for:
 - Local testing without CHAP
 
 - Model validation via
-  [`validate_model_io()`](https://knutdrand.github.io/chap_r_sdk/reference/validate_model_io.md)
+  [`validate_model_io()`](https://dhis2-chap.github.io/chap_r_sdk/reference/validate_model_io.md)
 
 - Backwards compatibility
