@@ -30,20 +30,20 @@ training_data <- data$training_data
 
 # Examine the structure
 training_data
-#> # A tsibble: 1,057 x 13 [1M]
+#> # A tsibble: 1,057 x 12 [1M]
 #> # Key:       location [7]
-#>     ...1 time_period rainfall mean_temperature disease_cases population parent
-#>    <dbl>       <mth>    <dbl>            <dbl>         <dbl>      <dbl> <chr> 
-#>  1     0    2000 Jul   430.               23.4             0     58503. -     
-#>  2     1    2000 Aug   322.               23.8             0     58503. -     
-#>  3     2    2000 Sep   265.               22.7             0     58503. -     
-#>  4     3    2000 Oct   103.               22.6             0     58503. -     
-#>  5     4    2000 Nov    19.7              20.3             0     58503. -     
-#>  6     5    2000 Dec    26.0              19.1             0     58503. -     
-#>  7     6    2001 Jan    17.6              19.8             0     60157. -     
-#>  8     7    2001 Feb     7.28             22.0             0     60157. -     
-#>  9     8    2001 Mar   123.               22.6             0     60157. -     
-#> 10     9    2001 Apr    29.6              27.5             0     60157. -     
+#>    time_period rainfall mean_temperature disease_cases population parent
+#>          <mth>    <dbl>            <dbl>         <dbl>      <dbl> <chr> 
+#>  1    2000 Jul   430.               23.4             0     58503. -     
+#>  2    2000 Aug   322.               23.8             0     58503. -     
+#>  3    2000 Sep   265.               22.7             0     58503. -     
+#>  4    2000 Oct   103.               22.6             0     58503. -     
+#>  5    2000 Nov    19.7              20.3             0     58503. -     
+#>  6    2000 Dec    26.0              19.1             0     58503. -     
+#>  7    2001 Jan    17.6              19.8             0     60157. -     
+#>  8    2001 Feb     7.28             22.0             0     60157. -     
+#>  9    2001 Mar   123.               22.6             0     60157. -     
+#> 10    2001 Apr    29.6              27.5             0     60157. -     
 #> # ℹ 1,047 more rows
 #> # ℹ 6 more variables: location <chr>, Cases <dbl>, E <dbl>, month <dbl>,
 #> #   ID_year <dbl>, ID_spat <chr>

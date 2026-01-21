@@ -62,12 +62,9 @@ monthly data:
 
 ``` r
 data <- get_example_data('laos', 'M')
-#> New names:
-#> Registered S3 method overwritten by 'tsibble': method from as_tibble.grouped_df
-#> dplyr
-#> New names:
-#> New names:
-#> • `` -> `...1`
+#> Registered S3 method overwritten by 'tsibble':
+#>   method               from 
+#>   as_tibble.grouped_df dplyr
 names(data)
 #> [1] "training_data" "historic_data" "future_data"   "predictions"
 ```
@@ -79,20 +76,20 @@ index and `location` as the key:
 
 ``` r
 data$training_data
-#> # A tsibble: 1,057 x 13 [1M]
+#> # A tsibble: 1,057 x 12 [1M]
 #> # Key:       location [7]
-#>     ...1 time_period rainfall mean_temperature disease_cases population parent
-#>    <dbl>       <mth>    <dbl>            <dbl>         <dbl>      <dbl> <chr> 
-#>  1     0    2000 Jul   430.               23.4             0     58503. -     
-#>  2     1    2000 Aug   322.               23.8             0     58503. -     
-#>  3     2    2000 Sep   265.               22.7             0     58503. -     
-#>  4     3    2000 Oct   103.               22.6             0     58503. -     
-#>  5     4    2000 Nov    19.7              20.3             0     58503. -     
-#>  6     5    2000 Dec    26.0              19.1             0     58503. -     
-#>  7     6    2001 Jan    17.6              19.8             0     60157. -     
-#>  8     7    2001 Feb     7.28             22.0             0     60157. -     
-#>  9     8    2001 Mar   123.               22.6             0     60157. -     
-#> 10     9    2001 Apr    29.6              27.5             0     60157. -     
+#>    time_period rainfall mean_temperature disease_cases population parent
+#>          <mth>    <dbl>            <dbl>         <dbl>      <dbl> <chr> 
+#>  1    2000 Jul   430.               23.4             0     58503. -     
+#>  2    2000 Aug   322.               23.8             0     58503. -     
+#>  3    2000 Sep   265.               22.7             0     58503. -     
+#>  4    2000 Oct   103.               22.6             0     58503. -     
+#>  5    2000 Nov    19.7              20.3             0     58503. -     
+#>  6    2000 Dec    26.0              19.1             0     58503. -     
+#>  7    2001 Jan    17.6              19.8             0     60157. -     
+#>  8    2001 Feb     7.28             22.0             0     60157. -     
+#>  9    2001 Mar   123.               22.6             0     60157. -     
+#> 10    2001 Apr    29.6              27.5             0     60157. -     
 #> # ℹ 1,047 more rows
 #> # ℹ 6 more variables: location <chr>, Cases <dbl>, E <dbl>, month <dbl>,
 #> #   ID_year <dbl>, ID_spat <chr>
@@ -102,20 +99,20 @@ data$training_data
 
 ``` r
 data$historic_data
-#> # A tsibble: 1,071 x 13 [1M]
+#> # A tsibble: 1,071 x 12 [1M]
 #> # Key:       location [7]
-#>     ...1 time_period rainfall mean_temperature disease_cases population parent
-#>    <dbl>       <mth>    <dbl>            <dbl>         <dbl>      <dbl> <chr> 
-#>  1     0    2000 Jul   430.               23.4             0     58503. -     
-#>  2     1    2000 Aug   322.               23.8             0     58503. -     
-#>  3     2    2000 Sep   265.               22.7             0     58503. -     
-#>  4     3    2000 Oct   103.               22.6             0     58503. -     
-#>  5     4    2000 Nov    19.7              20.3             0     58503. -     
-#>  6     5    2000 Dec    26.0              19.1             0     58503. -     
-#>  7     6    2001 Jan    17.6              19.8             0     60157. -     
-#>  8     7    2001 Feb     7.28             22.0             0     60157. -     
-#>  9     8    2001 Mar   123.               22.6             0     60157. -     
-#> 10     9    2001 Apr    29.6              27.5             0     60157. -     
+#>    time_period rainfall mean_temperature disease_cases population parent
+#>          <mth>    <dbl>            <dbl>         <dbl>      <dbl> <chr> 
+#>  1    2000 Jul   430.               23.4             0     58503. -     
+#>  2    2000 Aug   322.               23.8             0     58503. -     
+#>  3    2000 Sep   265.               22.7             0     58503. -     
+#>  4    2000 Oct   103.               22.6             0     58503. -     
+#>  5    2000 Nov    19.7              20.3             0     58503. -     
+#>  6    2000 Dec    26.0              19.1             0     58503. -     
+#>  7    2001 Jan    17.6              19.8             0     60157. -     
+#>  8    2001 Feb     7.28             22.0             0     60157. -     
+#>  9    2001 Mar   123.               22.6             0     60157. -     
+#> 10    2001 Apr    29.6              27.5             0     60157. -     
 #> # ℹ 1,061 more rows
 #> # ℹ 6 more variables: location <chr>, Cases <dbl>, E <dbl>, month <dbl>,
 #> #   ID_year <dbl>, ID_spat <chr>
@@ -146,22 +143,22 @@ this pattern.
 
 ``` r
 data$future_data
-#> # A tsibble: 21 x 11 [1M]
+#> # A tsibble: 21 x 10 [1M]
 #> # Key:       location [7]
-#>     ...1 time_period rainfall mean_temperature population parent location      E
-#>    <dbl>       <mth>    <dbl>            <dbl>      <dbl> <chr>  <chr>     <dbl>
-#>  1     0    2013 Apr     39.5             26.8     80014. -      Bokeo    8.00e4
-#>  2     1    2013 May    170.              25.8     80014. -      Bokeo    8.00e4
-#>  3     2    2013 Jun    231.              24.7     80014. -      Bokeo    8.00e4
-#>  4     0    2013 Apr    152.              27.2    731598. -      Champas… 7.32e5
-#>  5     1    2013 May    236.              26.3    731598. -      Champas… 7.32e5
-#>  6     2    2013 Jun    327.              25.1    731598. -      Champas… 7.32e5
-#>  7     0    2013 Apr     58.8             25.1    124396. -      LouangN… 1.24e5
-#>  8     1    2013 May    162.              24.7    124396. -      LouangN… 1.24e5
-#>  9     2    2013 Jun    184.              24.0    124396. -      LouangN… 1.24e5
-#> 10     0    2013 Apr     72.5             25.0    282683. -      Oudomxai 2.83e5
+#>    time_period rainfall mean_temperature population parent location      E month
+#>          <mth>    <dbl>            <dbl>      <dbl> <chr>  <chr>     <dbl> <dbl>
+#>  1    2013 Apr     39.5             26.8     80014. -      Bokeo    8.00e4     4
+#>  2    2013 May    170.              25.8     80014. -      Bokeo    8.00e4     5
+#>  3    2013 Jun    231.              24.7     80014. -      Bokeo    8.00e4     6
+#>  4    2013 Apr    152.              27.2    731598. -      Champas… 7.32e5     4
+#>  5    2013 May    236.              26.3    731598. -      Champas… 7.32e5     5
+#>  6    2013 Jun    327.              25.1    731598. -      Champas… 7.32e5     6
+#>  7    2013 Apr     58.8             25.1    124396. -      LouangN… 1.24e5     4
+#>  8    2013 May    162.              24.7    124396. -      LouangN… 1.24e5     5
+#>  9    2013 Jun    184.              24.0    124396. -      LouangN… 1.24e5     6
+#> 10    2013 Apr     72.5             25.0    282683. -      Oudomxai 2.83e5     4
 #> # ℹ 11 more rows
-#> # ℹ 3 more variables: month <dbl>, ID_year <dbl>, ID_spat <chr>
+#> # ℹ 2 more variables: ID_year <dbl>, ID_spat <chr>
 ```
 
 **Example predictions** - what your model should output:
@@ -313,10 +310,6 @@ The SDK can validate against all available example datasets:
 
 ``` r
 result <- validate_model_io_all(train_fn, predict_fn)
-#> New names:
-#> New names:
-#> New names:
-#> • `` -> `...1`
 result$success
 #> [1] TRUE
 names(result$results)

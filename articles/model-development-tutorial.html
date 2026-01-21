@@ -123,12 +123,9 @@ works correctly before deploying it.</p>
 monthly data:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">'laos'</span>, <span class="st">'M'</span><span class="op">)</span></span>
-<span><span class="co">#&gt; New names:</span></span>
-<span><span class="co">#&gt; Registered S3 method overwritten by 'tsibble': method from as_tibble.grouped_df</span></span>
-<span><span class="co">#&gt; dplyr</span></span>
-<span><span class="co">#&gt; New names:</span></span>
-<span><span class="co">#&gt; New names:</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `` -&gt; `...1`</span></span>
+<span><span class="co">#&gt; Registered S3 method overwritten by 'tsibble':</span></span>
+<span><span class="co">#&gt;   method               from </span></span>
+<span><span class="co">#&gt;   as_tibble.grouped_df dplyr</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "training_data" "historic_data" "future_data"   "predictions"</span></span></code></pre></div>
 <p>The example data contains four tsibbles. Each has
@@ -137,20 +134,20 @@ key:</p>
 <p><strong>Training data</strong> - what your model learns from:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">training_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tsibble: 1,057 x 13 [1M]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tsibble: 1,057 x 12 [1M]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Key:       location [7]</span></span></span>
-<span><span class="co">#&gt;     ...1 time_period rainfall mean_temperature disease_cases population parent</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;mth&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0    2000 Jul   430.               23.4             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1    2000 Aug   322.               23.8             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     2    2000 Sep   265.               22.7             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     3    2000 Oct   103.               22.6             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     4    2000 Nov    19.7              20.3             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     5    2000 Dec    26.0              19.1             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     6    2001 Jan    17.6              19.8             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     7    2001 Feb     7.28             22.0             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     8    2001 Mar   123.               22.6             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     9    2001 Apr    29.6              27.5             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
+<span><span class="co">#&gt;    time_period rainfall mean_temperature disease_cases population parent</span></span>
+<span><span class="co">#&gt;          <span style="color: #949494; font-style: italic;">&lt;mth&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>    2000 Jul   430.               23.4             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>    2000 Aug   322.               23.8             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>    2000 Sep   265.               22.7             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>    2000 Oct   103.               22.6             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>    2000 Nov    19.7              20.3             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>    2000 Dec    26.0              19.1             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>    2001 Jan    17.6              19.8             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>    2001 Feb     7.28             22.0             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    2001 Mar   123.               22.6             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    2001 Apr    29.6              27.5             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,047 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: location &lt;chr&gt;, Cases &lt;dbl&gt;, E &lt;dbl&gt;, month &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   ID_year &lt;dbl&gt;, ID_spat &lt;chr&gt;</span></span></span></code></pre></div>
@@ -158,20 +155,20 @@ key:</p>
 time:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">historic_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tsibble: 1,071 x 13 [1M]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tsibble: 1,071 x 12 [1M]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Key:       location [7]</span></span></span>
-<span><span class="co">#&gt;     ...1 time_period rainfall mean_temperature disease_cases population parent</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;mth&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0    2000 Jul   430.               23.4             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1    2000 Aug   322.               23.8             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     2    2000 Sep   265.               22.7             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     3    2000 Oct   103.               22.6             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     4    2000 Nov    19.7              20.3             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     5    2000 Dec    26.0              19.1             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     6    2001 Jan    17.6              19.8             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     7    2001 Feb     7.28             22.0             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     8    2001 Mar   123.               22.6             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     9    2001 Apr    29.6              27.5             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
+<span><span class="co">#&gt;    time_period rainfall mean_temperature disease_cases population parent</span></span>
+<span><span class="co">#&gt;          <span style="color: #949494; font-style: italic;">&lt;mth&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>    2000 Jul   430.               23.4             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>    2000 Aug   322.               23.8             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>    2000 Sep   265.               22.7             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>    2000 Oct   103.               22.6             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>    2000 Nov    19.7              20.3             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>    2000 Dec    26.0              19.1             0     <span style="text-decoration: underline;">58</span>503. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>    2001 Jan    17.6              19.8             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>    2001 Feb     7.28             22.0             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    2001 Mar   123.               22.6             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    2001 Apr    29.6              27.5             0     <span style="text-decoration: underline;">60</span>157. -     </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,061 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: location &lt;chr&gt;, Cases &lt;dbl&gt;, E &lt;dbl&gt;, month &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   ID_year &lt;dbl&gt;, ID_spat &lt;chr&gt;</span></span></span></code></pre></div>
@@ -198,22 +195,22 @@ of this pattern.</p>
 <code>disease_cases</code>):</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">future_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tsibble: 21 x 11 [1M]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tsibble: 21 x 10 [1M]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Key:       location [7]</span></span></span>
-<span><span class="co">#&gt;     ...1 time_period rainfall mean_temperature population parent location      E</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;mth&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0    2013 Apr     39.5             26.8     <span style="text-decoration: underline;">80</span>014. -      Bokeo    8.00<span style="color: #949494;">e</span>4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1    2013 May    170.              25.8     <span style="text-decoration: underline;">80</span>014. -      Bokeo    8.00<span style="color: #949494;">e</span>4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     2    2013 Jun    231.              24.7     <span style="text-decoration: underline;">80</span>014. -      Bokeo    8.00<span style="color: #949494;">e</span>4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     0    2013 Apr    152.              27.2    <span style="text-decoration: underline;">731</span>598. -      Champas… 7.32<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1    2013 May    236.              26.3    <span style="text-decoration: underline;">731</span>598. -      Champas… 7.32<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     2    2013 Jun    327.              25.1    <span style="text-decoration: underline;">731</span>598. -      Champas… 7.32<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     0    2013 Apr     58.8             25.1    <span style="text-decoration: underline;">124</span>396. -      LouangN… 1.24<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1    2013 May    162.              24.7    <span style="text-decoration: underline;">124</span>396. -      LouangN… 1.24<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     2    2013 Jun    184.              24.0    <span style="text-decoration: underline;">124</span>396. -      LouangN… 1.24<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     0    2013 Apr     72.5             25.0    <span style="text-decoration: underline;">282</span>683. -      Oudomxai 2.83<span style="color: #949494;">e</span>5</span></span>
+<span><span class="co">#&gt;    time_period rainfall mean_temperature population parent location      E month</span></span>
+<span><span class="co">#&gt;          <span style="color: #949494; font-style: italic;">&lt;mth&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>    2013 Apr     39.5             26.8     <span style="text-decoration: underline;">80</span>014. -      Bokeo    8.00<span style="color: #949494;">e</span>4     4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>    2013 May    170.              25.8     <span style="text-decoration: underline;">80</span>014. -      Bokeo    8.00<span style="color: #949494;">e</span>4     5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>    2013 Jun    231.              24.7     <span style="text-decoration: underline;">80</span>014. -      Bokeo    8.00<span style="color: #949494;">e</span>4     6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>    2013 Apr    152.              27.2    <span style="text-decoration: underline;">731</span>598. -      Champas… 7.32<span style="color: #949494;">e</span>5     4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>    2013 May    236.              26.3    <span style="text-decoration: underline;">731</span>598. -      Champas… 7.32<span style="color: #949494;">e</span>5     5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>    2013 Jun    327.              25.1    <span style="text-decoration: underline;">731</span>598. -      Champas… 7.32<span style="color: #949494;">e</span>5     6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>    2013 Apr     58.8             25.1    <span style="text-decoration: underline;">124</span>396. -      LouangN… 1.24<span style="color: #949494;">e</span>5     4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>    2013 May    162.              24.7    <span style="text-decoration: underline;">124</span>396. -      LouangN… 1.24<span style="color: #949494;">e</span>5     5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    2013 Jun    184.              24.0    <span style="text-decoration: underline;">124</span>396. -      LouangN… 1.24<span style="color: #949494;">e</span>5     6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    2013 Apr     72.5             25.0    <span style="text-decoration: underline;">282</span>683. -      Oudomxai 2.83<span style="color: #949494;">e</span>5     4</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: month &lt;dbl&gt;, ID_year &lt;dbl&gt;, ID_spat &lt;chr&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: ID_year &lt;dbl&gt;, ID_spat &lt;chr&gt;</span></span></span></code></pre></div>
 <p><strong>Example predictions</strong> - what your model should
 output:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -350,10 +347,6 @@ preserve tsibble structure.</p>
 <p>The SDK can validate against all available example datasets:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_model_io_all.html">validate_model_io_all</a></span><span class="op">(</span><span class="va">train_fn</span>, <span class="va">predict_fn</span><span class="op">)</span></span>
-<span><span class="co">#&gt; New names:</span></span>
-<span><span class="co">#&gt; New names:</span></span>
-<span><span class="co">#&gt; New names:</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `` -&gt; `...1`</span></span>
 <span><span class="va">result</span><span class="op">$</span><span class="va">success</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
