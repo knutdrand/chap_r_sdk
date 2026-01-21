@@ -12,8 +12,8 @@ Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-URL: https://knutdrand.github.io/chap_r_sdk/, https://github.com/knutdrand/chap_r_sdk
-BugReports: https://github.com/knutdrand/chap_r_sdk/issues
+URL: https://dhis2-chap.github.io/chap_r_sdk/, https://github.com/dhis2-chap/chap_r_sdk
+BugReports: https://github.com/dhis2-chap/chap_r_sdk/issues
 Imports:
     dplyr,
     jsonlite,

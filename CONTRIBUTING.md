@@ -48,7 +48,7 @@ Feature suggestions are welcome! Please open an issue with:
 
 ```r
 # Clone the repository
-git clone https://github.com/knutdrand/chap_r_sdk.git
+git clone https://github.com/dhis2-chap/chap_r_sdk.git
 cd chap_r_sdk
 
 # Install development dependencies
