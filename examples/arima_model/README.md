@@ -53,12 +53,29 @@ Rscript model.R info --format json  # Machine-readable output
 
 This example includes an `MLproject` file for direct integration with chap-core:
 
+**Basic evaluation:**
 ```bash
-# From the chap-core CLI
 chap evaluate --model-name ./examples/arima_model --dataset-csv data.csv
+```
 
-# Or run via mlflow
-mlflow run ./examples/arima_model -e train -P train_data=data.csv -P model=model.rds
+**Advanced evaluation with backtesting:**
+```bash
+chap evaluate2 \
+    ./examples/arima_model \
+    dataset.csv \
+    output.nc \
+    3 3 1 \
+    true true '' timestamp false
+```
+
+The arguments for `evaluate2` are:
+- Model path, dataset, output file
+- `3 3 1` - predict 3 periods ahead, 3 backtest splits, stride of 1
+- `true true '' timestamp false` - ignore env, debug mode, no log file, timestamp dir, not chapkit
+
+**Export evaluation metrics:**
+```bash
+chap export-metrics --input-files output.nc --output-file metrics.csv
 ```
 
 The MLproject file specifies:
