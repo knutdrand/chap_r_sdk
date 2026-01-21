@@ -14,7 +14,7 @@ leverage the excellent tidyverse ecosystem.
 | **cubble**     | Spatio-temporal data wrangling       | `install.packages("cubble")`     |
 
 ``` r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 library(tidyr)
 library(tsibble)

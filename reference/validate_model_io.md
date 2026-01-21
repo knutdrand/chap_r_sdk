@@ -70,11 +70,11 @@ The following checks are performed on predictions:
 
 - Row count must match the number of rows in `future_data`
 
-- Predictions must not contain NaN values (CHAP contract requirement)
+- Predictions must not contain NaN values (Chap contract requirement)
 
 - Predictions must not contain NA values
 
-- Predictions must be non-negative (CHAP contract requirement)
+- Predictions must be non-negative (Chap contract requirement)
 
 ## Examples
 

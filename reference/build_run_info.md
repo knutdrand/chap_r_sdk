@@ -1,7 +1,7 @@
 # Build default run_info object from data
 
 Constructs a default run_info list by inferring values from the loaded
-data. This is used as a fallback when CHAP doesn't provide a run_info
+data. This is used as a fallback when Chap doesn't provide a run_info
 file (e.g., during local development or testing).
 
 ## Usage
@@ -35,10 +35,10 @@ A list containing:
 
 ## Details
 
-In production, CHAP provides run_info directly via a file. This function
+In production, Chap provides run_info directly via a file. This function
 is primarily used for:
 
-- Local testing without CHAP
+- Local testing without Chap
 
 - Model validation via
   [`validate_model_io()`](https://dhis2-chap.github.io/chap_r_sdk/reference/validate_model_io.md)

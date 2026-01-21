@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>CHAP R SDK • chap.r.sdk</title>
+<title>Chap R SDK • chapr</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="CHAP R SDK">
-<meta name="description" content="Tools for building CHAP-compatible disease forecasting models">
-<meta property="og:description" content="Tools for building CHAP-compatible disease forecasting models">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Chap R SDK">
+<meta name="description" content="Tools for building Chap-compatible disease forecasting models">
+<meta property="og:description" content="Tools for building Chap-compatible disease forecasting models">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="index.html">chap.r.sdk</a>
+    <a class="navbar-brand me-2" href="index.html">chapr</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
@@ -55,11 +55,11 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="chaprsdk">chap.r.sdk<a class="anchor" aria-label="anchor" href="#chaprsdk"></a>
+<div class="page-header"><h1 id="chapr">chapr<a class="anchor" aria-label="anchor" href="#chapr"></a>
 </h1></div>
 <!-- badges: start -->
 
-<p>The CHAP R SDK provides tools for building disease forecasting models compatible with the <a href="https://github.com/dhis2/chap-core" class="external-link">CHAP platform</a>.</p>
+<p>The Chap R SDK provides tools for building disease forecasting models compatible with the <a href="https://github.com/dhis2/chap-core" class="external-link">Chap platform</a>.</p>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
@@ -76,17 +76,17 @@
 <div class="section level2">
 <h2 id="what-is-this">What is this?<a class="anchor" aria-label="anchor" href="#what-is-this"></a>
 </h2>
-<p>The CHAP (Climate and Health Analytics Platform) enables health ministries to run disease forecasting models. This R SDK helps model developers create models that integrate seamlessly with CHAP.</p>
+<p>Chap (Climate Health Analytics Platform) enables health ministries to run disease forecasting models. This R SDK helps model developers create models that integrate seamlessly with Chap.</p>
 <div class="section level3">
 <h3 id="who-is-this-for">Who is this for?<a class="anchor" aria-label="anchor" href="#who-is-this-for"></a>
 </h3>
 <ul>
 <li>
-<strong>Epidemiologists and researchers</strong> who want to deploy their R models on CHAP</li>
+<strong>Epidemiologists and researchers</strong> who want to deploy their R models on Chap</li>
 <li>
 <strong>Model developers</strong> who need a standardized interface for train/predict workflows</li>
 <li>
-<strong>Teams</strong> who want to share models with collaborators via CHAP</li>
+<strong>Teams</strong> who want to share models with collaborators via Chap</li>
 </ul>
 </div>
 <div class="section level3">
@@ -100,16 +100,16 @@
 <li>
 <strong>Configuration schemas</strong>: YAML/JSON config with validation and defaults</li>
 <li>
-<strong>Model validation</strong>: Test suite to verify CHAP compatibility before deployment</li>
+<strong>Model validation</strong>: Test suite to verify Chap compatibility before deployment</li>
 </ul>
 </div>
 </div>
 <div class="section level2">
 <h2 id="quick-example">Quick Example<a class="anchor" aria-label="anchor" href="#quick-example"></a>
 </h2>
-<p>A complete CHAP-compatible model in one file:</p>
+<p>A complete Chap-compatible model in one file:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chap.r.sdk</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chapr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -151,6 +151,11 @@
 </div>
 </div>
 <div class="section level2">
+<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h2>
+<p>See <a href="CONTRIBUTING.html">CONTRIBUTING.md</a> for development setup and guidelines.</p>
+</div>
+<div class="section level2">
 <h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
 <ul>
@@ -161,7 +166,7 @@
 <strong>Issues</strong>: <a href="https://github.com/dhis2-chap/chap_r_sdk/issues" class="external-link">GitHub Issues</a>
 </li>
 <li>
-<strong>CHAP Platform</strong>: <a href="https://github.com/dhis2/chap-core" class="external-link">github.com/dhis2/chap-core</a>
+<strong>Chap Platform</strong>: <a href="https://github.com/dhis2/chap-core" class="external-link">github.com/dhis2/chap-core</a>
 </li>
 </ul>
 </div>
@@ -194,7 +199,7 @@
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing chap.r.sdk</a></li>
+<li><a href="authors.html#citation">Citing chapr</a></li>
 </ul>
 </div>
 

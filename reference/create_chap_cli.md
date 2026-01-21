@@ -1,6 +1,6 @@
-# Create CHAP CLI
+# Create Chap CLI
 
-Creates a command-line interface for CHAP-compatible models using
+Creates a command-line interface for Chap-compatible models using
 optparse. Uses named arguments (–data, –historic, –future, –output) for
 clear, explicit command-line usage. Config and model paths have sensible
 defaults but can be overridden.
@@ -27,7 +27,7 @@ create_chap_cli(
   `function(training_data, model_configuration = list(), run_info = list())`
   where `training_data` is a tsibble, `model_configuration` is a list of
   user-defined configuration options, and `run_info` is a list
-  containing CHAP-provided run information (see Run Info section).
+  containing Chap-provided run information (see Run Info section).
   Should return a model object that will be automatically saved as RDS.
 
 - predict_fn:
@@ -36,16 +36,16 @@ create_chap_cli(
   `function(historic_data, future_data, saved_model, model_configuration = list(), run_info = list())`
   where all data inputs are tsibbles, `saved_model` is a loaded object,
   `model_configuration` is a list of user-defined configuration options,
-  and `run_info` is a list containing CHAP-provided run information.
+  and `run_info` is a list containing Chap-provided run information.
   Must return a tibble with a `samples` list-column containing numeric
   vectors. For deterministic models, use a single sample per forecast
   unit (e.g., `samples = list(c(42))`). For probabilistic models,
   include multiple Monte Carlo samples. The CLI automatically converts
   the nested samples to wide CSV format (sample_0, sample_1, ...) for
-  CHAP.
+  Chap.
 
   **Important**: `historic_data` may contain more recent observations
-  than the original training data. CHAP may call predict with updated
+  than the original training data. Chap may call predict with updated
   data after the model was trained. For time series models, you should
   typically refit the model to `historic_data` before forecasting. Use
   `saved_model` to store model hyperparameters or structure that should
@@ -61,7 +61,7 @@ create_chap_cli(
 - model_info:
 
   Optional list describing the model's data requirements and
-  capabilities. Used by CHAP to validate data before sending to the
+  capabilities. Used by Chap to validate data before sending to the
   model and displayed via the "info" subcommand. See Model Info section
   for details.
 
@@ -98,7 +98,7 @@ framework, which manages workspaces and file paths automatically.
 - `--model`: Path to save trained model (default: model.rds)
 
 - `--run-info`: Path to run_info YAML/JSON file (optional, provided by
-  CHAP)
+  Chap)
 
 ### Prediction Command
 
@@ -115,7 +115,7 @@ framework, which manages workspaces and file paths automatically.
 - `--model`: Path to load trained model (default: model.rds)
 
 - `--run-info`: Path to run_info YAML/JSON file (optional, provided by
-  CHAP)
+  Chap)
 
 ### Info Command
 
@@ -136,31 +136,31 @@ Configure ShellModelRunner in chapkit:
 ## Model Info
 
 The `model_info` parameter describes what data and configuration the
-model expects. This information is used by CHAP to validate inputs and
+model expects. This information is used by Chap to validate inputs and
 displayed via the "info" subcommand.
 
 - period_type:
 
   Character. The temporal resolution the model expects ("month", "week",
-  "day"). CHAP will ensure data is provided at this resolution.
+  "day"). Chap will ensure data is provided at this resolution.
 
 - allows_additional_continuous_covariates:
 
   Logical. If TRUE, the model can accept additional continuous
-  covariates beyond those it specifically requires. CHAP will list these
+  covariates beyond those it specifically requires. Chap will list these
   in `run_info$additional_continuous_covariates`.
 
 - required_covariates:
 
   Character vector. Names of columns that must be present in the data
-  (e.g., `c("population", "rainfall")`). CHAP will validate these exist
+  (e.g., `c("population", "rainfall")`). Chap will validate these exist
   before calling the model.
 
 ## Run Info
 
-The `run_info` parameter is provided by CHAP and passed to both train
+The `run_info` parameter is provided by Chap and passed to both train
 and predict functions. It contains runtime information about the current
-CHAP execution:
+Chap execution:
 
 - prediction_length:
 
@@ -186,7 +186,7 @@ constructed from the data.
 
 ``` r
 if (FALSE) { # \dontrun{
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 train_my_model <- function(training_data, model_configuration = list(),
@@ -230,7 +230,8 @@ if (!interactive()) {
 
 # Command line usage:
 # Rscript model.R train --data data.csv [--config config.yml] [--run-info run_info.yaml]
-# Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv [--config config.yml] [--run-info run_info.yaml]
+# Rscript model.R predict --historic historic.csv --future future.csv \
+#     --output predictions.csv [--config config.yml]
 # Rscript model.R info                    # Human-readable YAML output
 # Rscript model.R info --format json      # Machine-readable JSON for chapkit
 } # }

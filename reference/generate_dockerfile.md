@@ -1,4 +1,4 @@
-# Generate Dockerfile for CHAP model
+# Generate Dockerfile for Chap model
 
 Creates a Dockerfile that builds a container with R, renv packages,
 Python, and chapkit. The generated image can run the complete service.

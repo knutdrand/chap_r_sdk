@@ -1,7 +1,7 @@
-# chap.r.sdk
+# chapr
 
-The CHAP R SDK provides tools for building disease forecasting models
-compatible with the [CHAP platform](https://github.com/dhis2/chap-core).
+The Chap R SDK provides tools for building disease forecasting models
+compatible with the [Chap platform](https://github.com/dhis2/chap-core).
 
 ## Documentation
 
@@ -20,17 +20,17 @@ documentation](https://dhis2-chap.github.io/chap_r_sdk/)**
 
 ## What is this?
 
-The CHAP (Climate and Health Analytics Platform) enables health
-ministries to run disease forecasting models. This R SDK helps model
-developers create models that integrate seamlessly with CHAP.
+Chap (Climate Health Analytics Platform) enables health ministries to
+run disease forecasting models. This R SDK helps model developers create
+models that integrate seamlessly with Chap.
 
 ### Who is this for?
 
 - **Epidemiologists and researchers** who want to deploy their R models
-  on CHAP
+  on Chap
 - **Model developers** who need a standardized interface for
   train/predict workflows
-- **Teams** who want to share models with collaborators via CHAP
+- **Teams** who want to share models with collaborators via Chap
 
 ### Key Features
 
@@ -40,15 +40,15 @@ developers create models that integrate seamlessly with CHAP.
   formatting
 - **Configuration schemas**: YAML/JSON config with validation and
   defaults
-- **Model validation**: Test suite to verify CHAP compatibility before
+- **Model validation**: Test suite to verify Chap compatibility before
   deployment
 
 ## Quick Example
 
-A complete CHAP-compatible model in one file:
+A complete Chap-compatible model in one file:
 
 ``` r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
@@ -98,13 +98,19 @@ cd examples/fable_model
 Rscript -e 'renv::restore()'
 ```
 
+## Contributing
+
+See
+[CONTRIBUTING.md](https://dhis2-chap.github.io/chap_r_sdk/CONTRIBUTING.md)
+for development setup and guidelines.
+
 ## Getting Help
 
 - **Documentation**:
   [dhis2-chap.github.io/chap_r_sdk](https://dhis2-chap.github.io/chap_r_sdk/)
 - **Issues**: [GitHub
   Issues](https://github.com/dhis2-chap/chap_r_sdk/issues)
-- **CHAP Platform**:
+- **Chap Platform**:
   [github.com/dhis2/chap-core](https://github.com/dhis2/chap-core)
 
 # Package index
@@ -114,7 +120,7 @@ Rscript -e 'renv::restore()'
 Create command-line interfaces for CHAP models
 
 - [`create_chap_cli()`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_chap_cli.md)
-  : Create CHAP CLI
+  : Create Chap CLI
 - [`build_run_info()`](https://dhis2-chap.github.io/chap_r_sdk/reference/build_run_info.md)
   : Build default run_info object from data
 
@@ -217,15 +223,15 @@ Reference model implementations
 Docker and renv environment configuration for containerized models
 
 - [`init_chap_env()`](https://dhis2-chap.github.io/chap_r_sdk/reference/init_chap_env.md)
-  : Initialize CHAP model environment
+  : Initialize Chap model environment
 - [`generate_dockerfile()`](https://dhis2-chap.github.io/chap_r_sdk/reference/generate_dockerfile.md)
-  : Generate Dockerfile for CHAP model
+  : Generate Dockerfile for Chap model
 - [`generate_mlproject()`](https://dhis2-chap.github.io/chap_r_sdk/reference/generate_mlproject.md)
   : Generate MLproject file for chap-core compatibility
 - [`detect_system_deps()`](https://dhis2-chap.github.io/chap_r_sdk/reference/detect_system_deps.md)
   : Detect system dependencies from renv packages
 - [`read_renv_r_version()`](https://dhis2-chap.github.io/chap_r_sdk/reference/read_renv_r_version.md)
-  : Environment configuration for CHAP models. Read R version from
+  : Environment configuration for Chap models. Read R version from
   renv.lock
 
 ## Utilities
@@ -240,8 +246,8 @@ Helper functions
 ### All vignettes
 
 - [Getting Started with
-  chap.r.sdk](https://dhis2-chap.github.io/chap_r_sdk/articles/getting-started.md):
-- [Building Your First CHAP
+  chapr](https://dhis2-chap.github.io/chap_r_sdk/articles/getting-started.md):
+- [Building Your First Chap
   Model](https://dhis2-chap.github.io/chap_r_sdk/articles/model-development-tutorial.md):
 - [Working with Spatio-Temporal
   Data](https://dhis2-chap.github.io/chap_r_sdk/articles/spatio-temporal-data.md):

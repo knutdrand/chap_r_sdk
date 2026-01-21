@@ -1,4 +1,4 @@
-# Initialize CHAP model environment
+# Initialize Chap model environment
 
 Sets up renv for reproducible R dependencies and creates chap.yml. Run
 this once when creating a new model project.
@@ -17,7 +17,7 @@ init_chap_env(r_version = NULL, include_chap_sdk = TRUE)
 
 - include_chap_sdk:
 
-  Whether to include chap.r.sdk in dependencies (default: TRUE)
+  Whether to include chapr in dependencies (default: TRUE)
 
 ## Value
 

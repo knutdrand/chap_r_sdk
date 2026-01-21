@@ -1,7 +1,7 @@
 # Convert Nested Format Predictions to Wide Format
 
-Converts predictions from nested list-column format to CHAP wide CSV
-format (one column per sample). This is the format expected by the CHAP
+Converts predictions from nested list-column format to Chap wide CSV
+format (one column per sample). This is the format expected by the Chap
 platform.
 
 ## Usage
@@ -26,7 +26,7 @@ A data frame with columns: time_period, location, sample_0, sample_1,
 
 ``` r
 if (FALSE) { # \dontrun{
-# Convert nested predictions to wide format for CHAP
+# Convert nested predictions to wide format for Chap
 wide_preds <- predictions_to_wide(nested_preds)
 write.csv(wide_preds, "predictions.csv", row.names = FALSE)
 } # }

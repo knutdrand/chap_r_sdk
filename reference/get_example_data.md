@@ -1,6 +1,6 @@
 # Get Example Data for Testing
 
-Returns example datasets for testing and validating CHAP models.
+Returns example datasets for testing and validating Chap models.
 Currently supports Laos monthly data.
 
 ## Usage

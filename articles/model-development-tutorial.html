@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Building Your First CHAP Model • chap.r.sdk</title>
+<title>Building Your First Chap Model • chapr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Building Your First CHAP Model">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Building Your First Chap Model">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -18,7 +18,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">chap.r.sdk</a>
+    <a class="navbar-brand me-2" href="../index.html">chapr</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
@@ -58,7 +58,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Building Your First CHAP Model</h1>
+      <h1>Building Your First Chap Model</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/dhis2-chap/chap_r_sdk/blob/main/vignettes/model-development-tutorial.Rmd" class="external-link"><code>vignettes/model-development-tutorial.Rmd</code></a></small>
@@ -67,14 +67,14 @@
 
     
     
-<p>This tutorial walks you through building a CHAP-compatible model
+<p>This tutorial walks you through building a Chap-compatible model
 step-by-step, using a validation-first approach to ensure your model
 works correctly before deploying it.</p>
 <div class="section level2">
 <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chap.r.sdk</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chapr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
@@ -88,14 +88,14 @@ works correctly before deploying it.</p>
 <div class="section level2">
 <h2 id="step-1-understand-the-function-interface">Step 1: Understand the Function Interface<a class="anchor" aria-label="anchor" href="#step-1-understand-the-function-interface"></a>
 </h2>
-<p>Every CHAP model requires two functions:</p>
+<p>Every Chap model requires two functions:</p>
 <p><strong>Training function:</strong></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># training_data: tsibble with time_period index, location key,</span></span>
 <span>  <span class="co">#                disease_cases, and covariates</span></span>
 <span>  <span class="co"># model_configuration: optional list of parameters</span></span>
-<span>  <span class="co"># run_info: runtime info from CHAP (prediction_length, additional_continuous_covariates)</span></span>
+<span>  <span class="co"># run_info: runtime info from Chap (prediction_length, additional_continuous_covariates)</span></span>
 <span>  <span class="co"># Returns: any model object (list, fitted model, etc.)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><strong>Prediction function:</strong></p>
@@ -105,7 +105,7 @@ works correctly before deploying it.</p>
 <span>  <span class="co"># historic_data: tsibble with historical observations</span></span>
 <span>  <span class="co"># future_data: tsibble with time periods to predict</span></span>
 <span>  <span class="co"># saved_model: the object returned by train_fn</span></span>
-<span>  <span class="co"># run_info: runtime info from CHAP</span></span>
+<span>  <span class="co"># run_info: runtime info from Chap</span></span>
 <span>  <span class="co"># Returns: tibble with samples list-column containing numeric vectors</span></span>
 <span>  <span class="co">#   - For deterministic models: single sample per row (e.g., samples = list(c(42)))</span></span>
 <span>  <span class="co">#   - For probabilistic models: multiple samples per row (e.g., 1000 samples)</span></span>
@@ -187,7 +187,7 @@ time:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">historic_data</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;yearmonth[1]&gt;</span></span>
 <span><span class="co">#&gt; [1] "2013 Mar"</span></span></code></pre></div>
-<p>This is a key concept: when CHAP calls your prediction function,
+<p>This is a key concept: when Chap calls your prediction function,
 <code>historic_data</code> may contain <strong>more recent
 observations</strong> than what the model was trained on. For time
 series models (ARIMA, exponential smoothing, etc.), you should
@@ -362,10 +362,15 @@ preserve tsibble structure.</p>
 <div class="section level2">
 <h2 id="step-7-create-the-cli">Step 7: Create the CLI<a class="anchor" aria-label="anchor" href="#step-7-create-the-cli"></a>
 </h2>
-<p>Once validation passes, wrap your model in a CLI. Create a file
-called <code>model.R</code>:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chap.r.sdk</a></span><span class="op">)</span></span>
+<p>Once validation passes, wrap your model in a CLI.</p>
+<p>First, create a new directory for your model project:</p>
+<p><strong>In terminal:</strong></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">mkdir</span> my_model</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="bu">cd</span> my_model</span></code></pre></div>
+<p>Then create a file called <code>model.R</code> inside this
+directory:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chapr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -390,15 +395,26 @@ called <code>model.R</code>:</p>
 <div class="section level2">
 <h2 id="step-8-use-the-cli">Step 8: Use the CLI<a class="anchor" aria-label="anchor" href="#step-8-use-the-cli"></a>
 </h2>
-<p>Your model is now ready for command-line use:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R train <span class="at">--data</span> training_data.csv</span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="co"># Generate predictions</span></span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict <span class="at">--historic</span> historic.csv <span class="at">--future</span> future.csv <span class="at">--output</span> predictions.csv</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co"># Display model info</span></span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
+<p>Your model is now ready for command-line use. First, export the
+example data to CSV files for testing.</p>
+<p><strong>In R:</strong></p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Export example data for testing</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">'laos'</span>, <span class="st">'M'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">training_data</span><span class="op">)</span>, <span class="st">"training_data.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">historic_data</span><span class="op">)</span>, <span class="st">"historic.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">future_data</span><span class="op">)</span>, <span class="st">"future.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>Now you can test the CLI.</p>
+<p><strong>In terminal:</strong></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># Train the model</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R train <span class="at">--data</span> training_data.csv</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co"># Generate predictions</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict <span class="at">--historic</span> historic.csv <span class="at">--future</span> future.csv <span class="dt">\</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>    <span class="at">--output</span> predictions.csv</span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="co"># Display model info</span></span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
 <p>The CLI automatically handles:</p>
 <ul>
 <li>Loading CSV files</li>
@@ -418,7 +434,7 @@ can generate this automatically using
 <h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h3>
 <p>First, set up renv for reproducible dependencies:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/init.html" class="external-link">init</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"dhis2-chap/chap_r_sdk"</span><span class="op">)</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/snapshot.html" class="external-link">snapshot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -426,34 +442,34 @@ can generate this automatically using
 <div class="section level3">
 <h3 id="generate-the-mlproject-file">Generate the MLproject File<a class="anchor" aria-label="anchor" href="#generate-the-mlproject-file"></a>
 </h3>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chap.r.sdk</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chapr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/generate_mlproject.html">generate_mlproject</a></span><span class="op">(</span>model_name <span class="op">=</span> <span class="st">"my_mean_model"</span><span class="op">)</span></span></code></pre></div>
 <p>This creates an <code>MLproject</code> file like:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> my_mean_model</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="fu">renv_env</span><span class="kw">:</span><span class="at"> renv.lock</span></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="fu">entry_points</span><span class="kw">:</span></span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a><span class="at">  </span><span class="fu">train</span><span class="kw">:</span></span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="at">    </span><span class="fu">parameters</span><span class="kw">:</span></span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="at">      </span><span class="fu">train_data</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="at">      </span><span class="fu">model</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> Rscript model.R train --data {train_data} --model {model}</span></span>
-<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="at">  </span><span class="fu">predict</span><span class="kw">:</span></span>
-<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="at">    </span><span class="fu">parameters</span><span class="kw">:</span></span>
-<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="at">      </span><span class="fu">historic_data</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="at">      </span><span class="fu">future_data</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="at">      </span><span class="fu">model</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a><span class="at">      </span><span class="fu">out_file</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> Rscript model.R predict --historic {historic_data} --future {future_data}</span></span>
-<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="at">      --model {model} --output {out_file}</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> my_mean_model</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="fu">renv_env</span><span class="kw">:</span><span class="at"> renv.lock</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="fu">entry_points</span><span class="kw">:</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="at">  </span><span class="fu">train</span><span class="kw">:</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="at">    </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="at">      </span><span class="fu">train_data</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="at">      </span><span class="fu">model</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> Rscript model.R train --data {train_data} --model {model}</span></span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="at">  </span><span class="fu">predict</span><span class="kw">:</span></span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="at">    </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="at">      </span><span class="fu">historic_data</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="at">      </span><span class="fu">future_data</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a><span class="at">      </span><span class="fu">model</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a><span class="at">      </span><span class="fu">out_file</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb21-15"><a href="#cb21-15" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> Rscript model.R predict --historic {historic_data} --future {future_data}</span></span>
+<span id="cb21-16"><a href="#cb21-16" tabindex="-1"></a><span class="at">      --model {model} --output {out_file}</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-with-chap-core">Run with chap-core<a class="anchor" aria-label="anchor" href="#run-with-chap-core"></a>
 </h3>
 <p>Once you have the MLproject and renv.lock files, run your model with
 chap-core:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="ex">chap</span> evaluate <span class="at">--model-name</span> ./my_model_directory <span class="at">--dataset-csv</span> data.csv</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="ex">chap</span> evaluate <span class="at">--model-name</span> ./my_model_directory <span class="at">--dataset-csv</span> data.csv</span></code></pre></div>
 <p>See <code>examples/arima_model/</code> for a complete example with
 renv and MLproject.</p>
 </div>
@@ -463,7 +479,7 @@ renv and MLproject.</p>
 </h2>
 <p>For probabilistic forecasting, include multiple Monte Carlo samples
 instead of a single value:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predict_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">historic_data</span>, <span class="va">future_data</span>, <span class="va">saved_model</span>,</span>
 <span>                       <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">n_samples</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
@@ -480,14 +496,14 @@ instead of a single value:</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The <code>samples</code> column is a list-column where each element
 is a numeric vector. The CLI automatically converts this to wide CSV
-format (<code>sample_0</code>, <code>sample_1</code>, …) for CHAP.</p>
+format (<code>sample_0</code>, <code>sample_1</code>, …) for Chap.</p>
 </div>
 <div class="section level2">
 <h2 id="working-with-samples">Working with Samples<a class="anchor" aria-label="anchor" href="#working-with-samples"></a>
 </h2>
 <p>The SDK provides utility functions for working with sample-based
 predictions:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert nested samples to wide format</span></span>
 <span><span class="va">wide_preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predictions_to_wide.html">predictions_to_wide</a></span><span class="op">(</span><span class="va">nested_preds</span><span class="op">)</span></span>
 <span></span>
@@ -511,7 +527,7 @@ for validation.</p>
 </h3>
 <p>Use the schema helper functions to define type-safe configuration
 options:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_schema</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_config_schema.html">create_config_schema</a></span><span class="op">(</span></span>
 <span>  title <span class="op">=</span> <span class="st">"My Model Configuration"</span>,</span>
 <span>  description <span class="op">=</span> <span class="st">"Configuration options for my forecasting model"</span>,</span>
@@ -558,7 +574,7 @@ options:</p>
 <span></span>
 <span><span class="co"># View the schema</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">my_schema</span><span class="op">)</span></span>
-<span><span class="co">#&gt; CHAP Configuration Schema</span></span>
+<span><span class="co">#&gt; Chap Configuration Schema</span></span>
 <span><span class="co">#&gt; =========================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Title: My Model Configuration </span></span>
@@ -585,7 +601,7 @@ options:</p>
 </h3>
 <p>Pass the schema to <code><a href="../reference/create_chap_cli.html">create_chap_cli()</a></code> to enable automatic
 validation:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/create_chap_cli.html">create_chap_cli</a></span><span class="op">(</span><span class="va">train_fn</span>, <span class="va">predict_fn</span>, model_config_schema <span class="op">=</span> <span class="va">my_schema</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -603,15 +619,15 @@ parameters</li>
 fails</li>
 </ol>
 <p>Example <code>config.yaml</code>:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">n_samples</span><span class="kw">:</span><span class="at"> </span><span class="dv">500</span></span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="fu">learning_rate</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="fu">method</span><span class="kw">:</span><span class="at"> ets</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">n_samples</span><span class="kw">:</span><span class="at"> </span><span class="dv">500</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="fu">learning_rate</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="fu">method</span><span class="kw">:</span><span class="at"> ets</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="manual-validation">Manual Validation<a class="anchor" aria-label="anchor" href="#manual-validation"></a>
 </h3>
 <p>You can also validate configurations manually:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Valid configuration</span></span>
 <span><span class="va">config</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n_samples <span class="op">=</span> <span class="fl">500L</span>, method <span class="op">=</span> <span class="st">"ets"</span><span class="op">)</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_config.html">validate_config</a></span><span class="op">(</span><span class="va">config</span>, <span class="va">my_schema</span><span class="op">)</span></span>
@@ -704,42 +720,42 @@ fails</li>
 <p>Once you have defined a configuration schema, you can include it in
 your MLproject file. This exposes your model’s configuration options to
 chap-core users:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generate_mlproject.html">generate_mlproject</a></span><span class="op">(</span></span>
 <span>  model_name <span class="op">=</span> <span class="st">"my_mean_model"</span>,</span>
 <span>  config_schema <span class="op">=</span> <span class="va">my_schema</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This adds a <code>user_options</code> section to the MLproject
 file:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> my_mean_model</span></span>
-<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="fu">renv_env</span><span class="kw">:</span><span class="at"> renv.lock</span></span>
-<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a><span class="fu">user_options</span><span class="kw">:</span></span>
-<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a><span class="at">  </span><span class="fu">n_samples</span><span class="kw">:</span></span>
-<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> integer</span></span>
-<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Number of Monte Carlo samples for predictions</span></span>
-<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="at">    </span><span class="fu">default</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
-<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="at">  </span><span class="fu">learning_rate</span><span class="kw">:</span></span>
-<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> float</span></span>
-<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Learning rate for optimization</span></span>
-<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a><span class="at">    </span><span class="fu">default</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.01</span></span>
-<span id="cb28-12"><a href="#cb28-12" tabindex="-1"></a><span class="at">  </span><span class="fu">method</span><span class="kw">:</span></span>
-<span id="cb28-13"><a href="#cb28-13" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb28-14"><a href="#cb28-14" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Forecasting method to use</span></span>
-<span id="cb28-15"><a href="#cb28-15" tabindex="-1"></a><span class="at">    </span><span class="fu">default</span><span class="kw">:</span><span class="at"> arima</span></span>
-<span id="cb28-16"><a href="#cb28-16" tabindex="-1"></a><span class="fu">entry_points</span><span class="kw">:</span></span>
-<span id="cb28-17"><a href="#cb28-17" tabindex="-1"></a><span class="at">  </span><span class="fu">train</span><span class="kw">:</span></span>
-<span id="cb28-18"><a href="#cb28-18" tabindex="-1"></a><span class="at">    </span><span class="fu">parameters</span><span class="kw">:</span></span>
-<span id="cb28-19"><a href="#cb28-19" tabindex="-1"></a><span class="at">      </span><span class="fu">train_data</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb28-20"><a href="#cb28-20" tabindex="-1"></a><span class="at">      </span><span class="fu">model</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb28-21"><a href="#cb28-21" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> Rscript model.R train --data {train_data} --model {model}</span></span>
-<span id="cb28-22"><a href="#cb28-22" tabindex="-1"></a><span class="at">  </span><span class="fu">predict</span><span class="kw">:</span></span>
-<span id="cb28-23"><a href="#cb28-23" tabindex="-1"></a><span class="at">    </span><span class="fu">parameters</span><span class="kw">:</span></span>
-<span id="cb28-24"><a href="#cb28-24" tabindex="-1"></a><span class="at">      </span><span class="fu">historic_data</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb28-25"><a href="#cb28-25" tabindex="-1"></a><span class="at">      </span><span class="fu">future_data</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb28-26"><a href="#cb28-26" tabindex="-1"></a><span class="at">      </span><span class="fu">model</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb28-27"><a href="#cb28-27" tabindex="-1"></a><span class="at">      </span><span class="fu">out_file</span><span class="kw">:</span><span class="at"> str</span></span>
-<span id="cb28-28"><a href="#cb28-28" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> Rscript model.R predict --historic {historic_data} --future {future_data}</span></span>
-<span id="cb28-29"><a href="#cb28-29" tabindex="-1"></a><span class="at">      --model {model} --output {out_file}</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> my_mean_model</span></span>
+<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a><span class="fu">renv_env</span><span class="kw">:</span><span class="at"> renv.lock</span></span>
+<span id="cb30-3"><a href="#cb30-3" tabindex="-1"></a><span class="fu">user_options</span><span class="kw">:</span></span>
+<span id="cb30-4"><a href="#cb30-4" tabindex="-1"></a><span class="at">  </span><span class="fu">n_samples</span><span class="kw">:</span></span>
+<span id="cb30-5"><a href="#cb30-5" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> integer</span></span>
+<span id="cb30-6"><a href="#cb30-6" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Number of Monte Carlo samples for predictions</span></span>
+<span id="cb30-7"><a href="#cb30-7" tabindex="-1"></a><span class="at">    </span><span class="fu">default</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb30-8"><a href="#cb30-8" tabindex="-1"></a><span class="at">  </span><span class="fu">learning_rate</span><span class="kw">:</span></span>
+<span id="cb30-9"><a href="#cb30-9" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> float</span></span>
+<span id="cb30-10"><a href="#cb30-10" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Learning rate for optimization</span></span>
+<span id="cb30-11"><a href="#cb30-11" tabindex="-1"></a><span class="at">    </span><span class="fu">default</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.01</span></span>
+<span id="cb30-12"><a href="#cb30-12" tabindex="-1"></a><span class="at">  </span><span class="fu">method</span><span class="kw">:</span></span>
+<span id="cb30-13"><a href="#cb30-13" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb30-14"><a href="#cb30-14" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Forecasting method to use</span></span>
+<span id="cb30-15"><a href="#cb30-15" tabindex="-1"></a><span class="at">    </span><span class="fu">default</span><span class="kw">:</span><span class="at"> arima</span></span>
+<span id="cb30-16"><a href="#cb30-16" tabindex="-1"></a><span class="fu">entry_points</span><span class="kw">:</span></span>
+<span id="cb30-17"><a href="#cb30-17" tabindex="-1"></a><span class="at">  </span><span class="fu">train</span><span class="kw">:</span></span>
+<span id="cb30-18"><a href="#cb30-18" tabindex="-1"></a><span class="at">    </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb30-19"><a href="#cb30-19" tabindex="-1"></a><span class="at">      </span><span class="fu">train_data</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb30-20"><a href="#cb30-20" tabindex="-1"></a><span class="at">      </span><span class="fu">model</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb30-21"><a href="#cb30-21" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> Rscript model.R train --data {train_data} --model {model}</span></span>
+<span id="cb30-22"><a href="#cb30-22" tabindex="-1"></a><span class="at">  </span><span class="fu">predict</span><span class="kw">:</span></span>
+<span id="cb30-23"><a href="#cb30-23" tabindex="-1"></a><span class="at">    </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb30-24"><a href="#cb30-24" tabindex="-1"></a><span class="at">      </span><span class="fu">historic_data</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb30-25"><a href="#cb30-25" tabindex="-1"></a><span class="at">      </span><span class="fu">future_data</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb30-26"><a href="#cb30-26" tabindex="-1"></a><span class="at">      </span><span class="fu">model</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb30-27"><a href="#cb30-27" tabindex="-1"></a><span class="at">      </span><span class="fu">out_file</span><span class="kw">:</span><span class="at"> str</span></span>
+<span id="cb30-28"><a href="#cb30-28" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> Rscript model.R predict --historic {historic_data} --future {future_data}</span></span>
+<span id="cb30-29"><a href="#cb30-29" tabindex="-1"></a><span class="at">      --model {model} --output {out_file}</span></span></code></pre></div>
 <p>The <code>user_options</code> section allows chap-core to present
 configuration options to users and pass them to your model via a config
 file.</p>

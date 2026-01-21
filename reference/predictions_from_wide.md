@@ -1,6 +1,6 @@
 # Convert Wide Format Predictions to Nested Format
 
-Converts predictions from CHAP wide CSV format (one column per sample)
+Converts predictions from Chap wide CSV format (one column per sample)
 to nested list-column format (one row per forecast unit with samples
 stored as a numeric vector in a list-column).
 

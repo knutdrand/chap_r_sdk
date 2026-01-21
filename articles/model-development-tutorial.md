@@ -1,13 +1,13 @@
-# Building Your First CHAP Model
+# Building Your First Chap Model
 
-This tutorial walks you through building a CHAP-compatible model
+This tutorial walks you through building a Chap-compatible model
 step-by-step, using a validation-first approach to ensure your model
 works correctly before deploying it.
 
 ## Setup
 
 ``` r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -21,7 +21,7 @@ library(dplyr)
 
 ## Step 1: Understand the Function Interface
 
-Every CHAP model requires two functions:
+Every Chap model requires two functions:
 
 **Training function:**
 
@@ -30,7 +30,7 @@ train_fn <- function(training_data, model_configuration = list(), run_info = lis
   # training_data: tsibble with time_period index, location key,
   #                disease_cases, and covariates
   # model_configuration: optional list of parameters
-  # run_info: runtime info from CHAP (prediction_length, additional_continuous_covariates)
+  # run_info: runtime info from Chap (prediction_length, additional_continuous_covariates)
   # Returns: any model object (list, fitted model, etc.)
 }
 ```
@@ -43,7 +43,7 @@ predict_fn <- function(historic_data, future_data, saved_model,
   # historic_data: tsibble with historical observations
   # future_data: tsibble with time periods to predict
   # saved_model: the object returned by train_fn
-  # run_info: runtime info from CHAP
+  # run_info: runtime info from Chap
   # Returns: tibble with samples list-column containing numeric vectors
   #   - For deterministic models: single sample per row (e.g., samples = list(c(42)))
   #   - For probabilistic models: multiple samples per row (e.g., 1000 samples)
@@ -135,7 +135,7 @@ max(data$historic_data$time_period)
 #> [1] "2013 Mar"
 ```
 
-This is a key concept: when CHAP calls your prediction function,
+This is a key concept: when Chap calls your prediction function,
 `historic_data` may contain **more recent observations** than what the
 model was trained on. For time series models (ARIMA, exponential
 smoothing, etc.), you should **refit** the model to `historic_data`
@@ -325,11 +325,21 @@ names(result$results)
 
 ## Step 7: Create the CLI
 
-Once validation passes, wrap your model in a CLI. Create a file called
-`model.R`:
+Once validation passes, wrap your model in a CLI.
+
+First, create a new directory for your model project:
+
+**In terminal:**
+
+``` bash
+mkdir my_model
+cd my_model
+```
+
+Then create a file called `model.R` inside this directory:
 
 ``` r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
@@ -354,14 +364,30 @@ if (!interactive()) {
 
 ## Step 8: Use the CLI
 
-Your model is now ready for command-line use:
+Your model is now ready for command-line use. First, export the example
+data to CSV files for testing.
+
+**In R:**
+
+``` r
+# Export example data for testing
+data <- get_example_data('laos', 'M')
+write.csv(as.data.frame(data$training_data), "training_data.csv", row.names = FALSE)
+write.csv(as.data.frame(data$historic_data), "historic.csv", row.names = FALSE)
+write.csv(as.data.frame(data$future_data), "future.csv", row.names = FALSE)
+```
+
+Now you can test the CLI.
+
+**In terminal:**
 
 ``` bash
 # Train the model
 Rscript model.R train --data training_data.csv
 
 # Generate predictions
-Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
+Rscript model.R predict --historic historic.csv --future future.csv \
+    --output predictions.csv
 
 # Display model info
 Rscript model.R info
@@ -393,7 +419,7 @@ renv::snapshot()
 ### Generate the MLproject File
 
 ``` r
-library(chap.r.sdk)
+library(chapr)
 
 generate_mlproject(model_name = "my_mean_model")
 ```
@@ -455,7 +481,7 @@ predict_fn <- function(historic_data, future_data, saved_model,
 
 The `samples` column is a list-column where each element is a numeric
 vector. The CLI automatically converts this to wide CSV format
-(`sample_0`, `sample_1`, …) for CHAP.
+(`sample_0`, `sample_1`, …) for Chap.
 
 ## Working with Samples
 
@@ -534,7 +560,7 @@ my_schema <- create_config_schema(
 
 # View the schema
 print(my_schema)
-#> CHAP Configuration Schema
+#> Chap Configuration Schema
 #> =========================
 #> 
 #> Title: My Model Configuration 

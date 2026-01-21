@@ -1,4 +1,4 @@
-# Getting Started with chap.r.sdk
+# Getting Started with chapr
 
 ## Installation
 
@@ -9,17 +9,20 @@ Install the development version from GitHub:
 remotes::install_github("dhis2-chap/chap_r_sdk")
 ```
 
+*Note: If prompted for GitHub authentication, you can skip it by
+pressing Enter (the repository is public).*
+
 Load the package:
 
 ``` r
-library(chap.r.sdk)
+library(chapr)
 ```
 
-## What is the CHAP R SDK?
+## What is the Chap R SDK?
 
-The `chap.r.sdk` package provides infrastructure for developing disease
-forecasting models compatible with the [CHAP
-platform](https://github.com/dhis2/chap-core). CHAP (Climate and Health
+The `chapr` package provides infrastructure for developing disease
+forecasting models compatible with the [Chap
+platform](https://github.com/dhis2/chap-core). Chap (Climate Health
 Analytics Platform) enables health ministries to run predictive models
 for disease surveillance.
 
@@ -29,7 +32,7 @@ This SDK simplifies model development by handling:
 - **File I/O**: Automatic CSV loading, tsibble conversion, output
   formatting
 - **Configuration**: YAML/JSON config parsing with schema validation
-- **Validation**: Test suites to verify CHAP compatibility
+- **Validation**: Test suites to verify Chap compatibility
 
 ## Quick Start
 
@@ -38,7 +41,7 @@ The recommended pattern uses
 to create a complete command-line interface:
 
 ``` r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 # Define training function - receives loaded tsibble, not file paths
@@ -69,14 +72,17 @@ if (!interactive()) {
 
 ### Command Line Usage
 
-Save the above code as `model.R`, then use from the command line:
+Save the above code as `model.R`, then use from the command line.
+
+**In terminal:**
 
 ``` bash
 # Train the model
 Rscript model.R train --data training_data.csv
 
 # Generate predictions
-Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
+Rscript model.R predict --historic historic.csv --future future.csv \
+    --output predictions.csv
 
 # Display model information
 Rscript model.R info
@@ -92,7 +98,7 @@ Your model needs two functions:
 train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   # training_data: tsibble with time_period index, location key, disease_cases
   # model_configuration: optional list of parameters from config file
-  # run_info: runtime info from CHAP (prediction_length, additional_continuous_covariates, etc.)
+  # run_info: runtime info from Chap (prediction_length, additional_continuous_covariates, etc.)
   # Returns: model object (saved as RDS)
 }
 ```
@@ -105,7 +111,7 @@ predict_fn <- function(historic_data, future_data, saved_model,
   # historic_data: tsibble with historical observations
   # future_data: tsibble with time periods to predict (no disease_cases)
   # saved_model: object returned by train_fn
-  # run_info: runtime info from CHAP
+  # run_info: runtime info from Chap
   # Returns: tibble with samples list-column
 }
 ```
@@ -218,7 +224,7 @@ create_chap_cli(train_fn, predict_fn, model_config_schema = config_schema)
 
 ## Next Steps
 
-- **[Building Your First CHAP
+- **[Building Your First Chap
   Model](https://dhis2-chap.github.io/chap_r_sdk/articles/model-development-tutorial.md)**:
   Step-by-step tutorial with validation
 - **[Working with Spatio-Temporal

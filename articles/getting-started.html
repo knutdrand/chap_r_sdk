@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Getting Started with chap.r.sdk • chap.r.sdk</title>
+<title>Getting Started with chapr • chapr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Getting Started with chap.r.sdk">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Getting Started with chapr">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -18,7 +18,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">chap.r.sdk</a>
+    <a class="navbar-brand me-2" href="../index.html">chapr</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
@@ -58,7 +58,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Getting Started with chap.r.sdk</h1>
+      <h1>Getting Started with chapr</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/dhis2-chap/chap_r_sdk/blob/main/vignettes/getting-started.Rmd" class="external-link"><code>vignettes/getting-started.Rmd</code></a></small>
@@ -74,16 +74,18 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dhis2-chap/chap_r_sdk"</span><span class="op">)</span></span></code></pre></div>
+<p><em>Note: If prompted for GitHub authentication, you can skip it by
+pressing Enter (the repository is public).</em></p>
 <p>Load the package:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chap.r.sdk</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chapr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="what-is-the-chap-r-sdk">What is the CHAP R SDK?<a class="anchor" aria-label="anchor" href="#what-is-the-chap-r-sdk"></a>
+<h2 id="what-is-the-chap-r-sdk">What is the Chap R SDK?<a class="anchor" aria-label="anchor" href="#what-is-the-chap-r-sdk"></a>
 </h2>
-<p>The <code>chap.r.sdk</code> package provides infrastructure for
-developing disease forecasting models compatible with the <a href="https://github.com/dhis2/chap-core" class="external-link">CHAP platform</a>. CHAP
-(Climate and Health Analytics Platform) enables health ministries to run
+<p>The <code>chapr</code> package provides infrastructure for developing
+disease forecasting models compatible with the <a href="https://github.com/dhis2/chap-core" class="external-link">Chap platform</a>. Chap
+(Climate Health Analytics Platform) enables health ministries to run
 predictive models for disease surveillance.</p>
 <p>This SDK simplifies model development by handling:</p>
 <ul>
@@ -97,7 +99,7 @@ conversion, output formatting</li>
 <strong>Configuration</strong>: YAML/JSON config parsing with schema
 validation</li>
 <li>
-<strong>Validation</strong>: Test suites to verify CHAP
+<strong>Validation</strong>: Test suites to verify Chap
 compatibility</li>
 </ul>
 </div>
@@ -107,7 +109,7 @@ compatibility</li>
 <p>The recommended pattern uses <code><a href="../reference/create_chap_cli.html">create_chap_cli()</a></code> to create
 a complete command-line interface:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chap.r.sdk</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhis2-chap.github.io/chap_r_sdk/">chapr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define training function - receives loaded tsibble, not file paths</span></span>
@@ -138,15 +140,17 @@ a complete command-line interface:</p>
 <h3 id="command-line-usage">Command Line Usage<a class="anchor" aria-label="anchor" href="#command-line-usage"></a>
 </h3>
 <p>Save the above code as <code>model.R</code>, then use from the
-command line:</p>
+command line.</p>
+<p><strong>In terminal:</strong></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Train the model</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">Rscript</span> model.R train <span class="at">--data</span> training_data.csv</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Generate predictions</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict <span class="at">--historic</span> historic.csv <span class="at">--future</span> future.csv <span class="at">--output</span> predictions.csv</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Display model information</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="ex">Rscript</span> model.R predict <span class="at">--historic</span> historic.csv <span class="at">--future</span> future.csv <span class="dt">\</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>    <span class="at">--output</span> predictions.csv</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co"># Display model information</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="ex">Rscript</span> model.R info</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -160,7 +164,7 @@ command line:</p>
 <code class="sourceCode R"><span><span class="va">train_fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">training_data</span>, <span class="va">model_configuration</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">run_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># training_data: tsibble with time_period index, location key, disease_cases</span></span>
 <span>  <span class="co"># model_configuration: optional list of parameters from config file</span></span>
-<span>  <span class="co"># run_info: runtime info from CHAP (prediction_length, additional_continuous_covariates, etc.)</span></span>
+<span>  <span class="co"># run_info: runtime info from Chap (prediction_length, additional_continuous_covariates, etc.)</span></span>
 <span>  <span class="co"># Returns: model object (saved as RDS)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
@@ -173,7 +177,7 @@ command line:</p>
 <span>  <span class="co"># historic_data: tsibble with historical observations</span></span>
 <span>  <span class="co"># future_data: tsibble with time periods to predict (no disease_cases)</span></span>
 <span>  <span class="co"># saved_model: object returned by train_fn</span></span>
-<span>  <span class="co"># run_info: runtime info from CHAP</span></span>
+<span>  <span class="co"># run_info: runtime info from Chap</span></span>
 <span>  <span class="co"># Returns: tibble with samples list-column</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><strong>Important</strong>: <code>historic_data</code> may contain
@@ -319,7 +323,7 @@ subcommand:</p>
 <ul>
 <li>
 <strong><a href="model-development-tutorial.html">Building Your
-First CHAP Model</a></strong>: Step-by-step tutorial with
+First Chap Model</a></strong>: Step-by-step tutorial with
 validation</li>
 <li>
 <strong><a href="spatio-temporal-data.html">Working with

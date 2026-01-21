@@ -5,7 +5,7 @@
 Create command-line interfaces for CHAP models
 
 - [`create_chap_cli()`](https://dhis2-chap.github.io/chap_r_sdk/reference/create_chap_cli.md)
-  : Create CHAP CLI
+  : Create Chap CLI
 - [`build_run_info()`](https://dhis2-chap.github.io/chap_r_sdk/reference/build_run_info.md)
   : Build default run_info object from data
 
@@ -108,15 +108,15 @@ Reference model implementations
 Docker and renv environment configuration for containerized models
 
 - [`init_chap_env()`](https://dhis2-chap.github.io/chap_r_sdk/reference/init_chap_env.md)
-  : Initialize CHAP model environment
+  : Initialize Chap model environment
 - [`generate_dockerfile()`](https://dhis2-chap.github.io/chap_r_sdk/reference/generate_dockerfile.md)
-  : Generate Dockerfile for CHAP model
+  : Generate Dockerfile for Chap model
 - [`generate_mlproject()`](https://dhis2-chap.github.io/chap_r_sdk/reference/generate_mlproject.md)
   : Generate MLproject file for chap-core compatibility
 - [`detect_system_deps()`](https://dhis2-chap.github.io/chap_r_sdk/reference/detect_system_deps.md)
   : Detect system dependencies from renv packages
 - [`read_renv_r_version()`](https://dhis2-chap.github.io/chap_r_sdk/reference/read_renv_r_version.md)
-  : Environment configuration for CHAP models. Read R version from
+  : Environment configuration for Chap models. Read R version from
   renv.lock
 
 ## Utilities

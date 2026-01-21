@@ -1,4 +1,4 @@
-# Environment configuration for CHAP models. Read R version from renv.lock
+# Environment configuration for Chap models. Read R version from renv.lock
 
 Parses the renv.lock file and extracts the R version.
 
