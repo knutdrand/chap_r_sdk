@@ -28,7 +28,7 @@ library(dplyr)
 Every Chap model requires two functions:
 
 **Training function:**
-```r
+```{r eval=FALSE}
 train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   # training_data: tsibble with time_period index, location key,
   #                disease_cases, and covariates
@@ -39,7 +39,7 @@ train_fn <- function(training_data, model_configuration = list(), run_info = lis
 ```
 
 **Prediction function:**
-```r
+```{r eval=FALSE}
 predict_fn <- function(historic_data, future_data, saved_model,
                        model_configuration = list(), run_info = list()) {
   # historic_data: tsibble with historical observations
@@ -188,7 +188,7 @@ cd my_model
 
 Then create a file called `model.R` inside this directory:
 
-```r
+```{r eval=FALSE}
 library(chapr)
 library(dplyr)
 
@@ -217,7 +217,7 @@ if (!interactive()) {
 Your model is now ready for command-line use. First, export the example data to CSV files for testing.
 
 **In R:**
-```r
+```{r eval=FALSE}
 # Export example data for testing
 data <- get_example_data('laos', 'M')
 write.csv(as.data.frame(data$training_data), "training_data.csv", row.names = FALSE)
@@ -255,7 +255,7 @@ To run your model with chap-core, you need an MLproject file. The SDK can genera
 
 First, set up renv for reproducible dependencies:
 
-```r
+```{r eval=FALSE}
 renv::init()
 renv::install("dhis2-chap/chap_r_sdk")
 renv::snapshot()
@@ -263,7 +263,7 @@ renv::snapshot()
 
 ### Generate the MLproject File
 
-```r
+```{r eval=FALSE}
 library(chapr)
 
 generate_mlproject(model_name = "my_mean_model")
@@ -304,7 +304,7 @@ See `examples/arima_model/` for a complete example with renv and MLproject.
 
 For probabilistic forecasting, include multiple Monte Carlo samples instead of a single value:
 
-```r
+```{r eval=FALSE}
 predict_fn <- function(historic_data, future_data, saved_model,
                        model_configuration = list(), run_info = list()) {
   n_samples <- 1000
@@ -328,7 +328,7 @@ The CLI automatically converts this to wide CSV format (`sample_0`, `sample_1`, 
 
 The SDK provides utility functions for working with sample-based predictions:
 
-```r
+```{r eval=FALSE}
 # Convert nested samples to wide format
 wide_preds <- predictions_to_wide(nested_preds)
 
@@ -403,7 +403,7 @@ print(my_schema)
 
 Pass the schema to `create_chap_cli()` to enable automatic validation:
 
-```r
+```{r eval=FALSE}
 if (!interactive()) {
   create_chap_cli(train_fn, predict_fn, model_config_schema = my_schema)
 }
@@ -461,7 +461,7 @@ full_config$method         # Default applied
 
 Once you have defined a configuration schema, you can include it in your MLproject file. This exposes your model's configuration options to chap-core users:
 
-```r
+```{r eval=FALSE}
 generate_mlproject(
   model_name = "my_mean_model",
   config_schema = my_schema

@@ -99,7 +99,7 @@ Your model needs two functions:
 
 ### Training Function
 
-```r
+```{r eval=FALSE}
 train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   # training_data: tsibble with time_period index, location key, disease_cases
   # model_configuration: optional list of parameters from config file
@@ -110,7 +110,7 @@ train_fn <- function(training_data, model_configuration = list(), run_info = lis
 
 ### Prediction Function
 
-```r
+```{r eval=FALSE}
 predict_fn <- function(historic_data, future_data, saved_model,
                        model_configuration = list(), run_info = list()) {
   # historic_data: tsibble with historical observations
@@ -165,7 +165,7 @@ time_period,location,population,rainfall
 
 Tibble with `samples` list-column containing numeric vectors:
 
-```r
+```{r eval=FALSE}
 # Deterministic: single value per row
 tibble(
   time_period = "2023-05",
