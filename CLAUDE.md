@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an R package (chap_r_sdk) that provides convenience functionality for developing chap-compatible models and integrating existing models with the chap system. The package is tidyverse-oriented and follows R best practices.
+This is an R package (chapr) that provides convenience functionality for developing Chap-compatible models and integrating existing models with the Chap system. The package is tidyverse-oriented and follows R best practices.
 
 ### Jira Epic
 
-**Epic:** [CLIM-201 - CHAP R SDK Development](https://dhis2.atlassian.net/browse/CLIM-201)
+**Epic:** [CLIM-201 - Chap R SDK Development](https://dhis2.atlassian.net/browse/CLIM-201)
 ## Core Functionality
 
 The SDK provides three main areas of functionality:
@@ -18,11 +18,11 @@ The SDK provides three main areas of functionality:
    - Automatically handles CSV loading, tsibble conversion, YAML config parsing, and output saving
    - Model functions receive loaded data objects, not file paths
 
-2. **Model Validation**: Test suite to sanity check models and ensure prediction output is consistent with chap expectations
+2. **Model Validation**: Test suite to sanity check models and ensure prediction output is consistent with Chap expectations
 
 3. **Spatio-temporal Data Utilities**: Common transformations for spatio-temporal data
 
-4. **Configuration Schema**: Functionality to expose model configuration schemas to chap
+4. **Configuration Schema**: Functionality to expose model configuration schemas to Chap
 
 ## Development Status
 
@@ -78,7 +78,7 @@ See `examples/mean_model_docker/README.md` for details.
 The standard pattern for models is shown in `examples/mean_model/model.R`. This uses the unified CLI interface:
 
 ```r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 # Pure business logic - no file I/O!

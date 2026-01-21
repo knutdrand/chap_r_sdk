@@ -1,6 +1,6 @@
-# Guide: Running Model Comparisons with CHAP
+# Guide: Running Model Comparisons with Chap
 
-This guide walks through how to systematically compare different forecasting models using the CHAP evaluation framework. It's written for R model developers and highlights common difficulties you may encounter.
+This guide walks through how to systematically compare different forecasting models using the Chap evaluation framework. It's written for R model developers and highlights common difficulties you may encounter.
 
 ## Overview
 
@@ -15,15 +15,15 @@ The model comparison workflow is:
 ## Prerequisites
 
 - **chap-core** installed and accessible via `uv run chap`
-- Your R model working with `chap.r.sdk`
-- Dataset(s) in CHAP CSV format
+- Your R model working with `chapr`
+- Dataset(s) in Chap CSV format
 
 ## Step 1: Create a Configurable Model
 
 Your `model.R` should accept a configuration parameter to switch between model types:
 
 ```r
-library(chap.r.sdk)
+library(chapr)
 library(fable)
 library(dplyr)
 
@@ -292,7 +292,7 @@ set -e
 MODEL_DIR="/path/to/your/model"
 DATA_DIR="/path/to/datasets"
 OUTPUT_DIR="/tmp/model_comparison"
-CHAP_CORE="/path/to/chap-core"
+Chap_CORE="/path/to/chap-core"
 
 MODEL_TYPES="ETS ARIMA NNETAR"
 DATASETS="laos thailand vietnam"
@@ -312,7 +312,7 @@ done
 pkill -9 -f "evaluate2" 2>/dev/null || true
 pkill -9 -f "fastapi" 2>/dev/null || true
 
-cd $CHAP_CORE
+cd $Chap_CORE
 
 # Run evaluations
 for dataset in $DATASETS; do

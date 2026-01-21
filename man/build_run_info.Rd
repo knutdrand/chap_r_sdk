@@ -22,14 +22,14 @@ beyond the standard columns (time index, key columns, disease_cases)
 }
 \description{
 Constructs a default run_info list by inferring values from the loaded data.
-This is used as a fallback when CHAP doesn't provide a run_info file
+This is used as a fallback when Chap doesn't provide a run_info file
 (e.g., during local development or testing).
 }
 \details{
-In production, CHAP provides run_info directly via a file. This function
+In production, Chap provides run_info directly via a file. This function
 is primarily used for:
 \itemize{
-\item Local testing without CHAP
+\item Local testing without Chap
 \item Model validation via \code{validate_model_io()}
 \item Backwards compatibility
 }

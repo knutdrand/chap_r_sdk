@@ -647,7 +647,7 @@ schema_to_json <- function(schema, pretty = TRUE) {
 #' @return Invisible schema object
 #' @export
 print.chap_config_schema <- function(x, ...) {
-  cat("CHAP Configuration Schema\n")
+  cat("Chap Configuration Schema\n")
   cat("=========================\n\n")
 
   if (!is.null(x$title)) {

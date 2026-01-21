@@ -10,7 +10,7 @@
 #note: The model uses either weeks or months
 
 library(INLA)
-library(chap.r.sdk)
+library(chapr)
 source('lib.R')
 
 #' Train CHAP Model
@@ -28,7 +28,7 @@ train_chap <- function(training_data, model_configuration = NULL){
   return(NULL)
 }
 
-# Use chap.r.sdk CLI wrapper
+# Use chapr CLI wrapper
 if (!interactive()) {
   create_train_cli(train_chap)
 }

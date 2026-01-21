@@ -1,6 +1,6 @@
 #' Get Example Data for Testing
 #'
-#' Returns example datasets for testing and validating CHAP models.
+#' Returns example datasets for testing and validating Chap models.
 #' Currently supports Laos monthly data.
 #'
 #' @param country Character string specifying the country. Currently only 'laos' is supported.
@@ -39,7 +39,7 @@ get_example_data <- function(country, frequency) {
   }
 
   # Construct paths to test data
-  data_dir <- system.file("testdata", "ewars_example", "monthly", package = "chap.r.sdk")
+  data_dir <- system.file("testdata", "ewars_example", "monthly", package = "chapr")
 
   if (data_dir == "") {
     stop("Test data not found. Make sure the package is properly installed.")
@@ -58,7 +58,7 @@ get_example_data <- function(country, frequency) {
   if (detect_prediction_format(predictions_raw) == "wide") {
     predictions <- predictions_from_wide(predictions_raw)
   } else {
-    predictions <- tibble::as_tibble(predictions_raw)
+    predictions <- tibble::as_tibble(predictions_raw, .name_repair = "minimal")
   }
 
   # Return as named list
@@ -89,9 +89,9 @@ get_example_data <- function(country, frequency) {
 #'   \item Must have a \code{samples} list-column containing numeric vectors
 #'   \item All rows must have the same number of samples
 #'   \item Row count must match the number of rows in \code{future_data}
-#'   \item Predictions must not contain NaN values (CHAP contract requirement)
+#'   \item Predictions must not contain NaN values (Chap contract requirement)
 #'   \item Predictions must not contain NA values
-#'   \item Predictions must be non-negative (CHAP contract requirement)
+#'   \item Predictions must be non-negative (Chap contract requirement)
 #' }
 #'
 #' @param train_fn Training function that takes (training_data, model_configuration = list())
@@ -191,7 +191,7 @@ validate_model_io <- function(train_fn, predict_fn, example_data,
                                    "All samples must be numeric vectors")
           }
 
-          # Check for NaN values (required by CHAP contract)
+          # Check for NaN values (required by Chap contract)
           all_samples <- unlist(predictions$samples)
           if (any(is.nan(all_samples))) {
             n_nan <- sum(is.nan(all_samples))
@@ -206,7 +206,7 @@ validate_model_io <- function(train_fn, predict_fn, example_data,
                                    sprintf("Predictions must not contain NA values (found %d)", n_na))
           }
 
-          # Check for non-negative values (required by CHAP contract)
+          # Check for non-negative values (required by Chap contract)
           if (any(all_samples < 0, na.rm = TRUE)) {
             n_negative <- sum(all_samples < 0, na.rm = TRUE)
             validation_errors <- c(validation_errors,

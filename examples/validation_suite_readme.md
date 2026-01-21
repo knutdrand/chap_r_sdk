@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `chap.r.sdk` package provides functions to help test and validate CHAP-compatible models. This ensures models produce output consistent with CHAP platform expectations.
+The `chapr` package provides functions to help test and validate Chap-compatible models. This ensures models produce output consistent with Chap platform expectations.
 
 ## Getting Example Data
 
@@ -24,7 +24,7 @@ A named list with four tibbles:
 **Example:**
 
 ```r
-library(chap.r.sdk)
+library(chapr)
 
 # Load test data
 data <- get_example_data('laos', 'M')
@@ -70,7 +70,7 @@ Example output format with:
 ## Validation Functions (Coming Soon)
 
 ### `validate_model_output(predictions, expected_schema)`
-Validates that model output conforms to CHAP expectations.
+Validates that model output conforms to Chap expectations.
 
 ### `run_model_tests(train_fn, predict_fn, test_data)`
 Runs comprehensive test suite on model functions.

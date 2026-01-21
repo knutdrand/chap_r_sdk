@@ -2,14 +2,14 @@
 % Please edit documentation in R/environment.R
 \name{init_chap_env}
 \alias{init_chap_env}
-\title{Initialize CHAP model environment}
+\title{Initialize Chap model environment}
 \usage{
 init_chap_env(r_version = NULL, include_chap_sdk = TRUE)
 }
 \arguments{
 \item{r_version}{R version to record (default: current R version)}
 
-\item{include_chap_sdk}{Whether to include chap.r.sdk in dependencies (default: TRUE)}
+\item{include_chap_sdk}{Whether to include chapr in dependencies (default: TRUE)}
 }
 \value{
 Invisible NULL

@@ -28,7 +28,7 @@ This tutorial shows how to work with spatio-temporal data in CHAP models using e
 | **cubble** | Spatio-temporal data wrangling | `install.packages("cubble")` |
 
 ```{r setup}
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 library(tidyr)
 library(tsibble)

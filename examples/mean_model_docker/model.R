@@ -16,7 +16,7 @@
 #'   Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
 #'   Rscript model.R info --format json
 
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 #' Train mean model

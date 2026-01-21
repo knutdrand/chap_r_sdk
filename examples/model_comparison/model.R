@@ -18,7 +18,7 @@
 #   Rscript model.R predict historic.csv future.csv model.rds
 #   Rscript model.R info
 
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 library(fable)
 library(tsibble)
@@ -283,7 +283,7 @@ model_info <- list(
 
 # Enable CLI with single function call
 # Only run if script is executed directly (not sourced for testing)
-if (!interactive() && !isTRUE(getOption("chap.r.sdk.testing"))) {
+if (!interactive() && !isTRUE(getOption("chapr.testing"))) {
   create_chap_cli(
     train_fn = train_model,
     predict_fn = predict_model,

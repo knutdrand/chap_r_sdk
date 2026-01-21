@@ -52,9 +52,9 @@ The following checks are performed on predictions:
 \item Must have a \code{samples} list-column containing numeric vectors
 \item All rows must have the same number of samples
 \item Row count must match the number of rows in \code{future_data}
-\item Predictions must not contain NaN values (CHAP contract requirement)
+\item Predictions must not contain NaN values (Chap contract requirement)
 \item Predictions must not contain NA values
-\item Predictions must be non-negative (CHAP contract requirement)
+\item Predictions must be non-negative (Chap contract requirement)
 }
 }
 

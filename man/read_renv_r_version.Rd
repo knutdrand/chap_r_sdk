@@ -2,7 +2,7 @@
 % Please edit documentation in R/environment.R
 \name{read_renv_r_version}
 \alias{read_renv_r_version}
-\title{Environment configuration for CHAP models.
+\title{Environment configuration for Chap models.
 Read R version from renv.lock}
 \usage{
 read_renv_r_version(lockfile_path = "renv.lock")

@@ -1,13 +1,13 @@
-# Migration to CHAP R SDK
+# Migration to Chap R SDK
 
-This document describes the changes made to adapt the EWARS template model to use the new CHAP R SDK CLI infrastructure.
+This document describes the changes made to adapt the EWARS template model to use the new Chap R SDK CLI infrastructure.
 
 ## Summary of Changes
 
-The EWARS model has been updated to use the `chap.r.sdk` package for:
+The EWARS model has been updated to use the `chapr` package for:
 1. Standardized CLI argument parsing
 2. YAML configuration file parsing
-3. Consistent function signatures matching CHAP conventions
+3. Consistent function signatures matching Chap conventions
 
 ## What Changed
 
@@ -35,10 +35,10 @@ if (length(args) == 2) {
 **After:**
 ```r
 library(INLA)
-library(chap.r.sdk)
+library(chapr)
 source('lib.R')
 
-#' Train CHAP Model
+#' Train Chap Model
 #'
 #' This model does not perform training in the traditional sense.
 #' All training and prediction happens in the predict step.
@@ -53,15 +53,15 @@ train_chap <- function(training_data, model_configuration = NULL){
   return(NULL)
 }
 
-# Use chap.r.sdk CLI wrapper
+# Use chapr CLI wrapper
 if (!interactive()) {
   create_train_cli(train_chap)
 }
 ```
 
 **Key Changes:**
-- Added `library(chap.r.sdk)` for SDK functions
-- Updated function signature to match CHAP conventions: `train(training_data, model_configuration)`
+- Added `library(chapr)` for SDK functions
+- Updated function signature to match Chap conventions: `train(training_data, model_configuration)`
 - Replaced manual `commandArgs()` parsing with `create_train_cli()` wrapper
 - Added roxygen2 documentation
 - Added `if (!interactive())` guard for CLI mode
@@ -99,7 +99,7 @@ if (length(args) >= 1) {
 
 **After:**
 ```r
-library(chap.r.sdk)
+library(chapr)
 library(purrr)
 # SDK-based argument parsing
 
@@ -111,7 +111,7 @@ parse_model_configuration <- function(file_path) {
     ))
   }
 
-  # Use chap.r.sdk config reading function
+  # Use chapr config reading function
   config <- read_model_config(file_path, validate = FALSE)
 
   # Use purrr::pluck for safe nested access
@@ -162,15 +162,15 @@ predict_chap <- function(historic_data, future_data, saved_model, model_configur
   return(preds_fn)
 }
 
-# Use chap.r.sdk CLI wrapper
+# Use chapr CLI wrapper
 if (!interactive()) {
   create_predict_cli(predict_chap)
 }
 ```
 
 **Key Changes:**
-- Added `library(chap.r.sdk)` and `library(purrr)` for SDK functions
-- Updated function signature to match CHAP conventions: `predict(historic_data, future_data, saved_model, model_configuration)`
+- Added `library(chapr)` and `library(purrr)` for SDK functions
+- Updated function signature to match Chap conventions: `predict(historic_data, future_data, saved_model, model_configuration)`
 - Replaced manual `yaml.load_file()` with `read_model_config()` from SDK
 - Used `get_config_param()` for safe parameter extraction with defaults
 - Used `purrr::pluck()` for safe nested list access
@@ -201,11 +201,11 @@ However, parsing now uses:
 
 ### Added Dependencies
 
-The model now requires the `chap.r.sdk` package:
+The model now requires the `chapr` package:
 
 ```r
 # Install from source (once published)
-# install.packages("chap.r.sdk")
+# install.packages("chapr")
 
 # Or from local path during development:
 # devtools::install("/path/to/chap_r_sdk")
@@ -261,7 +261,7 @@ Rscript train.R train_data.csv model.rds
 Rscript predict.R historic.csv future.csv model.rds config.yaml
 ```
 
-**Note:** The argument order for predict has changed to match CHAP conventions:
+**Note:** The argument order for predict has changed to match Chap conventions:
 - `historic_data` comes first
 - `future_data` comes second
 - `saved_model` comes third
@@ -269,7 +269,7 @@ Rscript predict.R historic.csv future.csv model.rds config.yaml
 
 ## Benefits of Migration
 
-1. **Standardization**: Consistent interface with other CHAP models
+1. **Standardization**: Consistent interface with other Chap models
 2. **Better Error Handling**: SDK provides informative error messages via `cli` package
 3. **Safe Configuration Access**: `get_config_param()` provides defaults and safe nested access
 4. **Documentation**: Roxygen2 documentation for all functions
@@ -311,7 +311,7 @@ cp predict.R predict_new.R
 
 ## Next Steps
 
-1. **Install chap.r.sdk**: Ensure the SDK package is available
+1. **Install chapr**: Ensure the SDK package is available
 2. **Test thoroughly**: Run with example data to verify functionality
 3. **Update MLproject**: Update the MLproject file if needed to reflect new argument order
 4. **Update documentation**: Update any additional model documentation
@@ -319,6 +319,6 @@ cp predict.R predict_new.R
 
 ## Questions?
 
-For issues or questions about the CHAP R SDK, see:
+For issues or questions about the Chap R SDK, see:
 - SDK documentation: `/path/to/chap_r_sdk/CLAUDE.md`
 - Configuration decision: `/path/to/chap_r_sdk/docs/decisions/001-yaml-config-parsing.md`

@@ -1,6 +1,6 @@
 # Mean Model with Docker Support
 
-This example demonstrates a CHAP-compatible R model with full Docker and renv
+This example demonstrates a Chap-compatible R model with full Docker and renv
 environment support. Use this as a template for creating containerized R models.
 
 ## Directory Structure
@@ -24,7 +24,7 @@ mean_model_docker/
 In R console, from this directory:
 
 ```r
-library(chap.r.sdk)
+library(chapr)
 
 # Initialize renv and create chap.yml
 init_chap_env()
@@ -32,7 +32,7 @@ init_chap_env()
 
 This will:
 - Initialize renv for reproducible R dependencies
-- Add chap.r.sdk to your dependencies
+- Add chapr to your dependencies
 - Create `renv.lock` with exact package versions
 - Create `chap.yml` for environment configuration
 

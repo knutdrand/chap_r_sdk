@@ -4,7 +4,7 @@
 \alias{cli_utils}
 \title{CLI Utility Functions}
 \description{
-Internal utility functions for the unified CHAP CLI infrastructure.
+Internal utility functions for the unified Chap CLI infrastructure.
 These functions handle file I/O, data parsing, and format conversion
 automatically so model developers can focus on business logic.
 }

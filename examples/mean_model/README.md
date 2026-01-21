@@ -1,6 +1,6 @@
 # Mean Model Example
 
-This directory contains a simple example of using the chap.r.sdk CLI infrastructure with a basic mean model.
+This directory contains a simple example of using the chapr CLI infrastructure with a basic mean model.
 
 ## Overview
 
@@ -97,7 +97,7 @@ Columns:
 With `create_chap_cli()`, you only write business logic:
 
 ```r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 
 # Pure business logic - no file I/O!
@@ -234,7 +234,7 @@ To adapt this for your own model:
 ## Dependencies
 
 ```r
-library(chap.r.sdk)  # CLI and config functions
+library(chapr)  # CLI and config functions
 library(dplyr)       # Data manipulation (in your model functions)
 ```
 

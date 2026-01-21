@@ -1,4 +1,4 @@
-# chap.r.sdk (development version)
+# chapr (development version)
 
 ## Breaking Changes
 
@@ -18,7 +18,7 @@
 
 ---
 
-# chap.r.sdk 0.1.0
+# chapr 0.1.0
 
 ## Initial CRAN Release
 

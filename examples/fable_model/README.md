@@ -1,6 +1,6 @@
-# Fable ETS Model for CHAP
+# Fable ETS Model for Chap
 
-This example demonstrates how to develop an R-based time series model for disease prediction using the fable package and integrate it with CHAP via chapkit.
+This example demonstrates how to develop an R-based time series model for disease prediction using the fable package and integrate it with Chap via chapkit.
 
 ## Model Overview
 
@@ -26,14 +26,14 @@ Evaluated on the Laos monthly dataset:
 
 ## Development Process
 
-This section documents the complete workflow for developing an R model compatible with CHAP.
+This section documents the complete workflow for developing an R model compatible with Chap.
 
 ### Step 1: Create the R Model
 
-Create a model.R file using the `create_chap_cli()` function from chap.r.sdk:
+Create a model.R file using the `create_chap_cli()` function from chapr:
 
 ```r
-library(chap.r.sdk)
+library(chapr)
 library(dplyr)
 library(fable)
 library(tsibble)
@@ -79,7 +79,7 @@ Run the SDK validation tests to ensure your model is compatible:
 
 ```r
 # In R
-options(chap.r.sdk.testing = TRUE)
+options(chapr.testing = TRUE)
 devtools::load_all()
 source('model.R', local = TRUE)
 
@@ -260,7 +260,7 @@ Rscript -e 'renv::snapshot()'
 ### Requirements
 
 #### R packages (managed by renv)
-- chap.r.sdk
+- chapr
 - fable
 - fabletools
 - tsibble
@@ -330,7 +330,7 @@ interpolate_na <- function(x) {
 
 ### Generating Probabilistic Forecasts
 
-CHAP requires a `samples` list-column with Monte Carlo samples:
+Chap requires a `samples` list-column with Monte Carlo samples:
 
 ```r
 samples_list <- lapply(seq_len(nrow(forecasts)), function(i) {

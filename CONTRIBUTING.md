@@ -1,6 +1,6 @@
-# Contributing to chap.r.sdk
+# Contributing to chapr
 
-Thank you for your interest in contributing to the CHAP R SDK! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to the Chap R SDK! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -38,6 +38,8 @@ Feature suggestions are welcome! Please open an issue with:
 
 ## Development Setup
 
+This project uses [renv](https://rstudio.github.io/renv/) for reproducible dependency management.
+
 ### Prerequisites
 
 - R (>= 4.0.0)
@@ -46,19 +48,28 @@ Feature suggestions are welcome! Please open an issue with:
 
 ### Getting Started
 
-```r
+```bash
 # Clone the repository
 git clone https://github.com/dhis2-chap/chap_r_sdk.git
 cd chap_r_sdk
+```
 
-# Install development dependencies
-install.packages(c("devtools", "testthat", "roxygen2", "knitr", "rmarkdown"))
-
-# Install package dependencies
-devtools::install_deps()
+**In R:**
+```r
+# Restore dependencies via renv
+renv::restore()
 
 # Load the package for development
 devtools::load_all()
+```
+
+### Working with Model Examples
+
+Each example in `examples/` has its own isolated renv environment:
+
+```bash
+cd examples/fable_model
+Rscript -e 'renv::restore()'
 ```
 
 ### Development Workflow

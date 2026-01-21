@@ -16,11 +16,11 @@ There are currently no downstream dependencies for this package.
 
 ## Notes to CRAN
 
-This is the initial submission of chap.r.sdk. The package provides infrastructure for developing CHAP-compatible disease forecasting models.
+This is the initial submission of chapr. The package provides infrastructure for developing Chap-compatible disease forecasting models.
 
 ### Package Name
 
-The package name uses dots (chap.r.sdk) following the convention of other R SDK packages. This is intentional.
+The package name uses dots (chapr) following the convention of other R SDK packages. This is intentional.
 
 ### Examples
 
