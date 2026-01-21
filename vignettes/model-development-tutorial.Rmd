@@ -292,13 +292,58 @@ entry_points:
 
 ### Run with chap-core
 
-Once you have the MLproject and renv.lock files, run your model with chap-core:
+Once you have the MLproject and renv.lock files, you can run your model with chap-core using either the basic `evaluate` command or the more advanced `evaluate2` command.
 
+**Basic evaluation:**
+
+In terminal:
 ```bash
 chap evaluate --model-name ./my_model_directory --dataset-csv data.csv
 ```
 
-See `examples/arima_model/` for a complete example with renv and MLproject.
+**Advanced evaluation with backtesting (evaluate2):**
+
+The `evaluate2` command provides more control over the evaluation process, including backtesting with multiple splits:
+
+In terminal:
+```bash
+chap evaluate2 \
+    ./my_model_directory \
+    dataset.csv \
+    output.nc \
+    3 3 1 \
+    true true '' timestamp false
+```
+
+Arguments explained:
+- `./my_model_directory` - Path to your model directory containing MLproject and renv.lock
+- `dataset.csv` - Input dataset for evaluation
+- `output.nc` - Output file (NetCDF format) for evaluation results
+- `3` - Number of periods to predict (e.g., 3 months ahead)
+- `3` - Number of backtest splits
+- `1` - Stride between splits
+- `true` - Ignore environment setup (use system R)
+- `true` - Enable debug logging
+- `''` - Log file path (empty for no file logging)
+- `timestamp` - Run directory type
+- `false` - Whether this is a chapkit-model (false for MLproject-based models)
+
+**Export metrics after evaluation:**
+
+In terminal:
+```bash
+chap export-metrics \
+    --input-files output.nc \
+    --output-file metrics.csv
+```
+
+Key metrics to review:
+- **RMSE**: Root Mean Square Error (lower is better)
+- **MAE**: Mean Absolute Error (lower is better)
+- **CRPS**: Continuous Ranked Probability Score for probabilistic forecasts (lower is better)
+- **Coverage**: Should be close to the nominal level (e.g., 80% for 80% prediction intervals)
+
+See `examples/fable_model/` for a complete example with evaluation results and `examples/arima_model/` for a simpler renv and MLproject setup.
 
 ## Probabilistic Models
 
