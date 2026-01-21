@@ -51,7 +51,7 @@ A complete CHAP-compatible model in one file:
 library(chap.r.sdk)
 library(dplyr)
 
-train_fn <- function(training_data, model_configuration = list()) {
+train_fn <- function(training_data, model_configuration = list(), run_info = list()) {
   means <- training_data |>
     as_tibble() |>
     summarise(mean_cases = mean(disease_cases, na.rm = TRUE), .by = location)
@@ -59,7 +59,7 @@ train_fn <- function(training_data, model_configuration = list()) {
 }
 
 predict_fn <- function(historic_data, future_data, saved_model,
-                       model_configuration = list()) {
+                       model_configuration = list(), run_info = list()) {
   future_data |>
     left_join(saved_model$means, by = "location") |>
     mutate(samples = purrr::map(mean_cases, ~c(.x))) |>
@@ -67,47 +67,31 @@ predict_fn <- function(historic_data, future_data, saved_model,
 }
 
 if (!interactive()) {
- create_chap_cli(train_fn, predict_fn)
+  create_chap_cli(train_fn, predict_fn)
 }
 ```
 
-Then use from the command line:
+Then run from the command line:
 
 ``` bash
-Rscript model.R train training_data.csv
-Rscript model.R predict historic.csv future.csv model.rds
+Rscript model.R train --data training_data.csv
+Rscript model.R predict --historic historic.csv --future future.csv --output predictions.csv
 Rscript model.R info
 ```
 
 ## Installation
 
-Install from GitHub:
+Install from GitHub by running the following R-code:
 
 ``` r
 # install.packages("remotes")
 remotes::install_github("knutdrand/chap_r_sdk")
 ```
 
-## Development Setup
-
-This project uses [renv](https://rstudio.github.io/renv/) for
-reproducible dependency management.
-
-### For Contributors
-
-``` r
-# Clone the repository and restore dependencies
-renv::restore()
-
-# Standard development workflow
-devtools::load_all()
-devtools::test()
-devtools::check()
-```
-
 ### For Model Examples
 
-Each example in `examples/` has its own renv environment:
+Each example in `examples/` has its own renv environment which keeps
+track of the packages and the versions used:
 
 ``` bash
 cd examples/fable_model
